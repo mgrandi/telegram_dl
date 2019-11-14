@@ -9,6 +9,7 @@ verify_ssl = true
 sqlalchemy = "*"
 arrow = "*"
 logging-tree = "*"
+attrs = "*"
 
 [requires]
 python_version = "3.8"
