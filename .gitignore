@@ -262,3 +262,6 @@ $RECYCLE.BIN/
 
 
 scratch/
+
+# the folder that the tdjson library creates and manages itself
+tdlib/
