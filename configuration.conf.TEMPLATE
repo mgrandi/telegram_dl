@@ -1,0 +1,29 @@
+pytelegram_dl {
+
+    # the path to the `tdjson` library
+    library_path = "tdjson.dll"
+
+    tdlib_configuration {
+
+        auth {
+            # go to https://my.telegram.org/apps , create an new application,
+            # and save the `App api_id` and `App api_hash` IN A SAFE PLACE
+            # AND DON'T GIVE THEM OUT TO ANYONE
+            #
+            # once acquired, fill in the app_id and app_hash here
+            api_id = 123
+            api_hash = ""
+        }
+
+        # where to the store the directory that `tdlib` manages on its own
+        database_directory_path = "tdlib"
+
+        # If set to true, the library will maintain a cache of chats and messages.
+        use_message_database = true
+        # If set to true, support for secret chats will be enabled.
+        use_secret_chats = true
+        # If set to true, old files will automatically be deleted.
+        enable_storage_optimizer = true
+
+    }
+}
