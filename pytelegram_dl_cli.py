@@ -4,32 +4,15 @@
 import argparse
 import logging
 import sys
+import pathlib
 
 # third party imports
 import arrow
 import attr
-import requests
 import logging_tree
+import pyhocon
 
-
-class Application:
-    '''__^__description__^__
-    '''
-
-    def __init__(self, logger, args):
-        ''' constructor
-        @param logger the Logger instance
-        @param args - the namespace object we get from argparse.parse_args()
-        '''
-
-        self.logger = logger
-        self.args = args
-
-    def __^__themethod__^__(self):
-        self.logger.info("hello world")
-        self.logger.debug("hello world debug")
-        raise Exception("Testing Exception")
-
+from pytelegram_dl.application import Application
 
 
 class ArrowLoggingFormatter(logging.Formatter):
@@ -38,7 +21,29 @@ class ArrowLoggingFormatter(logging.Formatter):
     '''
 
     def formatTime(self, record, datefmt=None):
-        return arrow.get("{}".format(record.created)).to("local").isoformat()
+        # use the 'timestamp' format code
+        return arrow.get(f"{record.created}", "X").to("local").isoformat()
+
+def hocon_config_file_type(stringArg):
+    ''' argparse type method that returns a pyhocon Config object
+    or raises an argparse.ArgumentTypeError if this file doesn't exist
+
+    @param stringArg - the argument given to us by argparse
+    @return a dict like object containing the configuration or raises ArgumentTypeError
+    '''
+
+    resolved_path = pathlib.Path(stringArg).resolve()
+    if not resolved_path.exists:
+        raise argparse.ArgumentTypeError("The path {} doesn't exist!".format(resolved_path))
+
+    conf = None
+    try:
+        conf = pyhocon.ConfigFactory.parse_file(str(resolved_path))
+    except Exception as e:
+        raise argparse.ArgumentTypeError(
+            "Failed to parse the file `{}` as a HOCON file due to an exception: `{}`".format(resolved_path, e))
+
+    return conf
 
 if __name__ == "__main__":
     # if we are being run as a real program
@@ -56,17 +61,10 @@ if __name__ == "__main__":
     root_logger.addHandler(logging_handler)
 
 
-    # silence urllib3 (requests) logger because its noisy
-    requests_packages_urllib_logger = logging.getLogger("requests.packages.urllib3")
-    requests_packages_urllib_logger.setLevel("INFO")
-    urllib_logger = logging.getLogger("urllib3")
-    urllib_logger.setLevel("INFO")
 
-    # optional arguments, if specified these are the input and output files, if not specified, it uses stdin and stdout
-    parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin, help="something")
-    parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'),default=sys.stdout, help="something")
+    parser.add_argument('config', type=hocon_config_file_type, help="the configuration file")
     parser.add_argument("--verbose", action="store_true", help="Increase logging verbosity")
-    parser.add_argument("--dry_run", action="store_true", help="Do a dry run")
+
 
 
     try:
@@ -81,12 +79,9 @@ if __name__ == "__main__":
         root_logger.debug("Parsed arguments: %s", parsed_args)
         root_logger.debug("Logger hierarchy:\n%s", logging_tree.format.build_description(node=None))
 
-        if parsed_args.dry_run:
-            root_logger.info("*** Dry Run ***")
-
         # run the application
-        app = Application(root_logger.getChild("app"), parsed_args)
-        app.__^__themethod__^__()
+        app = Application(parsed_args)
+        app.run()
 
         root_logger.info("Done!")
     except Exception as e:
