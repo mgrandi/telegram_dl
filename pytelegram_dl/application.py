@@ -19,16 +19,20 @@ class Application:
 
         self.args = args
 
-        self.tdlib_handle = None
+        tdlib_config = tdlib.TdlibConfiguration.init_from_config(self.args.config)
 
-
+        self.tdlib_handle = tdlib.TdlibHandle.init_from_config(tdlib_config)
 
     def run(self):
 
-        cfg = self.args.config
 
-        tdlib_config = tdlib.TdlibConfiguration.init_from_config(cfg)
+        # start the tdlib session
 
-        self.tdlib_handle = tdlib.TdlibHandle.init_from_config(tdlib_config)
+        self.tdlib_handle = self.tdlib_handle.create_client()
+
+        self.tdlib_handle = self.tdlib_handle.destroy_client()
+
+
+
 
 

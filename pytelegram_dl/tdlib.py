@@ -85,7 +85,6 @@ class TdlibHandle:
 
     tdlib_config:TdlibConfiguration = attr.ib()
 
-
     # these are all of these types:
     #
     # <class 'ctypes.CDLL.__init__.<locals>._FuncPtr'>
@@ -100,6 +99,8 @@ class TdlibHandle:
     # type for passing in a python function to the tdlib function set+log_fatal_error_callback
     fatal_error_callback_type = ctypes.CFUNCTYPE(None, ctypes.c_char_p)
 
+    # gets set afterwards
+    tdlib_client:typing.Any = attr.ib(default=None)
 
     @staticmethod
     def fatal_error_callback(error_message:str) -> None:
@@ -112,6 +113,7 @@ class TdlibHandle:
         try:
 
             tdjson = ctypes.CDLL(str(tdlib_config.library_path))
+
 
             # load TDLib functions from shared library
             td_json_client_create = tdjson.td_json_client_create
@@ -147,6 +149,7 @@ class TdlibHandle:
             res = TdlibHandle(
                 tdlib_shared_library=tdjson,
                 tdlib_config=tdlib_config,
+                tdlib_client=None, # no client yet
                 func_client_create=td_json_client_create,
                 func_client_receive=td_json_client_receive,
                 func_client_send=td_json_client_receive,
@@ -164,6 +167,27 @@ class TdlibHandle:
 
 
 
+    def create_client(self) -> TdlibHandle:
+        ''' creates a client and returns a new instance of TdlibHandle with the new client
+        '''
+
+        if self.tdlib_client is not None:
+            raise Exception("TdlibHandle.create_client called when a client already exists")
+
+        logger.info("creating tdlib client")
+        new_client = self.func_client_create()
+        logger.info("tdlib client created successfully")
+
+        return attr.evolve(self, tdlib_client=new_client)
 
 
 
+    def destroy_client(self) -> TdlibHandle:
+        ''' destroys the client and returns a new instance of TdlibHandle with the
+        client removed
+        '''
+
+        logger.info("destroying tdlib client")
+        self.func_client_destroy(self.tdlib_client)
+        logger.info("tdlib client destroyed successfully")
+        return attr.evolve(self, tdlib_client=None)
