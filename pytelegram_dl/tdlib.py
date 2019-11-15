@@ -6,11 +6,14 @@ import typing
 import pathlib
 import locale
 import platform
+import json
 
 import attr
 import pyhocon
 
 import pytelegram_dl
+import pytelegram_dl.constants as constants
+
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +31,23 @@ class TdlibConfiguration:
    system_version:str = attr.ib()
    application_version:str = attr.ib()
    library_path:pathlib.Path = attr.ib()
+   tdlib_log_file_path:pathlib.Path = attr.ib()
+
+   def get_tdlibparams_json_params(self) -> dict:
+
+        d =  {
+            "database_directory": str(self.database_directory),
+            "use_message_database": self.use_message_database,
+            "use_secret_chats": self.use_secret_chats,
+            "api_id": self.api_id,
+            "api_hash": self.api_hash,
+            "system_language_code": self.system_language_code,
+            "device_model": self.device_model,
+            "system_version": self.system_version,
+            "application_version": self.application_version,
+            "enable_storage_optimizer": self.enable_storage_optimizer}
+
+        return d
 
    @staticmethod
    def init_from_config(config:pyhocon.config_tree.ConfigTree) -> TdlibConfiguration:
@@ -48,8 +68,9 @@ class TdlibConfiguration:
             tmp_lang = locale.getdefaultlocale()[0]
             tmp_model = "Desktop"
             tmp_sysver = f"{platform.system()} {platform.version()}"
-            tmp_ver = f"pytelegram_dl v{pytelegram_dl.__version__} / Python {platform.python_version()}"
+            tmp_ver = f"pytelegram_dl {pytelegram_dl.__version__} / Python {platform.python_version()}"
             tmp_lpath = pathlib.Path(config.get_string("pytelegram_dl.library_path"))
+            tmp_tdlogpath = pathlib.Path(config.get_string("pytelegram_dl.tdlib_log_file"))
 
             final_cfg = TdlibConfiguration(
                 database_directory=tmp_path,
@@ -62,7 +83,8 @@ class TdlibConfiguration:
                 device_model=tmp_model,
                 system_version=tmp_sysver,
                 application_version=tmp_ver,
-                library_path=tmp_lpath)
+                library_path=tmp_lpath,
+                tdlib_log_file_path=tmp_tdlogpath)
 
             logger.debug("new TdlibConfiguration from configuration: `%s`", final_cfg)
             return final_cfg
@@ -165,8 +187,6 @@ class TdlibHandle:
             raise e
 
 
-
-
     def create_client(self) -> TdlibHandle:
         ''' creates a client and returns a new instance of TdlibHandle with the new client
         '''
@@ -176,10 +196,54 @@ class TdlibHandle:
 
         logger.info("creating tdlib client")
         new_client = self.func_client_create()
-        logger.info("tdlib client created successfully")
+        logger.info("tdlib client created successfully: `%s`", new_client)
 
         return attr.evolve(self, tdlib_client=new_client)
 
+    def send(self, json_to_send) -> None:
+
+        if self.tdlib_client is None:
+            raise Exception("TdlibHandle.send called when no client has been created")
+
+        logger.info("tdlib client send called with: `%s`", json_to_send)
+        json_str = json.dumps(json_to_send)
+        json_bytes = json_str.encode("utf-8")
+
+        self.func_client_send(self.tdlib_client, json_bytes)
+        logger.info("tdlib client send called successfully")
+
+    def execute(self, json_to_send) -> dict:
+
+        if self.tdlib_client is None:
+            raise Exception("TdlibHandle.send called when no client has been created")
+
+        logger.info("tdlib client execute called with: `%s`", json_to_send)
+        json_str = json.dumps(json_to_send)
+        json_bytes = json_str.encode("utf-8")
+
+        res = self.func_client_execute(self.tdlib_client, json_bytes)
+        logger.info("tdlib client execute called successfully: `%s`", res)
+
+        # result is None if the request can't be parsed
+        if res is not None:
+            return json.loads(res)
+        else:
+            return res
+
+    def receive(self) -> dict:
+
+        if self.tdlib_client is None:
+            raise Exception("TdlibHandle.receive called when no client has been created")
+
+        logger.info("tdlib client receive called")
+        res = self.func_client_receive(self.tdlib_client, constants.TDLIB_CLIENT_RECEIVE_TIMEOUT)
+        logger.info("tdlib client receive called successfully, result: `%s`", res)
+
+        # result is None if the timeout expired
+        if res is not None:
+            return json.loads(res)
+        else:
+            return res
 
 
     def destroy_client(self) -> TdlibHandle:

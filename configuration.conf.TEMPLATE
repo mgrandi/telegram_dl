@@ -3,6 +3,9 @@ pytelegram_dl {
     # the path to the `tdjson` library
     library_path = "tdjson.dll"
 
+    # where tdlib will write its own log
+    tdlib_log_file = "C:/Users/auror/Code/Personal/pytelegram_dl/scratch/tdlib.log"
+
     tdlib_configuration {
 
         auth {
