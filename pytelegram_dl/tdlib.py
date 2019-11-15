@@ -152,7 +152,7 @@ class TdlibHandle:
                 tdlib_client=None, # no client yet
                 func_client_create=td_json_client_create,
                 func_client_receive=td_json_client_receive,
-                func_client_send=td_json_client_receive,
+                func_client_send=td_json_client_send,
                 func_client_execute=td_json_client_execute,
                 func_client_destroy=td_json_client_destroy,
                 func_set_log_fatal_error_callback=td_set_log_fatal_error_callback)
