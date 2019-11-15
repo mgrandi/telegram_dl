@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7d4ce88e13e7f8b205508bfb0fe549b179733754b2ecb9b6934910b1bb780a5e"
+            "sha256": "da24dd8d4fe71977cf62a3d3bb44acfd85545156f21a1bdcbc573f953eb96edd"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -39,6 +39,20 @@
             ],
             "index": "pypi",
             "version": "==1.8"
+        },
+        "pyhocon": {
+            "hashes": [
+                "sha256:94ceda402ce1718ead26fc725695a4f5a5671ce643da3c50514e049017098082"
+            ],
+            "index": "pypi",
+            "version": "==0.3.51"
+        },
+        "pyparsing": {
+            "hashes": [
+                "sha256:20f995ecd72f2a1f4bf6b072b63b22e2eb457836601e76d6e5dfcd75436acc1f",
+                "sha256:4ca62001be367f01bd3e92ecbb79070272a9d4964dce6a48a82ff0b8bc7e683a"
+            ],
+            "version": "==2.4.5"
         },
         "python-dateutil": {
             "hashes": [
