@@ -1,7 +1,7 @@
 import logging
 
 
-import pytelegram_dl.tdlib as tdlib
+import telegram_dl.tdlib as tdlib
 
 logger = logging.getLogger(__name__)
 

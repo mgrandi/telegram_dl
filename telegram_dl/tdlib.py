@@ -11,8 +11,8 @@ import json
 import attr
 import pyhocon
 
-import pytelegram_dl
-import pytelegram_dl.constants as constants
+import telegram_dl
+import telegram_dl.constants as constants
 
 
 logger = logging.getLogger(__name__)
