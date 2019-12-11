@@ -12,7 +12,7 @@ import attr
 import logging_tree
 import pyhocon
 
-from pytelegram_dl.application import Application
+from telegram_dl.application import Application
 
 
 class ArrowLoggingFormatter(logging.Formatter):
