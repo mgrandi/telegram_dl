@@ -4139,7 +4139,7 @@ class tdlib_type_pageBlockSubtitle(PageBlock):
 class tdlib_type_pageBlockTable(PageBlock):
     __tdlib_type__ = "pageBlockTable"
     caption:RichText = attr.ib()
-    cells:typing.Sequence[vector<pageBlockTableCell>] = attr.ib()
+    cells:typing.Sequence[typing.Sequence[pageBlockTableCell]] = attr.ib()
     is_bordered:bool = attr.ib()
     is_striped:bool = attr.ib()
 
@@ -4805,7 +4805,7 @@ class tdlib_type_replyMarkupForceReply(ReplyMarkup):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class tdlib_type_replyMarkupInlineKeyboard(ReplyMarkup):
     __tdlib_type__ = "replyMarkupInlineKeyboard"
-    rows:typing.Sequence[vector<inlineKeyboardButton>] = attr.ib()
+    rows:typing.Sequence[typing.Sequence[inlineKeyboardButton]] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -4817,7 +4817,7 @@ class tdlib_type_replyMarkupRemoveKeyboard(ReplyMarkup):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class tdlib_type_replyMarkupShowKeyboard(ReplyMarkup):
     __tdlib_type__ = "replyMarkupShowKeyboard"
-    rows:typing.Sequence[vector<keyboardButton>] = attr.ib()
+    rows:typing.Sequence[typing.Sequence[keyboardButton]] = attr.ib()
     resize_keyboard:bool = attr.ib()
     one_time:bool = attr.ib()
     is_personal:bool = attr.ib()
