@@ -1,20 +1,20 @@
+from __future__ import annotations
 import typing
 import decimal
-import json
 
 import attr
 
+from telegram_dl import utils
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class RootObject:
     __tdlib_type__ = "RootObject"
     _extra:str = attr.ib(default="")
+
     def as_tdlib_json(self) -> str:
-        asdict_result = attr.asdict(self, filter=attr.filters.exclude(attr.fields(RootObject)._extra))
-        asdict_result["@type"] = self.__tdlib_type__
-        if self._extra:
-            asdict_result["@extra"] = self._extra
-        return json.dumps(asdict_result)
+        return utils.custom_asdict(self, filter=attr.filters.exclude(attr.fields(RootObject)._extra))
+
+    
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
