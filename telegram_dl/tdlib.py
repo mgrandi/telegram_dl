@@ -12,83 +12,64 @@ import attr
 import pyhocon
 
 import telegram_dl
-import telegram_dl.constants as constants
+from telegram_dl import utils
+from telegram_dl import constants
+
+from telegram_dl.tdlib_generated import tdlibParameters, setLogStream, logStreamFile
 
 
 logger = logging.getLogger(__name__)
 
-@attr.s(auto_attribs=True, frozen=True)
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class TdlibConfiguration:
 
-   database_directory:pathlib.Path = attr.ib()
-   use_message_database:bool = attr.ib()
-   use_secret_chats:bool = attr.ib()
-   api_id:int = attr.ib()
-   api_hash:str = attr.ib()
-   enable_storage_optimizer:bool = attr.ib()
-   system_language_code:str = attr.ib()
-   device_model:str = attr.ib()
-   system_version:str = attr.ib()
-   application_version:str = attr.ib()
-   library_path:pathlib.Path = attr.ib()
-   tdlib_log_file_path:pathlib.Path = attr.ib()
+    library_path:str = attr.ib()
+    tdlib_log_file_path:pathlib.Path = attr.ib()
+    api_id:str = attr.ib(repr=False)
+    api_hash:str = attr.ib(repr=False)
+    tdlib_working_path:pathlib.Path = attr.ib()
+    tdlib_enable_storage_optimizer:bool = attr.ib()
+    tdlib_ignore_file_names:bool = attr.ib()
 
-   def get_tdlibparams_json_params(self) -> dict:
+    @staticmethod
+    def init_from_config(config:pyhocon.config_tree.ConfigTree) -> TdlibConfiguration:
 
-        d =  {
-            "database_directory": str(self.database_directory),
-            "use_message_database": self.use_message_database,
-            "use_secret_chats": self.use_secret_chats,
-            "api_id": self.api_id,
-            "api_hash": self.api_hash,
-            "system_language_code": self.system_language_code,
-            "device_model": self.device_model,
-            "system_version": self.system_version,
-            "application_version": self.application_version,
-            "enable_storage_optimizer": self.enable_storage_optimizer}
-
-        return d
-
-   @staticmethod
-   def init_from_config(config:pyhocon.config_tree.ConfigTree) -> TdlibConfiguration:
-
+        logger.info("loading config")
         try:
 
-            c = config.get_config("pytelegram_dl.tdlib_configuration")
+            c = config.get_config(constants.CONFIG_ROOT_GROUP)
 
-            tmp_path = pathlib.Path(c.get_string("database_directory_path")).resolve()
-            tmp_msgdb = c.get_bool("use_message_database")
-            tmp_secretchat = c.get_bool("use_secret_chats")
-            tmp_storageopt = c.get_bool("enable_storage_optimizer")
+            tmp_library_path = pathlib.Path(c.get_string(constants.CONFIG_KEY_SHARED_LIBRARY_PATH)).resolve()
+            if not tmp_library_path.exists():
+                raise Exception(f"the shared tdjson library path provided `{tmp_library_path}` doesn't exist!")
 
-            tmp_authid = c.get_int("auth.api_id")
-            tmp_authhash = c.get_string("auth.api_hash")
+            tmp_tdlib_log_file_path = pathlib.Path(c.get_string(constants.CONFIG_KEY_TDLIB_LOG_FILE))
+            if not tmp_tdlib_log_file_path.parent.exists():
+                raise Exception(f"the path provided for the tdlib log file `{tmp_tdlib_log_file_path}`'s parent doesn't exist!")
 
-            # use defaultlocale for now becuase of https://bugs.python.org/issue38805
-            tmp_lang = locale.getdefaultlocale()[0]
-            tmp_model = "Desktop"
-            tmp_sysver = f"{platform.system()} {platform.version()}"
-            tmp_ver = f"pytelegram_dl {pytelegram_dl.__version__} / Python {platform.python_version()}"
-            tmp_lpath = pathlib.Path(config.get_string("pytelegram_dl.library_path"))
-            tmp_tdlogpath = pathlib.Path(config.get_string("pytelegram_dl.tdlib_log_file"))
+            tmp_api_id = c.get_int(constants.CONFIG_KEY_API_ID)
+            tmp_api_hash = c.get_string(constants.CONFIG_KEY_API_HASH)
 
-            final_cfg = TdlibConfiguration(
-                database_directory=tmp_path,
-                use_message_database=tmp_msgdb,
-                use_secret_chats=tmp_secretchat,
-                api_id=tmp_authid,
-                api_hash=tmp_authhash,
-                enable_storage_optimizer=tmp_storageopt,
-                system_language_code=tmp_lang,
-                device_model=tmp_model,
-                system_version=tmp_sysver,
-                application_version=tmp_ver,
-                library_path=tmp_lpath,
-                tdlib_log_file_path=tmp_tdlogpath)
 
-            logger.debug("new TdlibConfiguration from configuration: `%s`", final_cfg)
-            return final_cfg
+            tmp_tdlib_working_path = pathlib.Path(c.get_string(constants.CONFIG_KEY_TDLIB_WORKING_PATH))
+            if not tmp_tdlib_working_path.exists() or not tmp_tdlib_working_path.is_dir():
+                raise Exception(f"the tdlib working path provided `{tmp_tdlib_working_path}` is not a folder or doesn't exist!")
 
+            tmp_enable_storage_opt = c.get_bool(constants.CONFIG_KEY_TDLIB_ENABLE_STORAGE_OPTIMIZER)
+            tmp_ignore_file_names = c.get_bool(constants.CONFIG_KEY_TDLIB_IGNORE_FILE_NAMES)
+
+            tdlibcfg =  TdlibConfiguration(
+                library_path=tmp_library_path,
+                tdlib_log_file_path=tmp_tdlib_log_file_path,
+                api_id=tmp_api_id,
+                api_hash=tmp_api_hash,
+                tdlib_working_path=tmp_tdlib_working_path,
+                tdlib_enable_storage_optimizer=tmp_enable_storage_opt,
+                tdlib_ignore_file_names=tmp_ignore_file_names)
+
+            logger.debug("loaded TdlibConfiguration: `%s`", tdlibcfg)
+
+            return tdlibcfg
 
         except pyhocon.exceptions.ConfigException as e:
 
@@ -106,6 +87,8 @@ class TdlibHandle:
     tdlib_shared_library:ctypes.CDLL = attr.ib()
 
     tdlib_config:TdlibConfiguration = attr.ib()
+
+    tdlib_parameters_config:tdlibParameters = attr.ib(repr=False)
 
     # these are all of these types:
     #
@@ -128,14 +111,52 @@ class TdlibHandle:
     def fatal_error_callback(error_message:str) -> None:
         logger.error("TDLib fatal error: `%s`", error_message)
 
+    @staticmethod
+    def create_tdlib_parameters(config:TdlibConfiguration) -> tdlib_generated.tdlibParameters:
+
+        # use defaultlocale for now becuase of https://bugs.python.org/issue38805
+        tmp_lang = locale.getdefaultlocale()[0]
+        tmp_model = "Desktop"
+        tmp_sysver = f"{platform.system()} {platform.version()}"
+        tmp_appver = f"telegram_dl {telegram_dl.__version__} / Python {platform.python_version()}"
+
+        files_dir = config.tdlib_working_path / "files"
+        if not files_dir.exists():
+            logger.debug("creating directory for the files inside the tdlib working directory: `%s`", files_dir)
+            files_dir.mkdir()
+
+        tp = tdlibParameters(
+            use_test_dc=False,
+            database_directory=str(config.tdlib_working_path),
+            files_directory=str(files_dir),
+            use_file_database=True,
+            use_chat_info_database=True,
+            use_message_database=True,
+            use_secret_chats=True,
+            api_id=config.api_id,
+            api_hash=config.api_hash,
+            system_language_code=tmp_lang,
+            device_model=tmp_model,
+            system_version=tmp_sysver,
+            application_version=tmp_appver,
+            enable_storage_optimizer=config.tdlib_enable_storage_optimizer,
+            ignore_file_names=config.tdlib_ignore_file_names )
+
+        return tp
+
 
     @staticmethod
-    def init_from_config(tdlib_config:TdlibConfiguration) -> TdlibHandle:
+    def init_from_config(config:TdlibConfiguration) -> TdlibHandle:
 
         try:
 
-            tdjson = ctypes.CDLL(str(tdlib_config.library_path))
 
+            logger.info("loading tdjson shared library at `%s`", config.library_path)
+            tdjson = ctypes.CDLL(str(config.library_path))
+            logger.info("tdjson shared library loaded successfully")
+
+            tdlib_parameters_config = TdlibHandle.create_tdlib_parameters(config)
+            logger.debug("tdlibParameters: `%s`", tdlib_parameters_config)
 
             # load TDLib functions from shared library
             td_json_client_create = tdjson.td_json_client_create
@@ -168,9 +189,10 @@ class TdlibHandle:
             c_on_fatal_error_callback = fatal_error_callback_type(TdlibHandle.fatal_error_callback)
             td_set_log_fatal_error_callback(c_on_fatal_error_callback)
 
-            res = TdlibHandle(
+            tdlib_handle = TdlibHandle(
                 tdlib_shared_library=tdjson,
-                tdlib_config=tdlib_config,
+                tdlib_config=config,
+                tdlib_parameters_config=tdlib_parameters_config,
                 tdlib_client=None, # no client yet
                 func_client_create=td_json_client_create,
                 func_client_receive=td_json_client_receive,
@@ -179,8 +201,17 @@ class TdlibHandle:
                 func_client_destroy=td_json_client_destroy,
                 func_set_log_fatal_error_callback=td_set_log_fatal_error_callback)
 
-            logger.debug("new TdlibHandle from configuration: `%s`", res)
-            return res
+
+            log_stream_file_obj = logStreamFile(
+                path=tdlib_handle.tdlib_config.tdlib_log_file_path,
+                max_file_size=10000000)
+            set_log_stream_obj = setLogStream(log_stream=log_stream_file_obj)
+
+            # temporary: set tdlib logging to a file
+            tdlib_handle.execute(set_log_stream_obj.as_tdlib_json(), force=True)
+
+            logger.debug("new TdlibHandle from configuration: `%s`", tdlib_handle)
+            return tdlib_handle
 
         except Exception as e:
             logger.exception("TdlibHandle.init_with_configuration: unknown exception")
@@ -206,19 +237,19 @@ class TdlibHandle:
             raise Exception("TdlibHandle.send called when no client has been created")
 
         logger.info("tdlib client send called with: `%s`", json_to_send)
-        json_str = json.dumps(json_to_send)
+        json_str = json.dumps(json_to_send, cls=utils.CustomJSONEncoder)
         json_bytes = json_str.encode("utf-8")
 
         self.func_client_send(self.tdlib_client, json_bytes)
         logger.info("tdlib client send called successfully")
 
-    def execute(self, json_to_send) -> dict:
+    def execute(self, json_to_send, force=False) -> dict:
 
-        if self.tdlib_client is None:
+        if self.tdlib_client is None and not force:
             raise Exception("TdlibHandle.send called when no client has been created")
 
         logger.info("tdlib client execute called with: `%s`", json_to_send)
-        json_str = json.dumps(json_to_send)
+        json_str = json.dumps(json_to_send, cls=utils.CustomJSONEncoder)
         json_bytes = json_str.encode("utf-8")
 
         res = self.func_client_execute(self.tdlib_client, json_bytes)

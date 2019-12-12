@@ -30,8 +30,7 @@ class Application:
 
         self.tdlib_handle = self.tdlib_handle.create_client()
 
-        # temporary: set tdlib logging to a file
-        self.tdlib_handle.execute({"@type": "setLogStream", "log_stream": {"@type": "logStreamFile", "path": str(self.tdlib_handle.tdlib_config.tdlib_log_file_path), "max_file_size": 10000000}})
+        import pdb;pdb.set_trace()
 
         while True:
             event = self.tdlib_handle.receive()
