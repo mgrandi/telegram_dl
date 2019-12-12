@@ -102,7 +102,8 @@ def custom_asdict(
             rv[constants.TDLIB_JSON_EXTRA_STR] = inst._extra
     return rv
 
-
+# TAKEN FROM https://github.com/python-attrs/attrs/blob/master/src/attr/_funcs.py
+# REVISION: 8824dc26c219abcb43564dd9386fe1a88f938344
 def _custom_asdict_anything(val, filter, dict_factory, retain_collection_types):
     """
     ``asdict`` only works on attrs instances, this works on anything.
