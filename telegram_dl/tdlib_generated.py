@@ -11,11 +11,6 @@ class RootObject:
     __tdlib_type__ = "RootObject"
     _extra:str = attr.ib(default="")
 
-    def as_tdlib_json(self) -> str:
-        return utils.custom_asdict(self, filter=attr.filters.exclude(attr.fields(RootObject)._extra))
-
-    
-
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class AccountTtl(RootObject):
@@ -8653,3 +8648,8 @@ class testReturnError(RootObject):
     error:error = attr.ib()
 
 
+
+# use these when you need to use `typing.get_type_hints` or `eval`
+# to resolve a string representation of these types
+tdlib_gen_globals = globals()
+tdlib_gen_locals = locals()
