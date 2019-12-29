@@ -5,6 +5,7 @@ import argparse
 import logging
 import sys
 import pathlib
+import asyncio
 
 # third party imports
 import arrow
@@ -81,7 +82,7 @@ if __name__ == "__main__":
 
         # run the application
         app = Application(parsed_args)
-        app.run()
+        asyncio.run(app.run())
 
         root_logger.info("Done!")
     except Exception as e:

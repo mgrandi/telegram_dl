@@ -15,10 +15,15 @@ import telegram_dl
 from telegram_dl import utils
 from telegram_dl import constants
 
-from telegram_dl.tdlib_generated import tdlibParameters, setLogStream, logStreamFile
+from telegram_dl import tdlib_generated
 
 
 logger = logging.getLogger(__name__)
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class TdlibResult:
+    code:int = attr.ib()
+    message:str = attr.ib()
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class TdlibConfiguration:
@@ -146,7 +151,7 @@ class TdlibHandle:
 
 
     @staticmethod
-    def init_from_config(config:TdlibConfiguration) -> TdlibHandle:
+    async def init_from_config(config:TdlibConfiguration) -> TdlibHandle:
 
         try:
 
@@ -202,13 +207,13 @@ class TdlibHandle:
                 func_set_log_fatal_error_callback=td_set_log_fatal_error_callback)
 
 
-            log_stream_file_obj = logStreamFile(
+            log_stream_file_obj = tdlib_generated.logStreamFile(
                 path=tdlib_handle.tdlib_config.tdlib_log_file_path,
                 max_file_size=10000000)
-            set_log_stream_obj = setLogStream(log_stream=log_stream_file_obj)
+            set_log_stream_obj = tdlib_generated.setLogStream(log_stream=log_stream_file_obj)
 
             # temporary: set tdlib logging to a file
-            tdlib_handle.execute(set_log_stream_obj.as_tdlib_json(), force=True)
+            await tdlib_handle.execute(set_log_stream_obj.as_tdlib_dict(), force=True)
 
             logger.debug("new TdlibHandle from configuration: `%s`", tdlib_handle)
             return tdlib_handle
@@ -218,7 +223,7 @@ class TdlibHandle:
             raise e
 
 
-    def create_client(self) -> TdlibHandle:
+    async def create_client(self) -> TdlibHandle:
         ''' creates a client and returns a new instance of TdlibHandle with the new client
         '''
 
@@ -231,25 +236,25 @@ class TdlibHandle:
 
         return attr.evolve(self, tdlib_client=new_client)
 
-    def send(self, json_to_send) -> None:
+    async def send(self, dict_to_send:dict) -> None:
 
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.send called when no client has been created")
 
-        logger.info("tdlib client send called with: `%s`", json_to_send)
-        json_str = json.dumps(json_to_send, cls=utils.CustomJSONEncoder)
+        logger.info("tdlib client send called with: `%s`", dict_to_send)
+        json_str = json.dumps(dict_to_send, cls=utils.CustomJSONEncoder)
         json_bytes = json_str.encode("utf-8")
 
         self.func_client_send(self.tdlib_client, json_bytes)
         logger.info("tdlib client send called successfully")
 
-    def execute(self, json_to_send, force=False) -> dict:
+    async def execute(self, dict_to_send:dict, force:bool=False) -> dict:
 
         if self.tdlib_client is None and not force:
             raise Exception("TdlibHandle.send called when no client has been created")
 
-        logger.info("tdlib client execute called with: `%s`", json_to_send)
-        json_str = json.dumps(json_to_send, cls=utils.CustomJSONEncoder)
+        logger.info("tdlib client execute called with: `%s`", dict_to_send)
+        json_str = json.dumps(dict_to_send, cls=utils.CustomJSONEncoder)
         json_bytes = json_str.encode("utf-8")
 
         res = self.func_client_execute(self.tdlib_client, json_bytes)
@@ -261,7 +266,7 @@ class TdlibHandle:
         else:
             return res
 
-    def receive(self) -> dict:
+    async def receive(self) -> dict:
 
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.receive called when no client has been created")
