@@ -9,7 +9,7 @@ from telegram_dl import utils
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class RootObject:
     __tdlib_type__ = "RootObject"
-    _extra:str = attr.ib(default="")
+    _extra:str = attr.ib(default="", repr=False, cmp=False)
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
