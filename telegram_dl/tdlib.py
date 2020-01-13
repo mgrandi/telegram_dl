@@ -230,9 +230,9 @@ class TdlibHandle:
         if self.tdlib_client is not None:
             raise Exception("TdlibHandle.create_client called when a client already exists")
 
-        logger.info("creating tdlib client")
+        logger.debug("creating tdlib client")
         new_client = self.func_client_create()
-        logger.info("tdlib client created successfully: `%s`", new_client)
+        logger.debug("tdlib client created successfully: `%s`", new_client)
 
         return attr.evolve(self, tdlib_client=new_client)
 
@@ -241,7 +241,7 @@ class TdlibHandle:
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.send called when no client has been created")
 
-        logger.info("tdlib client `%s` called with: `%s`", "send", obj_to_send)
+        logger.debug("tdlib client `%s` called with: `%s`", "send", obj_to_send)
 
         # convert the object to a dictionary
         # TODO: replace cattrs
@@ -251,14 +251,14 @@ class TdlibHandle:
         json_bytes = json_str.encode("utf-8")
 
         self.func_client_send(self.tdlib_client, json_bytes)
-        logger.info("tdlib client `%s` called successfully", "send")
+        logger.debug("tdlib client `%s` called successfully", "send")
 
     async def execute(self, obj_to_send:tdlib_generated.RootObject, without_client_ok:bool=False) -> tdlib_generated.RootObject:
 
         if self.tdlib_client is None and not without_client_ok:
             raise Exception("TdlibHandle.send called when no client has been created")
 
-        logger.info("tdlib client `%s` called with: `%s`", "execute", obj_to_send)
+        logger.debug("tdlib client `%s` called with: `%s`", "execute", obj_to_send)
 
         # convert the object to a dictionary
         # TODO: replace cattrs
@@ -281,7 +281,7 @@ class TdlibHandle:
             # TODO: replace cattrs
             final_result = self.cattr_converter.structure(json_result, tdlib_generated.RootObject)
 
-        logger.info("tdlib client `%s` called successfully: `%s`", "execute", final_result)
+        logger.debug("tdlib client `%s` called successfully: `%s`", "execute", final_result)
 
         return final_result
 
@@ -290,7 +290,7 @@ class TdlibHandle:
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.receive called when no client has been created")
 
-        logger.info("tdlib client `%s` called", "receive")
+        logger.debug("tdlib client `%s` called", "receive")
         res = self.func_client_receive(self.tdlib_client, constants.TDLIB_CLIENT_RECEIVE_TIMEOUT)
 
         final_result = res
@@ -305,7 +305,7 @@ class TdlibHandle:
             # TODO: replace cattrs
             final_result = self.cattr_converter.unstructure(json_result)
 
-        logger.info("tdlib client `%s` called successfully, result: `%s`", "receive", res)
+        logger.debug("tdlib client `%s` called successfully, result: `%s`", "receive", res)
 
 
     def destroy_client(self) -> TdlibHandle:

@@ -56,6 +56,7 @@ class Application:
         self.tdlib_handle = await self.tdlib_handle.create_client()
 
 
+        logger.info("Starting main loop")
         # main loop
         while True:
             logger.debug("loop iteration")
@@ -81,12 +82,9 @@ class Application:
 
 
 
-
+        logger.info("Main loop finished")
         # destroy tdlib client
         logger.info("destroying tdlib handle")
         self.tdlib_handle = self.tdlib_handle.destroy_client()
-
-
-
-
+        logger.info("tdlib handle destroyed successfully")
 
