@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 class TdlibResult:
     code:int = attr.ib()
     message:str = attr.ib()
+    result_obj:tdlib_generated.RootObject = attr.ib()
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class TdlibConfiguration:
@@ -110,7 +111,10 @@ class TdlibHandle:
     fatal_error_callback_type = ctypes.CFUNCTYPE(None, ctypes.c_char_p)
 
     # gets set afterwards
-    tdlib_client:typing.Any = attr.ib(default=None)
+    tdlib_client:typing.Any = attr.ib()
+
+    cattr_converter:utils.CustomCattrConverter = attr.ib()
+
 
     @staticmethod
     def fatal_error_callback(error_message:str) -> None:
@@ -130,7 +134,7 @@ class TdlibHandle:
             logger.debug("creating directory for the files inside the tdlib working directory: `%s`", files_dir)
             files_dir.mkdir()
 
-        tp = tdlibParameters(
+        tp = tdlib_generated.tdlibParameters(
             use_test_dc=False,
             database_directory=str(config.tdlib_working_path),
             files_directory=str(files_dir),
@@ -194,6 +198,9 @@ class TdlibHandle:
             c_on_fatal_error_callback = fatal_error_callback_type(TdlibHandle.fatal_error_callback)
             td_set_log_fatal_error_callback(c_on_fatal_error_callback)
 
+            # cattr converter
+            converter = utils.CustomCattrConverter(tdlib_generated.tdlib_gen_globals, tdlib_generated.tdlib_gen_locals)
+
             tdlib_handle = TdlibHandle(
                 tdlib_shared_library=tdjson,
                 tdlib_config=config,
@@ -204,16 +211,9 @@ class TdlibHandle:
                 func_client_send=td_json_client_send,
                 func_client_execute=td_json_client_execute,
                 func_client_destroy=td_json_client_destroy,
-                func_set_log_fatal_error_callback=td_set_log_fatal_error_callback)
+                func_set_log_fatal_error_callback=td_set_log_fatal_error_callback,
+                cattr_converter=converter)
 
-
-            log_stream_file_obj = tdlib_generated.logStreamFile(
-                path=tdlib_handle.tdlib_config.tdlib_log_file_path,
-                max_file_size=10000000)
-            set_log_stream_obj = tdlib_generated.setLogStream(log_stream=log_stream_file_obj)
-
-            # temporary: set tdlib logging to a file
-            await tdlib_handle.execute(set_log_stream_obj.as_tdlib_dict(), force=True)
 
             logger.debug("new TdlibHandle from configuration: `%s`", tdlib_handle)
             return tdlib_handle
@@ -236,50 +236,76 @@ class TdlibHandle:
 
         return attr.evolve(self, tdlib_client=new_client)
 
-    async def send(self, dict_to_send:dict) -> None:
+    async def send(self, obj_to_send:tdlib_generated.RootObject) -> None:
 
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.send called when no client has been created")
 
-        logger.info("tdlib client send called with: `%s`", dict_to_send)
-        json_str = json.dumps(dict_to_send, cls=utils.CustomJSONEncoder)
+        logger.info("tdlib client `%s` called with: `%s`", "send", obj_to_send)
+
+        # convert the object to a dictionary
+        # TODO: replace cattrs
+        obj_as_dict = self.cattr_converter.unstructure(obj_to_send)
+
+        json_str = json.dumps(obj_as_dict, cls=utils.CustomJSONEncoder)
         json_bytes = json_str.encode("utf-8")
 
         self.func_client_send(self.tdlib_client, json_bytes)
-        logger.info("tdlib client send called successfully")
+        logger.info("tdlib client `%s` called successfully", "send")
 
-    async def execute(self, dict_to_send:dict, force:bool=False) -> dict:
+    async def execute(self, obj_to_send:tdlib_generated.RootObject, without_client_ok:bool=False) -> tdlib_generated.RootObject:
 
-        if self.tdlib_client is None and not force:
+        if self.tdlib_client is None and not without_client_ok:
             raise Exception("TdlibHandle.send called when no client has been created")
 
-        logger.info("tdlib client execute called with: `%s`", dict_to_send)
-        json_str = json.dumps(dict_to_send, cls=utils.CustomJSONEncoder)
+        logger.info("tdlib client `%s` called with: `%s`", "execute", obj_to_send)
+
+        # convert the object to a dictionary
+        # TODO: replace cattrs
+        obj_as_dict = self.cattr_converter.unstructure(obj_to_send)
+
+        json_str = json.dumps(obj_as_dict, cls=utils.CustomJSONEncoder)
         json_bytes = json_str.encode("utf-8")
 
         res = self.func_client_execute(self.tdlib_client, json_bytes)
-        logger.info("tdlib client execute called successfully: `%s`", res)
 
-        # result is None if the request can't be parsed
+        final_result = res
+
+        # need to parse the result, or return None if it was None
+        # result is None if the request can't be parsed or timeout i guess?
         if res is not None:
-            return json.loads(res)
-        else:
-            return res
 
-    async def receive(self) -> dict:
+            json_result = json.loads(res)
+
+            # convert the json back into an object
+            # TODO: replace cattrs
+            final_result = self.cattr_converter.structure(json_result, tdlib_generated.RootObject)
+
+        logger.info("tdlib client `%s` called successfully: `%s`", "execute", final_result)
+
+        return final_result
+
+    async def receive(self) -> utils.RootObject:
 
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.receive called when no client has been created")
 
-        logger.info("tdlib client receive called")
+        logger.info("tdlib client `%s` called", "receive")
         res = self.func_client_receive(self.tdlib_client, constants.TDLIB_CLIENT_RECEIVE_TIMEOUT)
-        logger.info("tdlib client receive called successfully, result: `%s`", res)
 
-        # result is None if the timeout expired
+        final_result = res
+
+        # need to parse the result, or return None if it was None
+        # result is None if the request can't be parsed or timeout i guess?
         if res is not None:
-            return json.loads(res)
-        else:
-            return res
+
+            json_result = json.loads(res)
+
+            # convert the json back into an object
+            # TODO: replace cattrs
+            final_result = self.cattr_converter.unstructure(json_result)
+
+        logger.info("tdlib client `%s` called successfully, result: `%s`", "receive", res)
 
 
     def destroy_client(self) -> TdlibHandle:

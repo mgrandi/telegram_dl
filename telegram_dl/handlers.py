@@ -21,7 +21,8 @@ class TdlibBaseMessageHandler:
         logger.debug("TdlibBaseMessageHandler.handle_message got `%s`", message)
         return new TdlibResult(
             code=constants.TDLIB_RESULT_CODE_MANUAL_MESSAGE_NOT_HANDLED,
-            message=f"Unimplemented message of type `{type(message)}`: `{message}`")
+            message=f"Unimplemented message of type `{type(message)}`: `{message}`",
+            result_obj=None)
 
 
 
@@ -47,7 +48,7 @@ class AuthenticationHandler:
     '''
 
     @TdlibBaseMessageHandler.handle_message.register
-    async def handle_message_update_uthorization_state(message:tdlib_generated.updateAuthorizationState) -> TdlibResult:
+    async def handle_message_update_authorization_state(message:tdlib_generated.updateAuthorizationState) -> TdlibResult:
 
         logger.debug("handle_message_update_uthorization_state.handle_message got `%s`", message)
 
