@@ -3,48 +3,20 @@
 # library imports
 import argparse
 import logging
+import logging.config
 import sys
 import pathlib
 import asyncio
+import json
 
 # third party imports
-import arrow
 import attr
 import logging_tree
-import pyhocon
 
 from telegram_dl.application import Application
+from telegram_dl import utils
 
 
-class ArrowLoggingFormatter(logging.Formatter):
-    ''' logging.Formatter subclass that uses arrow, that formats the timestamp
-    to the local timezone (but its in ISO format)
-    '''
-
-    def formatTime(self, record, datefmt=None):
-        # use the 'timestamp' format code
-        return arrow.get(f"{record.created}", "X").to("local").isoformat()
-
-def hocon_config_file_type(stringArg):
-    ''' argparse type method that returns a pyhocon Config object
-    or raises an argparse.ArgumentTypeError if this file doesn't exist
-
-    @param stringArg - the argument given to us by argparse
-    @return a dict like object containing the configuration or raises ArgumentTypeError
-    '''
-
-    resolved_path = pathlib.Path(stringArg).resolve()
-    if not resolved_path.exists:
-        raise argparse.ArgumentTypeError("The path {} doesn't exist!".format(resolved_path))
-
-    conf = None
-    try:
-        conf = pyhocon.ConfigFactory.parse_file(str(resolved_path))
-    except Exception as e:
-        raise argparse.ArgumentTypeError(
-            "Failed to parse the file `{}` as a HOCON file due to an exception: `{}`".format(resolved_path, e))
-
-    return conf
 
 if __name__ == "__main__":
     # if we are being run as a real program
@@ -56,15 +28,19 @@ if __name__ == "__main__":
     # set up logging stuff
     logging.captureWarnings(True) # capture warnings with the logging infrastructure
     root_logger = logging.getLogger()
-    logging_formatter = ArrowLoggingFormatter("%(asctime)s %(threadName)-10s %(name)-20s %(levelname)-8s: %(message)s")
+    logging_formatter = utils.ArrowLoggingFormatter("%(asctime)s %(threadName)-10s %(name)-20s %(levelname)-8s: %(message)s")
     logging_handler = logging.StreamHandler(sys.stdout)
     logging_handler.setFormatter(logging_formatter)
     root_logger.addHandler(logging_handler)
 
 
 
-    parser.add_argument('config', type=hocon_config_file_type, help="the configuration file")
-    parser.add_argument("--verbose", action="store_true", help="Increase logging verbosity")
+    parser.add_argument('config', type=utils.hocon_config_file_type, help="the configuration file")
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--verbose", action="store_true", help="Increase logging verbosity")
+    group.add_argument("--logging-config", dest="logging_config",
+        type=utils.isFileType, help="Specify a JSON file representing logging configuration")
 
 
 
@@ -75,7 +51,12 @@ if __name__ == "__main__":
         if parsed_args.verbose:
             root_logger.setLevel("DEBUG")
         else:
-            root_logger.setLevel("INFO")
+            if parsed_args.logging_config:
+                with open(parsed_args.logging_config, "r", encoding="utf-8") as f:
+                    logging.config.dictConfig(json.load(f))
+            else:
+                logging.basicConfig(level="INFO")
+
 
         root_logger.debug("Parsed arguments: %s", parsed_args)
         root_logger.debug("Logger hierarchy:\n%s", logging_tree.format.build_description(node=None))
