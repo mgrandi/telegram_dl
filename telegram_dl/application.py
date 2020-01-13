@@ -1,5 +1,4 @@
 import logging
-import signal
 
 from telegram_dl import tdlib
 from telegram_dl import utils
@@ -20,34 +19,23 @@ class Application:
 
         self.args = args
 
+        self.please_stop = False
 
 
+    def should_stop_loop(self):
+        return self.please_stop
 
     async def run(self):
 
         from telegram_dl import tdlib_generated as tdg
 
-        # log_stream_file_obj = tdg.logStreamFile(
-        #     path="C:/Users/auror/Temp/log.txt",
-        #     max_file_size=10000000)
-        # set_log_stream_obj = tdg.setLogStream(log_stream=log_stream_file_obj)
+        # register Ctrl+C/D/whatever signal
+        def _please_stop_loop_func():
+            self.please_stop = True
 
+        utils.register_ctrl_c_signal_handler(_please_stop_loop_func)
 
-        # logger.info("original: `%s`", set_log_stream_obj)
-        # converter = utils.CustomCattrConverter(tdlib_generated.tdlib_gen_globals, tdlib_generated.tdlib_gen_locals)
-
-        # # utils.register_tdlib_gen_classes_with_cattr(converter)
-
-        # x =converter.unstructure(set_log_stream_obj)
-
-        # logger.info("unstructure result: `%s`", x)
-
-        # y = converter.structure(x, tdg.RootObject)
-
-        # logger.info("structure result: `%s`", y)
-
-        # start the tdlib session
-
+        # load config stuff
         logger.info("creating TdlibConfiguration")
         tdlib_config = tdlib.TdlibConfiguration.init_from_config(self.args.config)
         logger.info("creating TdlibHandle")
@@ -62,25 +50,28 @@ class Application:
         logger.info("setting TDLib log file path: `%s`", set_log_stream_obj)
         await self.tdlib_handle.execute(set_log_stream_obj, without_client_ok=True)
 
+        # create tdlib client
         logger.info("creating TDLib client")
         self.tdlib_handle = await self.tdlib_handle.create_client()
 
 
-
+        # main loop
         while True:
             logger.debug("loop iteration")
+
+            # handle if the user wants to stop
+            if self.should_stop_loop():
+                logger.info("Stopping main loop")
+                break
+
+
             resultdict = await self.tdlib_handle.receive()
 
             logger.debug("recieved something from receive: `%s`", resultdict)
 
 
-
-
-
-
-
-
-
+        # destroy tdlib client
+        logger.info("destroying tdlib handle")
         self.tdlib_handle = self.tdlib_handle.destroy_client()
 
 

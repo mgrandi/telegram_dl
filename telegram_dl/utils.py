@@ -3,6 +3,7 @@ import json
 import pathlib
 import logging
 import typing
+import signal
 
 import cattr
 
@@ -14,6 +15,18 @@ logger = logging.getLogger(__name__)
 converter_logger = logger.getChild("converter")
 structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
+
+
+def register_ctrl_c_signal_handler(func_to_run):
+
+    def inner_ctrl_c_signal_handler(sig, frame):
+
+        logger.info("SIGINT caught!")
+        func_to_run()
+
+    signal.signal(signal.SIGINT, inner_ctrl_c_signal_handler)
+
+
 
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
