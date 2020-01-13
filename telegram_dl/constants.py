@@ -22,3 +22,4 @@ CONFIG_KEY_TDLIB_IGNORE_FILE_NAMES = "tdlib_ignore_file_names"
 # as in a message type was not registered wiht TdlibBaseMessageHandler.handle_message
 # so we ran the base implementation
 TDLIB_RESULT_CODE_MANUAL_MESSAGE_NOT_HANDLED = -1
+TDLIB_RESULT_CODE_OK = 0
