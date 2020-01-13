@@ -309,10 +309,11 @@ class TdlibHandle:
 
             # convert the json back into an object
             # TODO: replace cattrs
-            final_result = self.cattr_converter.unstructure(json_result)
+            final_result = self.cattr_converter.structure(json_result, tdlib_generated.RootObject)
 
         receive_logger.debug("tdlib client `%s` called successfully, obj result: `%s`", "receive", final_result)
 
+        return final_result
 
     def destroy_client(self) -> TdlibHandle:
         ''' destroys the client and returns a new instance of TdlibHandle with the
