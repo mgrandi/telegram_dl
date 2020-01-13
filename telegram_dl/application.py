@@ -2,6 +2,7 @@ import logging
 
 from telegram_dl import tdlib
 from telegram_dl import utils
+from telegram_dl import handlers
 from telegram_dl import tdlib_generated
 
 logger = logging.getLogger(__name__)
@@ -65,9 +66,20 @@ class Application:
                 break
 
 
-            resultdict = await self.tdlib_handle.receive()
+            result_obj_from_receive = await self.tdlib_handle.receive()
 
-            logger.debug("recieved something from receive: `%s`", resultdict)
+            logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
+
+            if not result_obj_from_receive:
+                logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")
+                continue
+
+            logger.debug("calling singledispatch handler")
+            handle_result = await handlers.TdlibBaseMessageHandler.handle_message(result_obj_from_receive)
+
+            logger.debug("handle result is: `%s`", handle_result)
+
+
 
 
         # destroy tdlib client

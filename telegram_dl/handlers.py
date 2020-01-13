@@ -1,5 +1,6 @@
 import functools
 import logging
+import typing
 
 import attr
 
@@ -16,10 +17,10 @@ class TdlibBaseMessageHandler:
 
     @staticmethod
     @functools.singledispatch
-    async def handle_message(message:tdlib_generated.RootObject) -> TdlibResult:
+    async def handle_message(message:tdlib_generated.RootObject) -> typing.Optional[TdlibResult]:
 
         logger.debug("TdlibBaseMessageHandler.handle_message got `%s`", message)
-        return new TdlibResult(
+        return TdlibResult(
             code=constants.TDLIB_RESULT_CODE_MANUAL_MESSAGE_NOT_HANDLED,
             message=f"Unimplemented message of type `{type(message)}`: `{message}`",
             result_obj=None)
@@ -52,9 +53,7 @@ class AuthenticationHandler:
 
         logger.debug("handle_message_update_uthorization_state.handle_message got `%s`", message)
 
-        return new TdlibResult(
-            code=constants.TDLIB_RESULT_CODE_MANUAL_MESSAGE_NOT_HANDLED,
-            message=f"Unimplemented message of type `{type(message)}`: `{message}`")
+        return None
 
 
 
