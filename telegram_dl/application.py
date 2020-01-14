@@ -57,7 +57,9 @@ class Application:
 
 
         logger.info("Starting main loop")
+
         # main loop
+        # TODO: might need to make this a asyncio.Task!
         while True:
             logger.debug("loop iteration")
 
@@ -76,7 +78,7 @@ class Application:
                 continue
 
             logger.debug("calling singledispatch handler")
-            handle_result = await handlers.TdlibBaseMessageHandler.handle_message(result_obj_from_receive)
+            handle_result = await handlers.TdlibBaseMessageHandler.handle_message(result_obj_from_receive, self.tdlib_handle)
 
             logger.debug("handle result is: `%s`", handle_result)
 
