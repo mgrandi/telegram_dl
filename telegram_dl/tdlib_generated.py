@@ -9,7 +9,7 @@ from telegram_dl import utils
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class RootObject:
     __tdlib_type__ = "RootObject"
-    _extra:str = attr.ib(default="", repr=False, cmp=False)
+    _extra:str = attr.ib(default="", cmp=False)
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1555,7 +1555,9 @@ class chat(Chat):
     title:str = attr.ib()
     photo:chatPhoto = attr.ib()
     permissions:chatPermissions = attr.ib()
-    last_message:message = attr.ib()
+    # CUSTOM EDIT
+    last_message:message = attr.ib(default=None)
+    ############
     order:int = attr.ib()
     is_pinned:bool = attr.ib()
     is_marked_as_unread:bool = attr.ib()
@@ -1571,7 +1573,9 @@ class chat(Chat):
     notification_settings:chatNotificationSettings = attr.ib()
     pinned_message_id:int = attr.ib()
     reply_markup_message_id:int = attr.ib()
-    draft_message:draftMessage = attr.ib()
+    # CUSTOM EDIT
+    draft_message:draftMessage = attr.ib(default=None)
+    #############
     client_data:str = attr.ib()
 
 
@@ -5940,7 +5944,9 @@ class updateSecretChat(Update):
 class updateSelectedBackground(Update):
     __tdlib_type__ = "updateSelectedBackground"
     for_dark_theme:bool = attr.ib()
-    background:background = attr.ib()
+    # CUSTOM EDIT
+    background:background = attr.ib(default=None)
+    ##############
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6042,7 +6048,9 @@ class user(User):
     username:str = attr.ib()
     phone_number:str = attr.ib()
     status:UserStatus = attr.ib()
-    profile_photo:profilePhoto = attr.ib()
+    # CUSTOM EDIT
+    profile_photo:profilePhoto = attr.ib(default=None)
+    ###############
     outgoing_link:LinkState = attr.ib()
     incoming_link:LinkState = attr.ib()
     is_verified:bool = attr.ib()
