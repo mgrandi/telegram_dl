@@ -4,6 +4,8 @@ import pathlib
 import logging
 import typing
 import signal
+import uuid
+import decimal
 
 import cattr
 import arrow
@@ -18,6 +20,21 @@ converter_logger = logger.getChild("converter")
 structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
 
+
+def register_custom_types_with_cattr_converter(cattr_converter):
+    '''
+    register custom type hooks with our cattr converter
+
+    TODO: get rid of cattrs or incorporate this into the cattr custom subclass
+    '''
+
+
+    # decimal
+    cattr_converter.register_unstructure_hook(decimal.Decimal, lambda x: str(x))
+    cattr_converter.register_structure_hook(decimal.Decimal, lambda inst, cl: decimal.Decimal(inst))
+
+def new_extra():
+    return str(uuid.uuid4())
 
 class ArrowLoggingFormatter(logging.Formatter):
     ''' logging.Formatter subclass that uses arrow, that formats the timestamp
@@ -84,6 +101,8 @@ def register_ctrl_c_signal_handler(func_to_run):
 class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, pathlib.Path):
+            return str(obj)
+        elif isinstance(obj, uuid.UUID):
             return str(obj)
 
         # Let the base class default method raise the TypeError
