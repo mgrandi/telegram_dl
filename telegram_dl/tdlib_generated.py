@@ -1555,9 +1555,7 @@ class chat(Chat):
     title:str = attr.ib()
     photo:chatPhoto = attr.ib()
     permissions:chatPermissions = attr.ib()
-    # CUSTOM EDIT
-    last_message:message = attr.ib(default=None)
-    ############
+    last_message:message = attr.ib()
     order:int = attr.ib()
     is_pinned:bool = attr.ib()
     is_marked_as_unread:bool = attr.ib()
@@ -1573,9 +1571,7 @@ class chat(Chat):
     notification_settings:chatNotificationSettings = attr.ib()
     pinned_message_id:int = attr.ib()
     reply_markup_message_id:int = attr.ib()
-    # CUSTOM EDIT
-    draft_message:draftMessage = attr.ib(default=None)
-    #############
+    draft_message:draftMessage = attr.ib()
     client_data:str = attr.ib()
 
 
@@ -5944,9 +5940,7 @@ class updateSecretChat(Update):
 class updateSelectedBackground(Update):
     __tdlib_type__ = "updateSelectedBackground"
     for_dark_theme:bool = attr.ib()
-    # CUSTOM EDIT
-    background:background = attr.ib(default=None)
-    ##############
+    background:background = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6048,9 +6042,7 @@ class user(User):
     username:str = attr.ib()
     phone_number:str = attr.ib()
     status:UserStatus = attr.ib()
-    # CUSTOM EDIT
-    profile_photo:profilePhoto = attr.ib(default=None)
-    ###############
+    profile_photo:profilePhoto = attr.ib()
     outgoing_link:LinkState = attr.ib()
     incoming_link:LinkState = attr.ib()
     is_verified:bool = attr.ib()

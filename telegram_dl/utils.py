@@ -6,6 +6,7 @@ import typing
 import signal
 import uuid
 import decimal
+import base64
 
 import cattr
 import arrow
@@ -32,6 +33,35 @@ def register_custom_types_with_cattr_converter(cattr_converter):
     # decimal
     cattr_converter.register_unstructure_hook(decimal.Decimal, lambda x: str(x))
     cattr_converter.register_structure_hook(decimal.Decimal, lambda inst, cl: decimal.Decimal(inst))
+
+    # bytes are already registered by default with `cattr` but in this case, tdjson is
+    # giving us a base64 string so we need to override the default converter methods do some additional logic
+    # or else we get errors such as `TypeError: string argument without an encoding` when calling `bytes()`
+    # with a string
+    #
+    # NOTE: this might change depending on how we convert the class to JSON in the future, we might want to leave
+    # the data as bytes in the JSON (when we are unstructuring) and then a JSONEncoder could convert bytes -> base64,
+    # or when structuring from JSON, a JSONDecoder could convert base64 into bytes for us, and therefore the cattr
+    # converter won't need these handlers anymore
+
+    def _structure_bytes(bytes_to_structure, klass):
+
+        # we get base64 back from tdjson
+        if isinstance(bytes_to_structure, str):
+            return base64.b64decode(bytes_to_structure)
+        else:
+            # if they are already bytes, just pass them through
+            return bytes_to_structure
+
+
+    def _unstructure_bytes(bytes_to_structure):
+
+        # base64 encode it for tdjson
+        return base64.b64encode(bytes_to_structure)
+
+    # bytes
+    cattr_converter.register_unstructure_hook(bytes, _unstructure_bytes)
+    cattr_converter.register_structure_hook(bytes, _structure_bytes)
 
 def new_extra():
     return str(uuid.uuid4())
@@ -218,16 +248,34 @@ class CustomCattrConverter(cattr.Converter):
             try:
                 val = dict_to_unstructure[name]
             except KeyError:
-                continue
+                # CUSTOM EDIT
+                # see https://github.com/tdlib/td/issues/890
+                # basically, tdjson will not return a key/value pair if it is null
+                # which causes attrs to complain because every value is mandatory unless
+                # it has an explicit default, which would require a huge amount of trial and error, so
+                # in this case if we can't find the key/va,ue, just set it to be None for now
+
+                val = None
+                structure_logger.debug("for the type `%s`, the key `%s` was missing, substituting it with `%s`", type_, name, None)
+                # continue
+                #####################################33
 
             if name[0] == "_":
                 name = name[1:]
 
             structure_logger.debug("---- dispatching to structure type `%s`", type_)
 
-            conv_obj[name] = (
-                dispatch(type_)(val, type_) if type_ is not None else val
-            )
+            # CUSTOM EDIT
+            # just cleaning this up but the logic should be the same, except now we check for None values as well
+            # conv_obj[name] = (
+            #     dispatch(type_)(val, type_) if type_ is not None else val
+            # )
+            if type_ is not None and val is not None:
+                conv_obj[name] = dispatch(type_)(val, type_)
+            else:
+                conv_obj[name] = val
+            structure_logger.debug("TEST: `%s`", conv_obj)
+            ########################
 
         return actual_type(**conv_obj)  # type: ignore
 
