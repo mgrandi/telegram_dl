@@ -23,6 +23,8 @@ class Application:
         self.please_stop = False
 
 
+        self.message_handler = handlers.TdlibBaseMessageHandler()
+
     def should_stop_loop(self):
         return self.please_stop
 
@@ -46,7 +48,7 @@ class Application:
         log_stream_file_obj = tdg.logStreamFile(
                 path=self.tdlib_handle.tdlib_config.tdlib_log_file_path,
                 max_file_size=10000000)
-        set_log_stream_obj = tdlib_generated.setLogStream(log_stream=log_stream_file_obj)
+        set_log_stream_obj = tdlib_generated.setLogStream(log_stream=log_stream_file_obj, extra=utils.new_extra())
 
         logger.info("setting TDLib log file path: `%s`", set_log_stream_obj)
         await self.tdlib_handle.execute(set_log_stream_obj, without_client_ok=True)
@@ -78,7 +80,7 @@ class Application:
                 continue
 
             logger.debug("calling singledispatch handler")
-            handle_result = await handlers.TdlibBaseMessageHandler.handle_message(result_obj_from_receive, self.tdlib_handle)
+            handle_result = await self.message_handler.handle_message(result_obj_from_receive, self.tdlib_handle)
 
             logger.debug("handle result is: `%s`", handle_result)
 

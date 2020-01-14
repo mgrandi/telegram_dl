@@ -205,6 +205,7 @@ class TdlibHandle:
 
             # cattr converter
             converter = utils.CustomCattrConverter(tdlib_generated.tdlib_gen_globals, tdlib_generated.tdlib_gen_locals)
+            utils.register_custom_types_with_cattr_converter(converter)
 
             tdlib_handle = TdlibHandle(
                 tdlib_shared_library=tdjson,
