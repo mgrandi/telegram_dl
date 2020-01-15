@@ -12,17 +12,20 @@ from telegram_dl import utils
 logger = logging.getLogger(__name__)
 
 authstate_logger = logger.getChild("authstate")
+not_implemented_logger = logger.getChild("not_implemented")
 
 
 class TdlibBaseMessageHandler:
 
-    def __init__(self, input_obj):
+    def __init__(self, input_obj, auth_handler):
         self.input = input_obj
+
+        self.auth_handler = auth_handler
 
     @functools.singledispatchmethod
     async def handle_message(self, message:tdg.RootObject, tdlib_handle:tdlib.TdlibHandle) -> typing.Optional[tdlib.TdlibResult]:
 
-        logger.error("TdlibBaseMessageHandler.handle_message got `%s`", message)
+        not_implemented_logger.error("Unimplemented type: TdlibBaseMessageHandler.handle_message got `%s`", message)
         return tdlib.TdlibResult(
             code=constants.TDLIB_RESULT_CODE_MANUAL_MESSAGE_NOT_HANDLED,
             message=f"Unimplemented message of type `{type(message)}`: `{message}`",
@@ -42,7 +45,7 @@ class TdlibBaseMessageHandler:
 
         auth_state = message.authorization_state
 
-        await self.handle_auth_state(auth_state, tdlib_handle)
+        await self.auth_handler.handle_auth_state(auth_state, tdlib_handle)
 
         return tdlib.TdlibResult(
                 code=constants.TDLIB_RESULT_CODE_OK,
@@ -50,24 +53,13 @@ class TdlibBaseMessageHandler:
                 result_obj=None)
 
 
+    @handle_message.register
+    async def handle_message_update_option(self, message:tdg.updateOption, tdlib_handle:tdlib.TdlibHandle) -> tdlib.TdlibResult:
 
-    '''
-    updateAuthorizationState
-        authorizationStateClosing,
-        authorizationStateLoggingOut,
-        authorizationStateClosed
+        logger.debug("handle_message_update_option.handle_message got `%s`", message)
 
-        authorizationStateWaitTdlibParameters
-        authorizationStateWaitEncryptionKey
 
-        authorizationStateWaitPhoneNumber
-
-        authorizationStateWaitCode
-
-        authorizationStateWaitRegistration
-
-        authorizationStateWaitPassword
-    '''
+class AuthorizationHandler:
 
     @functools.singledispatchmethod
     async def handle_auth_state(self, auth_state:tdg.AuthorizationState, tdlib_handle:tdlib.TdlibHandle) -> None:
@@ -171,6 +163,18 @@ class TdlibBaseMessageHandler:
         check_password = tdg.checkAuthenticationPassword(password=password_result.password, extra=utils.new_extra())
         authstate_logger.debug("calling send with checkAuthenticationPassword: `%s`", check_password)
         await tdlib_handle.send(check_password)
+
+
+
+    @handle_auth_state.register
+    async def handle_auth_state_ready(self, message:tdg.authorizationStateReady,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateReady
+        '''
+
+        authstate_logger.info("Authorization State is now `%s`", "Ready")
+
 
     @handle_auth_state.register
     async def handle_auth_state_closing(self, message:tdg.authorizationStateClosing,

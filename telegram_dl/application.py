@@ -23,8 +23,7 @@ class Application:
 
         self.please_stop = False
 
-
-        self.message_handler = handlers.TdlibBaseMessageHandler(input.TTYInput())
+        self.message_handler = handlers.TdlibBaseMessageHandler(input.TTYInput(), handlers.AuthorizationHandler())
 
     def should_stop_loop(self):
         return self.please_stop
