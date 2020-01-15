@@ -274,7 +274,6 @@ class CustomCattrConverter(cattr.Converter):
                 conv_obj[name] = dispatch(type_)(val, type_)
             else:
                 conv_obj[name] = val
-            structure_logger.debug("TEST: `%s`", conv_obj)
             ########################
 
         return actual_type(**conv_obj)  # type: ignore
