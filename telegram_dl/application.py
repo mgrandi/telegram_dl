@@ -4,6 +4,7 @@ from telegram_dl import tdlib
 from telegram_dl import utils
 from telegram_dl import handlers
 from telegram_dl import tdlib_generated
+from telegram_dl import input
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class Application:
         self.please_stop = False
 
 
-        self.message_handler = handlers.TdlibBaseMessageHandler()
+        self.message_handler = handlers.TdlibBaseMessageHandler(input.TTYInput())
 
     def should_stop_loop(self):
         return self.please_stop

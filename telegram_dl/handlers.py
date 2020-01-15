@@ -16,6 +16,9 @@ authstate_logger = logger.getChild("authstate")
 
 class TdlibBaseMessageHandler:
 
+    def __init__(self, input_obj):
+        self.input = input_obj
+
     @functools.singledispatchmethod
     async def handle_message(self, message:tdg.RootObject, tdlib_handle:tdlib.TdlibHandle) -> typing.Optional[tdlib.TdlibResult]:
 
@@ -50,6 +53,8 @@ class TdlibBaseMessageHandler:
 
     '''
     updateAuthorizationState
+        authorizationStateClosing,
+        authorizationStateLoggingOut,
         authorizationStateClosed
 
         authorizationStateWaitTdlibParameters
@@ -66,12 +71,18 @@ class TdlibBaseMessageHandler:
 
     @functools.singledispatchmethod
     async def handle_auth_state(self, auth_state:tdg.AuthorizationState, tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        GENERIC implementation of AuthorizationState
+        '''
 
         authstate_logger.error("Unimplemented AuthorizationState! we got: `%s`", auth_state)
 
     @handle_auth_state.register
     async def handle_auth_state_wait_tdlib_params(self, message:tdg.authorizationStateWaitTdlibParameters,
         tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateWaitTdlibParameters
+        '''
 
 
         authstate_logger.debug("handle_auth_state_wait_tdlib_params got message: `%s`", message)
@@ -85,6 +96,9 @@ class TdlibBaseMessageHandler:
     @handle_auth_state.register
     async def handle_auth_state_wait_encryption_key(self, message:tdg.authorizationStateWaitEncryptionKey,
         tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateWaitEncryptionKey
+        '''
 
         authstate_logger.debug("handle_auth_state_wait_encryption_key got message: `%s`", message)
 
@@ -95,9 +109,92 @@ class TdlibBaseMessageHandler:
 
 
 
+    @handle_auth_state.register
+    async def handle_auth_state_wait_phone_number(self, message:tdg.authorizationStateWaitPhoneNumber,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateWaitPhoneNumber
+        '''
+
+        authstate_logger.debug("handle_auth_state_wait_phone_number got message: `%s`", message)
+
+        ask_phone_no_result = self.input.ask_user_for_phone_number()
+        set_auth_phone_no = tdg.setAuthenticationPhoneNumber(phone_number=ask_phone_no_result.get_as_one_string(),
+            settings=None, extra=utils.new_extra())
+        authstate_logger.debug("calling send with setAuthenticationPhoneNumber: `%s`", set_auth_phone_no)
+
+        await tdlib_handle.send(set_auth_phone_no)
 
 
 
+    @handle_auth_state.register
+    async def handle_auth_state_wait_code(self, message:tdg.authorizationStateWaitCode,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateWaitCode
+        '''
+
+        authstate_logger.debug("handle_auth_state_wait_code got message: `%s`", message)
+
+        ask_for_code_result = self.input.ask_user_for_code()
+        check_auth_code = tdg.checkAuthenticationCode(code=ask_for_code_result.code, extra=utils.new_extra())
+        authstate_logger.debug("calling send with checkAuthenticationCode: `%s`", check_auth_code)
+
+        await tdlib_handle.send(check_auth_code)
 
 
+    @handle_auth_state.register
+    async def handle_auth_state_wait_registration(self, message:tdg.authorizationStateWaitRegistration,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateWaitRegistration
+        '''
 
+        authstate_logger.debug("handle_auth_state_wait_registration got message: `%s`", message)
+
+        name_result = self.input.ask_user_for_first_last_name()
+        reg_user_ = tdg.registerUser(first_name=name_result.first, last_name=name_result.last, extra=utils.new_extra())
+        authstate_logger.debug("calling send with registerUser: `%s`", reg_user)
+        await tdlib_handle.send(reg_user)
+
+
+    @handle_auth_state.register
+    async def handle_auth_state_wait_password(self, message:tdg.authorizationStateWaitPassword,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateWaitPassword
+        '''
+
+        authstate_logger.debug("handle_auth_state_wait_password got message: `%s`", message)
+        password_result = self.input.ask_user_for_password()
+
+        check_password = tdg.checkAuthenticationPassword(password=password_result.password, extra=utils.new_extra())
+        authstate_logger.debug("calling send with checkAuthenticationPassword: `%s`", check_password)
+        await tdlib_handle.send(check_password)
+
+    @handle_auth_state.register
+    async def handle_auth_state_closing(self, message:tdg.authorizationStateClosing,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateClosing
+        '''
+
+        authstate_logger.info("Authorization State is now `%s`", "Closing")
+
+
+    @handle_auth_state.register
+    async def handle_auth_state_logging_out(self, message:tdg.authorizationStateLoggingOut,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateLoggingOut
+        '''
+        authstate_logger.info("Authorization State is now `%s`", "Logging Out")
+
+
+    @handle_auth_state.register
+    async def handle_auth_state_closed(self, message:tdg.authorizationStateClosed,
+        tdlib_handle:tdlib.TdlibHandle) -> None:
+        '''
+        authorizationStateClosed
+        '''
+        authstate_logger.info("Authorization State is now `%s`", "Closed")
