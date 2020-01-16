@@ -11,6 +11,9 @@ arrow = "*"
 logging-tree = "*"
 attrs = "*"
 pyhocon = "*"
+sqlalchemy-utils = "*"
+phonenumberslite = "*"
+furl = "*"
 
 [requires]
 python_version = "3.8"
