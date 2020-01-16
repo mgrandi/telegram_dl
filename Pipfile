@@ -14,6 +14,7 @@ pyhocon = "*"
 sqlalchemy-utils = "*"
 phonenumberslite = "*"
 furl = "*"
+alembic = "*"
 
 [requires]
 python_version = "3.8"
