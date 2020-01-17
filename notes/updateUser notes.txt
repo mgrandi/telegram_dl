@@ -1,0 +1,264 @@
+
+#########################
+update user example response
+#########################
+
+
+updateUser(_extra=None,
+        user=user(_extra=None,
+            id=12345,
+            first_name='Bob',
+            last_name='',
+            username='Smith',
+            phone_number='SNIP',
+            status=
+                userStatusOffline(_extra=None, was_online=1579069141),
+            profile_photo=
+                profilePhoto(_extra=None,
+                    id=12345,
+                    small=
+                        file(_extra=None,
+                            id=29,
+                            size=0,
+                            expected_size=0,
+                            local=
+                                localFile(_extra=None,
+                                    path='',
+                                    can_be_downloaded=True,
+                                    can_be_deleted=False,
+                                    is_downloading_active=False,
+                                    is_downloading_completed=False,
+                                    download_offset=0,
+                                    downloaded_prefix_size=0,
+                                    downloaded_size=0),
+                            remote=
+                                remoteFile(_extra=None,
+                                    id='ABCDEfgh',
+                                    is_uploading_active=False,
+                                    is_uploading_completed=True,
+                                    uploaded_size=0)),
+                    big=
+                        file(_extra=None,
+                            id=30,
+                            size=0,
+                            expected_size=0,
+                            local=
+                                localFile(_extra=None, path='',
+                                    can_be_downloaded=True,
+                                    can_be_deleted=False,
+                                    is_downloading_active=False,
+                                    is_downloading_completed=False,
+                                    download_offset=0,
+                                    downloaded_prefix_size=0,
+                                    downloaded_size=0),
+                            remote=
+                                remoteFile(_extra=None,
+                                    id='ABCDefgh',
+                                    is_uploading_active=False,
+                                    is_uploading_completed=True,
+                                    uploaded_size=0))),
+                outgoing_link=
+                    linkStateIsContact(_extra=None),
+                incoming_link=
+                    linkStateIsContact(_extra=None),
+                is_verified=False,
+                is_support=False,
+                restriction_reason='',
+                is_scam=False,
+                have_access=True,
+                type=
+                    userTypeRegular(_extra=None),
+                language_code=''
+            )
+        )
+
+
+#########################
+updateUser
+#########################
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class updateUser(Update):
+    __tdlib_type__ = "updateUser"
+    user:user = attr.ib()
+
+#########################
+user
+#########################
+
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1user.html
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class user(User):
+    __tdlib_type__ = "user"
+    id:int = attr.ib()
+    first_name:str = attr.ib()
+    last_name:str = attr.ib()
+    username:str = attr.ib()
+    phone_number:str = attr.ib()
+    status:UserStatus = attr.ib()
+    profile_photo:profilePhoto = attr.ib()
+    outgoing_link:LinkState = attr.ib()
+    incoming_link:LinkState = attr.ib()
+    is_verified:bool = attr.ib()
+    is_support:bool = attr.ib()
+    restriction_reason:str = attr.ib()
+    is_scam:bool = attr.ib()
+    have_access:bool = attr.ib()
+    type:UserType = attr.ib()
+    language_code:str = attr.ib()
+
+
+#########################
+UserStatus
+#########################
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class UserStatus(RootObject):
+    __tdlib_type__ = "UserStatus"
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userStatusEmpty(UserStatus):
+    __tdlib_type__ = "userStatusEmpty"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userStatusLastMonth(UserStatus):
+    __tdlib_type__ = "userStatusLastMonth"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userStatusLastWeek(UserStatus):
+    __tdlib_type__ = "userStatusLastWeek"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userStatusOffline(UserStatus):
+    __tdlib_type__ = "userStatusOffline"
+    was_online:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userStatusOnline(UserStatus):
+    __tdlib_type__ = "userStatusOnline"
+    expires:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userStatusRecently(UserStatus):
+    __tdlib_type__ = "userStatusRecently"
+
+
+#########################
+profilePhoto
+#########################
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class profilePhoto(ProfilePhoto):
+    __tdlib_type__ = "profilePhoto"
+    id:int = attr.ib()
+    small:file = attr.ib()
+    big:file = attr.ib()
+
+#########################
+file
+#########################
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class file(File):
+    __tdlib_type__ = "file"
+    id:int = attr.ib()
+    size:int = attr.ib()
+    expected_size:int = attr.ib()
+    local:localFile = attr.ib()
+    remote:remoteFile = attr.ib()
+
+#########################
+localFile
+#########################
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class localFile(LocalFile):
+    __tdlib_type__ = "localFile"
+    path:str = attr.ib()
+    can_be_downloaded:bool = attr.ib()
+    can_be_deleted:bool = attr.ib()
+    is_downloading_active:bool = attr.ib()
+    is_downloading_completed:bool = attr.ib()
+    download_offset:int = attr.ib()
+    downloaded_prefix_size:int = attr.ib()
+    downloaded_size:int = attr.ib()
+
+#########################
+remoteFile
+#########################
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class remoteFile(RemoteFile):
+    __tdlib_type__ = "remoteFile"
+    id:str = attr.ib()
+    is_uploading_active:bool = attr.ib()
+    is_uploading_completed:bool = attr.ib()
+    uploaded_size:int = attr.ib()
+
+#########################
+LinkState
+#########################
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class LinkState(RootObject):
+    __tdlib_type__ = "LinkState"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class linkStateIsContact(LinkState):
+    __tdlib_type__ = "linkStateIsContact"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class linkStateKnowsPhoneNumber(LinkState):
+    __tdlib_type__ = "linkStateKnowsPhoneNumber"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class linkStateNone(LinkState):
+    __tdlib_type__ = "linkStateNone"
+
+
+#########################
+UserType
+#########################
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class UserType(RootObject):
+    __tdlib_type__ = "UserType"
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userTypeBot(UserType):
+    __tdlib_type__ = "userTypeBot"
+    can_join_groups:bool = attr.ib()
+    can_read_all_group_messages:bool = attr.ib()
+    is_inline:bool = attr.ib()
+    inline_query_placeholder:str = attr.ib()
+    need_location:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userTypeDeleted(UserType):
+    __tdlib_type__ = "userTypeDeleted"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userTypeRegular(UserType):
+    __tdlib_type__ = "userTypeRegular"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userTypeUnknown(UserType):
+    __tdlib_type__ = "userTypeUnknown"
+
+#########################
+
+#########################
