@@ -1,3 +1,10 @@
+import sys
+import os
+
+# make it so we can import our model without 'no module named telegram_dl' errors
+# see https://stackoverflow.com/questions/32032940/how-to-import-the-own-model-into-myproject-alembic-env-py
+sys.path.insert(0, os.getcwd())
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -17,7 +24,9 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = None
+
+from telegram_dl import db_model
+target_metadata = db_model.CustomDeclarativeBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
