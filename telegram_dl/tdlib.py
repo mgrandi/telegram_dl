@@ -9,12 +9,11 @@ import platform
 import json
 
 import attr
-import pyhocon
 
 import telegram_dl
 from telegram_dl import utils
 from telegram_dl import constants
-
+from telegram_dl import config
 from telegram_dl import tdlib_generated
 
 
@@ -30,65 +29,6 @@ class TdlibResult:
     code:int = attr.ib()
     message:str = attr.ib()
     result_obj:tdlib_generated.RootObject = attr.ib()
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class TdlibConfiguration:
-
-    library_path:str = attr.ib()
-    tdlib_log_file_path:pathlib.Path = attr.ib()
-    api_id:str = attr.ib(repr=False)
-    api_hash:str = attr.ib(repr=False)
-    tdlib_working_path:pathlib.Path = attr.ib()
-    tdlib_enable_storage_optimizer:bool = attr.ib()
-    tdlib_ignore_file_names:bool = attr.ib()
-
-    @staticmethod
-    def init_from_config(config:pyhocon.config_tree.ConfigTree) -> TdlibConfiguration:
-
-        logger.info("loading config")
-        try:
-
-            c = config.get_config(constants.CONFIG_ROOT_GROUP)
-
-            tmp_library_path = pathlib.Path(c.get_string(constants.CONFIG_KEY_SHARED_LIBRARY_PATH)).resolve()
-            if not tmp_library_path.exists():
-                raise Exception(f"the shared tdjson library path provided `{tmp_library_path}` doesn't exist!")
-
-            tmp_tdlib_log_file_path = pathlib.Path(c.get_string(constants.CONFIG_KEY_TDLIB_LOG_FILE))
-            if not tmp_tdlib_log_file_path.parent.exists():
-                raise Exception(f"the path provided for the tdlib log file `{tmp_tdlib_log_file_path}`'s parent doesn't exist!")
-
-            tmp_api_id = c.get_int(constants.CONFIG_KEY_API_ID)
-            tmp_api_hash = c.get_string(constants.CONFIG_KEY_API_HASH)
-
-
-            tmp_tdlib_working_path = pathlib.Path(c.get_string(constants.CONFIG_KEY_TDLIB_WORKING_PATH))
-            if not tmp_tdlib_working_path.exists() or not tmp_tdlib_working_path.is_dir():
-                raise Exception(f"the tdlib working path provided `{tmp_tdlib_working_path}` is not a folder or doesn't exist!")
-
-            tmp_enable_storage_opt = c.get_bool(constants.CONFIG_KEY_TDLIB_ENABLE_STORAGE_OPTIMIZER)
-            tmp_ignore_file_names = c.get_bool(constants.CONFIG_KEY_TDLIB_IGNORE_FILE_NAMES)
-
-            tdlibcfg =  TdlibConfiguration(
-                library_path=tmp_library_path,
-                tdlib_log_file_path=tmp_tdlib_log_file_path,
-                api_id=tmp_api_id,
-                api_hash=tmp_api_hash,
-                tdlib_working_path=tmp_tdlib_working_path,
-                tdlib_enable_storage_optimizer=tmp_enable_storage_opt,
-                tdlib_ignore_file_names=tmp_ignore_file_names)
-
-            logger.debug("loaded TdlibConfiguration: `%s`", tdlibcfg)
-
-            return tdlibcfg
-
-        except pyhocon.exceptions.ConfigException as e:
-
-            logger.exception("TdlibConfiguration.init_from_config: error when reading needed values from configuration")
-            raise e
-        except Exception as e:
-            logger.exception("TdlibConfiguration.init_from_config: unexpected error")
-            raise e
 
 
 @attr.s(auto_attribs=True, frozen=True)
@@ -126,7 +66,7 @@ class TdlibHandle:
         logger.error("TDLib fatal error: `%s`", error_message)
 
     @staticmethod
-    def create_tdlib_parameters(config:TdlibConfiguration) -> tdlib_generated.tdlibParameters:
+    def create_tdlib_parameters(config:config.ApplicationConfiguration) -> tdlib_generated.tdlibParameters:
 
         # use defaultlocale for now becuase of https://bugs.python.org/issue38805
         tmp_lang = locale.getdefaultlocale()[0]
@@ -160,7 +100,7 @@ class TdlibHandle:
 
 
     @staticmethod
-    async def init_from_config(config:TdlibConfiguration) -> TdlibHandle:
+    async def init_from_config(config:config.ApplicationConfiguration) -> TdlibHandle:
 
         try:
 

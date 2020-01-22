@@ -5,6 +5,7 @@ from telegram_dl import utils
 from telegram_dl import handlers
 from telegram_dl import tdlib_generated
 from telegram_dl import input
+from telegram_dl import config
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +41,9 @@ class Application:
 
         # load config stuff
         logger.info("creating TdlibConfiguration")
-        tdlib_config = tdlib.TdlibConfiguration.init_from_config(self.args.config)
+        app_config = config.ApplicationConfiguration.init_from_config(self.args.config)
         logger.info("creating TdlibHandle")
-        self.tdlib_handle = await tdlib.TdlibHandle.init_from_config(tdlib_config)
+        self.tdlib_handle = await tdlib.TdlibHandle.init_from_config(app_config)
 
         # change log settings
         log_stream_file_obj = tdg.logStreamFile(
