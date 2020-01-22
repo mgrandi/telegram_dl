@@ -19,6 +19,16 @@ CONFIG_KEY_TDLIB_WORKING_PATH = "tdlib_working_path"
 CONFIG_KEY_TDLIB_ENABLE_STORAGE_OPTIMIZER = "tdlib_enable_storage_optimizer"
 CONFIG_KEY_TDLIB_IGNORE_FILE_NAMES = "tdlib_ignore_file_names"
 
+CONFIG_DATABASE_GROUP = "database"
+CONFIG_KEY_DATABASE_DRIVER = "driver_name"
+CONFIG_KEY_DATABASE_USER = "user_name"
+CONFIG_KEY_DATABASE_PASSWORD = "password"
+CONFIG_KEY_DATABASE_HOST = "host"
+CONFIG_KEY_DATABASE_PORT = "port"
+CONFIG_KEY_DATABASE_DATABASE = "database"
+CONFIG_KEY_DATABASE_QUERY = "query"
+
+
 
 # as in a message type was not registered wiht TdlibBaseMessageHandler.handle_message
 # so we ran the base implementation

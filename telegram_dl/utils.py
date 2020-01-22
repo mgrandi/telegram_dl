@@ -15,11 +15,35 @@ import pyhocon
 from telegram_dl import tdlib_generated
 from telegram_dl import constants
 
+
+from sqlalchemy.engine.url import URL
+
 logger = logging.getLogger(__name__)
 
 converter_logger = logger.getChild("converter")
 structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
+
+
+def get_sqlalchemy_url_from_hocon_config(config:pyhocon.ConfigTree) -> URL:
+
+    driver = config.get_string(constants.CONFIG_KEY_DATABASE_DRIVER)
+    user = config.get_string(constants.CONFIG_KEY_DATABASE_USER)
+    password = config.get_string(constants.CONFIG_KEY_DATABASE_PASSWORD)
+    host = config.get_string(constants.CONFIG_KEY_DATABASE_HOST)
+    port = config.get_string(constants.CONFIG_KEY_DATABASE_PORT)
+    db = config.get_string(constants.CONFIG_KEY_DATABASE_DATABASE)
+    query = config.get_string(constants.CONFIG_KEY_DATABASE_QUERY)
+
+
+    return URL(drivername=driver,
+        username=user,
+        password=password,
+        host=host,
+        port=port,
+        database=db,
+        query=query)
+
 
 
 def register_custom_types_with_cattr_converter(cattr_converter):
