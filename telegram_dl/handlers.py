@@ -18,8 +18,8 @@ not_implemented_logger = logger.getChild("not_implemented")
 class TdlibBaseMessageHandler:
 
     def __init__(self, input_obj, auth_handler):
-        self.input = input_obj
 
+        self.input = input_obj
         self.auth_handler = auth_handler
 
     @functools.singledispatchmethod
@@ -57,6 +57,20 @@ class TdlibBaseMessageHandler:
     async def handle_message_update_option(self, message:tdg.updateOption, tdlib_handle:tdlib.TdlibHandle) -> tdlib.TdlibResult:
 
         logger.debug("handle_message_update_option.handle_message got `%s`", message)
+
+    @handle_message.register
+    async def handle_message_update_user(self,  message:tdg.updateUser, tdlib_handle:tdlib.TdlibHandle) -> tdlib.TdlibResult:
+
+        logger.debug("handle_message_update_user.handle_message got `%s`", message)
+
+
+        # TODO: DO SOMETHING
+
+        return tdlib.TdlibResult(
+                code=constants.TDLIB_RESULT_CODE_OK,
+                message=f"OK",
+                result_obj=None)
+
 
 
 class AuthorizationHandler:
