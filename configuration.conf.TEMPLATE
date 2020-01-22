@@ -14,4 +14,15 @@ telegram_dl {
 
     tdlib_ignore_file_names = true
 
+    database {
+
+        driver_name = "sqlite"
+        user_name = null
+        password = null
+        host = null
+        port = null
+        database = "C:/Users/Someone/database.sqlite"
+        query = null
+    }
+
 }
