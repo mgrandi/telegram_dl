@@ -7,6 +7,11 @@ Create Date: ${create_date}
 """
 from alembic import op
 import sqlalchemy as sa
+
+import sqlalchemy_utils
+
+from telegram_dl import db_model as dbm
+from telegram_dl import db_model_enums as dbme
 ${imports if imports else ""}
 
 # revision identifiers, used by Alembic.
