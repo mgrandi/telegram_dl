@@ -9,6 +9,7 @@ from telegram_dl import config
 
 logger = logging.getLogger(__name__)
 
+loop_logger = logger.getChild("loop")
 
 class Application:
     '''
@@ -59,35 +60,35 @@ class Application:
         self.tdlib_handle = await self.tdlib_handle.create_client()
 
 
-        logger.info("Starting main loop")
+        loop_logger.info("Starting main loop")
 
         # main loop
         # TODO: might need to make this a asyncio.Task!
         while True:
-            logger.debug("loop iteration")
+            loop_logger.debug("loop iteration")
 
             # handle if the user wants to stop
             if self.should_stop_loop():
-                logger.info("Stopping main loop")
+                loop_logger.info("Stopping main loop")
                 break
 
 
             result_obj_from_receive = await self.tdlib_handle.receive()
 
-            logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
+            loop_logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
 
             if not result_obj_from_receive:
                 logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")
                 continue
 
-            logger.debug("calling singledispatch handler")
+            loop_logger.debug("calling singledispatch handler")
             handle_result = await self.message_handler.handle_message(result_obj_from_receive, self.tdlib_handle)
 
-            logger.debug("handle result is: `%s`", handle_result)
+            loop_logger.debug("handle result is: `%s`", handle_result)
 
 
 
-        logger.info("Main loop finished")
+        loop_logger.info("Main loop finished")
         # destroy tdlib client
         logger.info("destroying tdlib handle")
         self.tdlib_handle = self.tdlib_handle.destroy_client()
