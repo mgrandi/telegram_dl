@@ -1,9 +1,10 @@
-import sys
-import os
-
-# make it so we can import our model without 'no module named telegram_dl' errors
+# NOTE:
+# we set the current working dir (the top level directory,
+# containing the `telegram_dl` folder) to be in the python path, so that
+# it can actually find the `telegram_dl` module, or else we just get
+# `ModuleNotFoundError: No module named 'telegram_dl'` errors
 # see https://stackoverflow.com/questions/32032940/how-to-import-the-own-model-into-myproject-alembic-env-py
-sys.path.insert(0, os.getcwd())
+import sys, os;sys.path.insert(0, os.getcwd())
 
 from logging.config import fileConfig
 
@@ -33,6 +34,11 @@ target_metadata = db_model.CustomDeclarativeBase.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+# NOTE:
+# uncomment to debug logging issues with `alembic.ini`
+# import logging_tree, logging
+# r = logging.getLogger()
+# r.info(logging_tree.format.build_description(node=None))
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
