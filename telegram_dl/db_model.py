@@ -7,7 +7,7 @@ from sqlalchemy_utils import PhoneNumberType, ChoiceType
 
 import telegram_dl.db_model_enums as dbme
 
-CustomDeclarativeBase = declarative_base(cls=RepresentableBase)
+CustomDeclarativeBase = declarative_base(cls=RepresentableBase, name="CustomDeclarativeBase")
 
 class User(CustomDeclarativeBase):
 

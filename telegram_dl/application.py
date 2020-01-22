@@ -1,5 +1,8 @@
 import logging
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 from telegram_dl import tdlib
 from telegram_dl import utils
 from telegram_dl import handlers
@@ -27,6 +30,15 @@ class Application:
 
         self.message_handler = handlers.TdlibBaseMessageHandler(input.TTYInput(), handlers.AuthorizationHandler())
 
+        # load config stuff
+        logger.info("creating TdlibConfiguration")
+        self.app_config = config.ApplicationConfiguration.init_from_config(self.args.config)
+
+        logger.info("creating engine")
+
+        self.engine = create_engine(self.app_config.sqlalchemy_url, echo=False)
+        self.sessionmaker = sessionmaker(bind=self.engine)
+
     def should_stop_loop(self):
         return self.please_stop
 
@@ -40,11 +52,9 @@ class Application:
 
         utils.register_ctrl_c_signal_handler(_please_stop_loop_func)
 
-        # load config stuff
-        logger.info("creating TdlibConfiguration")
-        app_config = config.ApplicationConfiguration.init_from_config(self.args.config)
+
         logger.info("creating TdlibHandle")
-        self.tdlib_handle = await tdlib.TdlibHandle.init_from_config(app_config)
+        self.tdlib_handle = await tdlib.TdlibHandle.init_from_config(self.app_config)
 
         # change log settings
         log_stream_file_obj = tdg.logStreamFile(
@@ -61,6 +71,9 @@ class Application:
 
 
         loop_logger.info("Starting main loop")
+
+        # FIXME should i regenerate this every time or cache it?
+        handler_params =  handlers.HandlerParameters(tdlib_handle=self.tdlib_handle, sqla_sessionmaker=self.sessionmaker)
 
         # main loop
         # TODO: might need to make this a asyncio.Task!
@@ -82,10 +95,9 @@ class Application:
                 continue
 
             loop_logger.debug("calling singledispatch handler")
-            handle_result = await self.message_handler.handle_message(result_obj_from_receive, self.tdlib_handle)
+            handle_result = await self.message_handler.handle_message(result_obj_from_receive, handler_params)
 
             loop_logger.debug("handle result is: `%s`", handle_result)
-
 
 
         loop_logger.info("Main loop finished")
