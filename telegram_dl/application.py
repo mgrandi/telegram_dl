@@ -73,7 +73,7 @@ class Application:
         loop_logger.info("Starting main loop")
 
         # FIXME should i regenerate this every time or cache it?
-        handler_params =  handlers.HandlerParameters(tdlib_handle=self.tdlib_handle, sqla_sessionmaker=self.sessionmaker)
+        handler_params =  handlers.HandlerParameters(tdlib_handle=self.tdlib_handle)
 
         # main loop
         # TODO: might need to make this a asyncio.Task!
@@ -84,7 +84,6 @@ class Application:
             if self.should_stop_loop():
                 loop_logger.info("Stopping main loop")
                 break
-
 
             result_obj_from_receive = await self.tdlib_handle.receive()
 

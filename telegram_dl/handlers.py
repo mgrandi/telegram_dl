@@ -21,7 +21,6 @@ class HandlerParameters:
     '''
 
     tdlib_handle:tdlib.TdlibHandle = attr.ib()
-    sqla_sessionmaker = attr.ib()
 
 
 class TdlibBaseMessageHandler:
