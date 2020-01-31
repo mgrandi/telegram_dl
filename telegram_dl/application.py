@@ -123,24 +123,33 @@ class ReceiveMessageTask:
 
     async def run(self):
 
-        while not self.stop_event.is_set():
+        # we need this as the tdlib json library blocks and there is no way to
+        # use async/await on those ctypes calls, so by default this task will just
+        # run forever and never give any of the other tasks a chance to run
+        # so we run the tdlib json ctypes calls in a separate executor that is
+        # on a different thread, so that way it doesn't block any of the other tasks
+        with concurrent.futures.ThreadPoolExecutor() as thread_pool_executor:
+            while not self.stop_event.is_set():
 
-            receive_message_logger.debug("loop iteration")
+                receive_message_logger.debug("loop iteration")
 
-            # TODO: make tdlib receive act like a real coroutine and have a timeout error when it timeouts?
-            result_obj_from_receive = await self.tdlib_handle.receive()
+                # TODO: make tdlib receive act like a real coroutine and have a timeout error when it timeouts?
 
-            receive_message_logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
+                result_obj_from_receive = await asyncio.get_running_loop().run_in_executor(
+                    thread_pool_executor, self.tdlib_handle.receive)
 
-            if not result_obj_from_receive:
-                logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")
-                continue
+                receive_message_logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
 
-            # put message into our queue
-            # NOTE assuming this queue is infinite or very large so don't use the coroutine version for now
-            self.message_queue.put_nowait(result_obj_from_receive)
 
-            logger.debug("added message to queue, queue size is now `%s`", self.message_queue.qsize())
+                if not result_obj_from_receive:
+                    logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")
+                    continue
+
+                # put message into our queue
+                # NOTE assuming this queue is infinite or very large so don't use the coroutine version for now
+                self.message_queue.put_nowait(result_obj_from_receive)
+
+                logger.debug("added message to queue, queue size is now `%s`", self.message_queue.qsize())
 
             receive_message_logger.info("stop event is set, returning")
 
