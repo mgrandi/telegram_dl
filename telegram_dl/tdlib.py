@@ -33,7 +33,11 @@ class TdlibResult:
 
 @attr.s(auto_attribs=True, frozen=True)
 class TdlibHandle:
+    ''' documentation on the tdlib json methods:
 
+    https://core.telegram.org/tdlib/docs/td__json__client_8h.html
+
+    '''
 
     tdlib_shared_library:ctypes.CDLL = attr.ib()
 
