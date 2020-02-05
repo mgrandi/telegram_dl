@@ -6,6 +6,7 @@ import typing
 import signal
 import uuid
 import decimal
+import argparse
 import base64
 
 import cattr
@@ -107,7 +108,7 @@ def hocon_config_file_type(stringArg):
     @return a dict like object containing the configuration or raises ArgumentTypeError
     '''
 
-    resolved_path = pathlib.Path(stringArg).resolve()
+    resolved_path = pathlib.Path(stringArg).expanduser().resolve()
     if not resolved_path.exists:
         raise argparse.ArgumentTypeError("The path {} doesn't exist!".format(resolved_path))
 
@@ -130,7 +131,7 @@ def isFileType(filePath):
 
     # try and resolve the path
     try:
-        path_resolved = path_maybe.resolve(strict=True)
+        path_resolved = path_maybe.expanduser().resolve(strict=True)
 
     except Exception as e:
         raise argparse.ArgumentTypeError("Failed to parse `{}` as a path: `{}`".format(filePath, e))
