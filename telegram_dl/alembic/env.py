@@ -5,13 +5,15 @@
 # `ModuleNotFoundError: No module named 'telegram_dl'` errors
 # see https://stackoverflow.com/questions/32032940/how-to-import-the-own-model-into-myproject-alembic-env-py
 import sys, os;sys.path.insert(0, os.getcwd())
-
 from logging.config import fileConfig
+import logging
 
-from sqlalchemy import engine_from_config
+from sqlalchemy import engine_from_config, create_engine
 from sqlalchemy import pool
 
 from alembic import context
+
+import pyhocon
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -26,8 +28,10 @@ fileConfig(config.config_file_name)
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-from telegram_dl import db_model
+from telegram_dl import db_model, utils, constants
 target_metadata = db_model.CustomDeclarativeBase.metadata
+
+logger = logging.getLogger(__name__)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -36,9 +40,29 @@ target_metadata = db_model.CustomDeclarativeBase.metadata
 
 # NOTE:
 # uncomment to debug logging issues with `alembic.ini`
-# import logging_tree, logging
-# r = logging.getLogger()
-# r.info(logging_tree.format.build_description(node=None))
+# import logging_tree
+# logger.info(logging_tree.format.build_description(node=None))
+
+
+def get_our_own_sqla_url():
+
+    # Load our own application config and use it to get the SQLAlchemy URL
+    # TODO: maybe make this an option, like have it be in the `-x` arguments OR in alembic.ini?
+
+    x_arguments  = context.get_x_argument(as_dictionary=True)
+
+    if constants.ALEMBIC_CMD_X_ARGUMENT_NAME not in x_arguments.keys():
+        raise Exception("you need to pass in `-x {}=/path/to/config``".format(constants.ALEMBIC_CMD_X_ARGUMENT_NAME))
+
+    our_config_path = x_arguments[constants.ALEMBIC_CMD_X_ARGUMENT_NAME]
+
+    logger.info("telegram_dl config file path: `%s`", our_config_path)
+    our_config = utils.hocon_config_file_type(our_config_path)
+    database_group_path = f"{constants.CONFIG_ROOT_GROUP}.{constants.CONFIG_DATABASE_GROUP}"
+    sqla_url = utils.get_sqlalchemy_url_from_hocon_config(our_config.get_config(database_group_path))
+
+    logger.info("SQLAlchemy URL: `%s`", sqla_url)
+    return sqla_url
 
 def run_migrations_offline():
     """Run migrations in 'offline' mode.
@@ -52,7 +76,11 @@ def run_migrations_offline():
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+
+    # url = config.get_main_option("sqlalchemy.url")
+
+    url = get_our_own_sqla_url()
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -71,11 +99,12 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+
+    sqla_url = get_our_own_sqla_url()
+
+    connectable = create_engine(sqla_url, poolclass=pool.NullPool)
+
+    logger.info("Engine: `%s`", connectable)
 
     with connectable.connect() as connection:
         context.configure(

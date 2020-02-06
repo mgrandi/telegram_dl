@@ -2,18 +2,7 @@
 
 ## Alembic Commands
 
-alembic revision --autogenerate -m "add user, file, profile_photo tables"
-
-alembic upgrade head
-
-alembic revision --autogenerate -m "add profile_photo table"
-
-alembic upgrade head
-
-
-alembic revision --autogenerate -m "add user table"
-alembic upgrade head
-
+see `alembic notes.md`
 
 ## Commands for running the app
 

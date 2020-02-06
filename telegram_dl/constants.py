@@ -11,6 +11,9 @@ TDLIB_ORIGINAL_JSON_EXTRA_STR = "_extra"
 
 TDLIB_TYPE_VAR_NAME = "__tdlib_type__"
 
+# used to pass in our own config path into alembic commands using `alembic -x key=value`
+ALEMBIC_CMD_X_ARGUMENT_NAME = "telegram_dl_config"
+
 CONFIG_ROOT_GROUP = "telegram_dl"
 CONFIG_KEY_SHARED_LIBRARY_PATH = "library_path"
 CONFIG_KEY_TDLIB_LOG_FILE = "tdlib_log_file_path"
