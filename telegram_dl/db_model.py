@@ -1,9 +1,9 @@
-from sqlalchemy import Column, Index, Integer, Unicode, Boolean, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Index, Integer, Unicode, Boolean, ForeignKey, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_repr import RepresentableBase
 
-from sqlalchemy_utils import PhoneNumberType, ChoiceType
+from sqlalchemy_utils import PhoneNumberType, ChoiceType, ArrowType
 
 import telegram_dl.db_model_enums as dbme
 
@@ -13,7 +13,10 @@ class User(CustomDeclarativeBase):
 
     __tablename__ = "user"
 
-    user_id = Column(Integer, primary_key=True)
+    # primary key column
+    user_id = Column(Integer)
+
+    as_of = Column(ArrowType)
 
     # telegram fields
     tg_user_id = Column(Integer)
@@ -44,7 +47,8 @@ class User(CustomDeclarativeBase):
     profile_photo = relationship("ProfilePhoto")
 
     __table_args__ = (
-        Index("IXUQ-user-tg_user_id", "tg_user_id", unique=True),
+        PrimaryKeyConstraint("user_id", name="PK-user-user_id"),
+        Index("IXUQ-user-tg_user_id-as_of", "tg_user_id", "as_of", unique=True),
         Index("IX-user-phone_number", "phone_number"),
         Index("IX-user-user_type", "user_type"),
     )
@@ -57,8 +61,8 @@ class File(CustomDeclarativeBase):
     # this is combining `file`, `localFile` and `remoteFile`
 
 
-    # our unique identifier
-    file_id = Column(Integer, primary_key=True)
+    # our unique identifier, primary key column
+    file_id = Column(Integer)
 
     # seems to be local to the user and a very low number, like `27`
     tg_file_id = Column(Integer)
@@ -82,7 +86,7 @@ class File(CustomDeclarativeBase):
 
 
     __table_args__ = (
-
+        PrimaryKeyConstraint("file_id", name="PK-file-file_id"),
         Index("IXUQ-file-tg_file_id", "tg_file_id", unique=True),
         Index("IX-file-remote_file_id", "remote_file_id"),
     )
@@ -92,7 +96,10 @@ class ProfilePhoto(CustomDeclarativeBase):
 
     __tablename__ = "profile_photo"
 
-    profile_photo_id = Column(Integer, primary_key=True)
+    # primary key column
+    profile_photo_id = Column(Integer)
+
+    as_of = Column(ArrowType)
 
     tg_profile_photo_id = Column(Integer)
     big_id = Column(Integer, ForeignKey("file.tg_file_id"))
@@ -103,8 +110,8 @@ class ProfilePhoto(CustomDeclarativeBase):
     small = relationship("File", foreign_keys=[small_id])
 
     __table_args__ = (
-
-        Index("IXUQ-profile_photo-tg_profile_photo_id", "tg_profile_photo_id"),
+        PrimaryKeyConstraint("profile_photo_id", name="PK-profile_photo-profile_photo_id"),
+        Index("IXUQ-profile_photo-tg_profile_photo_id-as_of", "tg_profile_photo_id", "as_of", unique=True),
     )
 
 
