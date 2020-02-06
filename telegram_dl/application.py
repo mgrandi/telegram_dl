@@ -15,8 +15,11 @@ from telegram_dl import config, constants
 logger = logging.getLogger(__name__)
 
 task_logger = logger.getChild("task")
-receive_message_logger = task_logger.getChild("ReceiveMessageTask")
-process_message_logger = task_logger.getChild("ProcessMessageTask")
+send_messages_to_tl_logger = task_logger.getChild("SendMessagesToTelegramTask")
+receive_messages_from_tl_logger = task_logger.getChild("ReceiveMessagesFromTelegramTask")
+process_messages_from_tl_logger = task_logger.getChild("ProcessMessagesFromTelegram")
+database_task_logger = task_logger.getChild("DatabaseTask")
+
 
 class Application:
     '''
@@ -30,9 +33,7 @@ class Application:
 
         self.args = args
 
-
-
-        self.message_handler = handlers.TdlibBaseMessageHandler(input.TTYInput(), handlers.AuthorizationHandler())
+        self.message_handler = handlers.TdlibBaseMessageHandler(handlers.AuthorizationHandler(input.TTYInput()))
 
         # load config stuff
         logger.info("creating TdlibConfiguration")
@@ -45,7 +46,8 @@ class Application:
 
         # NOTE: you NEED to create these inside a running loop or else it will use
         # `asyncio.get_event_loop()` which is not the same loop that `asyncio.run()` uses
-        self.message_queue = None
+        self.to_telegram_queue = None
+        self.from_telegram_queue = None
         self.stop_event = None
 
     def should_stop_loop(self):
@@ -55,7 +57,8 @@ class Application:
 
         from telegram_dl import tdlib_generated as tdg
 
-        self.message_queue = asyncio.Queue()
+        self.to_telegram_queue = asyncio.Queue()
+        self.from_telegram_queue = asyncio.Queue()
         self.stop_event = asyncio.Event()
 
         # register Ctrl+C/D/whatever signal
@@ -75,23 +78,26 @@ class Application:
         set_log_stream_obj = tdlib_generated.setLogStream(log_stream=log_stream_file_obj, extra=utils.new_extra())
 
         logger.info("setting TDLib log file path: `%s`", set_log_stream_obj)
-        await self.tdlib_handle.execute(set_log_stream_obj, without_client_ok=True)
+        self.tdlib_handle.execute(set_log_stream_obj, without_client_ok=True)
 
         # create tdlib client
         logger.info("creating TDLib client")
-        self.tdlib_handle = await self.tdlib_handle.create_client()
+        self.tdlib_handle = self.tdlib_handle.create_client()
 
 
         logger.info("Starting tasks")
 
 
-        rmt = ReceiveMessageTask(self.stop_event, self.tdlib_handle, self.message_queue)
-        receive_message_task = asyncio.create_task(rmt.run())
+        recieve_messages_task_notstarted = ReceiveMessagesFromTelegramTask(self.stop_event, self.tdlib_handle, self.from_telegram_queue)
+        receive_message_task = asyncio.create_task(recieve_messages_task_notstarted.run(), name="ReceiveMessagesFromTelegramTask")
 
-        pmt = ProcessMessageTask(self.stop_event, self.tdlib_handle, self.message_queue, self.message_handler)
-        process_message_task = asyncio.create_task(pmt.run())
+        process_messages_task_notstarted = ProcessMessagesFromTelegram(self.stop_event, self.tdlib_handle, self.from_telegram_queue, self.to_telegram_queue, self.message_handler)
+        process_message_task = asyncio.create_task(process_messages_task_notstarted.run(), name="ProcessMessagesFromTelegram")
 
-        all_tasks = [receive_message_task, process_message_task]
+        send_messages_task_notstarted = SendMessagesToTelegramTask(self.stop_event, self.tdlib_handle, self.to_telegram_queue)
+        send_messages_task = asyncio.create_task(send_messages_task_notstarted.run(), name="SendMessagesToTelegramTask")
+
+        all_tasks = [receive_message_task, process_message_task, send_messages_task]
 
         logger.info("created tasks: `%s`", all_tasks)
 
@@ -113,13 +119,65 @@ class Application:
         logger.info("tdlib handle destroyed successfully")
 
 
-class ReceiveMessageTask:
+class DatabaseTask:
+   async def run(self):
 
-    def __init__(self, stop_event, tdlib_handle, message_queue):
+        while not self.stop_event.is_set():
+
+
+            pass
+
+class SendMessagesToTelegramTask:
+
+    def __init__(self, stop_event, tdlib_handle, to_telegram_queue):
         self.stop_event = stop_event
         self.tdlib_handle = tdlib_handle
-        self.message_queue = message_queue
+        self.to_telegram_queue = to_telegram_queue
 
+
+    async def run(self):
+
+        with concurrent.futures.ThreadPoolExecutor() as thread_pool_executor:
+
+            while not self.stop_event.is_set():
+                send_messages_to_tl_logger.debug("loop iteration")
+
+
+                try:
+                    result_obj = await asyncio.wait_for(self.to_telegram_queue.get(), constants.PROCESS_MESSAGE_QUEUE_TIMEOUT)
+
+                    send_messages_to_tl_logger.debug("got object from queue: `%s`, (queue size is now `%s`)",
+                        result_obj, self.to_telegram_queue.qsize())
+
+
+                    # TODO: make tdlib receive act like a real coroutine and have a timeout error when it timeouts?
+                    # and put this executor stuff in tdlib.py
+
+                    # send message to telegram
+                    result_obj_from_receive = await asyncio.get_running_loop().run_in_executor(
+                        thread_pool_executor, self.tdlib_handle.send, result_obj)
+
+                    send_messages_to_tl_logger.debug("send successful")
+                    self.to_telegram_queue.task_done()
+
+
+                except asyncio.TimeoutError as e:
+
+                    continue
+
+                except Exception as e:
+
+                    send_messages_to_tl_logger.exception("uncaught exception!")
+
+            send_messages_to_tl_logger.info("stop event is set, returning")
+
+
+class ReceiveMessagesFromTelegramTask:
+
+    def __init__(self, stop_event, tdlib_handle, from_telegram_queue):
+        self.stop_event = stop_event
+        self.tdlib_handle = tdlib_handle
+        self.from_telegram_queue = from_telegram_queue
 
     async def run(self):
 
@@ -131,35 +189,41 @@ class ReceiveMessageTask:
         with concurrent.futures.ThreadPoolExecutor() as thread_pool_executor:
             while not self.stop_event.is_set():
 
-                receive_message_logger.debug("loop iteration")
+                try:
+                    receive_messages_from_tl_logger.debug("loop iteration")
 
-                # TODO: make tdlib receive act like a real coroutine and have a timeout error when it timeouts?
+                    # TODO: make tdlib receive act like a real coroutine and have a timeout error when it timeouts?
+                    # and put this executor stuff in tdlib.py
+                    result_obj_from_receive = await asyncio.get_running_loop().run_in_executor(
+                        thread_pool_executor, self.tdlib_handle.receive)
 
-                result_obj_from_receive = await asyncio.get_running_loop().run_in_executor(
-                    thread_pool_executor, self.tdlib_handle.receive)
-
-                receive_message_logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
-
-
-                if not result_obj_from_receive:
-                    logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")
-                    continue
-
-                # put message into our queue
-                # NOTE assuming this queue is infinite or very large so don't use the coroutine version for now
-                self.message_queue.put_nowait(result_obj_from_receive)
-
-                logger.debug("added message to queue, queue size is now `%s`", self.message_queue.qsize())
-
-            receive_message_logger.info("stop event is set, returning")
+                    receive_messages_from_tl_logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
 
 
-class ProcessMessageTask:
+                    if not result_obj_from_receive:
+                        receive_messages_from_tl_logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")
+                        continue
 
-    def __init__(self, stop_event, tdlib_handle, message_queue, message_handler):
+                    # put message into our queue
+                    # NOTE assuming this queue is infinite or very large so don't use the coroutine version for now
+                    self.from_telegram_queue.put_nowait(result_obj_from_receive)
+
+                    receive_messages_from_tl_logger.debug("added message to queue, queue size is now `%s`", self.from_telegram_queue.qsize())
+
+                except Exception as e:
+
+                    receive_messages_from_tl_logger.exception("uncaught exception!")
+
+            receive_messages_from_tl_logger.info("stop event is set, returning")
+
+
+class ProcessMessagesFromTelegram:
+
+    def __init__(self, stop_event, tdlib_handle, from_telegram_queue, to_telegram_queue, message_handler):
         self.stop_event = stop_event
         self.tdlib_handle = tdlib_handle
-        self.message_queue = message_queue
+        self.from_telegram_queue = from_telegram_queue
+        self.to_telegram_queue = to_telegram_queue
         self.message_handler = message_handler
 
 
@@ -167,24 +231,28 @@ class ProcessMessageTask:
 
         while not self.stop_event.is_set():
 
-            process_message_logger.debug("loop iteration")
+            process_messages_from_tl_logger.debug("loop iteration")
 
             # FIXME should i regenerate this every time or cache it?
-            handler_params =  handlers.HandlerParameters(tdlib_handle=self.tdlib_handle)
+            handler_params =  handlers.HandlerParameters(tdlib_handle=self.tdlib_handle, to_telegram_queue=self.to_telegram_queue)
 
             try:
-                result_obj = await asyncio.wait_for(self.message_queue.get(), constants.PROCESS_MESSAGE_QUEUE_TIMEOUT)
+                result_obj = await asyncio.wait_for(self.from_telegram_queue.get(), constants.PROCESS_MESSAGE_QUEUE_TIMEOUT)
 
-                try:
-                    process_message_logger.debug("got object from queue: `%s`, (queue size is now `%s`),  calling single dispatch handler",
-                        result_obj, self.message_queue.qsize())
-                    handle_result = await self.message_handler.handle_message(result_obj, handler_params)
+                process_messages_from_tl_logger.debug("got object from queue: `%s`, (queue size is now `%s`),  calling single dispatch handler",
+                    result_obj, self.from_telegram_queue.qsize())
+                handle_result = await self.message_handler.handle_message(result_obj, handler_params)
 
-                    process_message_logger.debug("handle result is: `%s`", handle_result)
-                finally:
-                    self.message_queue.task_done()
+                process_messages_from_tl_logger.debug("handle result is: `%s`", handle_result)
+
+                self.from_telegram_queue.task_done()
 
             except asyncio.TimeoutError as e:
 
                 continue
-        process_message_logger.info("stop event is set, returning")
+
+            except Exception as e:
+
+                process_messages_from_tl_logger.exception("uncaught exception!")
+
+        process_messages_from_tl_logger.info("stop event is set, returning")

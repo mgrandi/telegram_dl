@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import functools
 import logging
 import typing
@@ -21,19 +23,19 @@ class HandlerParameters:
     '''
 
     tdlib_handle:tdlib.TdlibHandle = attr.ib()
+    to_telegram_queue:asyncio.Queue = attr.ib()
 
 
 class TdlibBaseMessageHandler:
 
-    def __init__(self, input_obj, auth_handler):
+    def __init__(self, auth_handler):
 
-        self.input = input_obj
         self.auth_handler = auth_handler
 
     @functools.singledispatchmethod
     async def handle_message(self, message:tdg.RootObject, params:HandlerParameters) -> typing.Optional[tdlib.TdlibResult]:
 
-        not_implemented_logger.error("Unimplemented type: TdlibBaseMessageHandler.handle_message got `%s`", message)
+        #not_implemented_logger.error("Unimplemented type: TdlibBaseMessageHandler.handle_message got `%s`", message)
         return tdlib.TdlibResult(
             code=constants.TDLIB_RESULT_CODE_MANUAL_MESSAGE_NOT_HANDLED,
             message=f"Unimplemented message of type `{type(message)}`: `{message}`",
@@ -83,6 +85,10 @@ class TdlibBaseMessageHandler:
 
 class AuthorizationHandler:
 
+    def __init__(self, input):
+
+        self.input = input
+
     @functools.singledispatchmethod
     async def handle_auth_state(self, auth_state:tdg.AuthorizationState, params:HandlerParameters) -> None:
         '''
@@ -103,8 +109,8 @@ class AuthorizationHandler:
 
         set_param = tdg.setTdlibParameters(parameters=params.tdlib_handle.tdlib_parameters_config, extra=utils.new_extra())
 
-        authstate_logger.debug("calling send with setTdlibParameters: `%s`", set_param)
-        await params.tdlib_handle.send(set_param)
+        authstate_logger.debug("putting into queue: setTdlibParameters: `%s`", set_param)
+        params.to_telegram_queue.put_nowait(set_param)
 
 
     @handle_auth_state.register
@@ -117,9 +123,9 @@ class AuthorizationHandler:
         authstate_logger.debug("handle_auth_state_wait_encryption_key got message: `%s`", message)
 
         check_key = tdg.checkDatabaseEncryptionKey(encryption_key="", extra=utils.new_extra())
-        authstate_logger.debug("calling send with checkDatabaseEncryptionKey: `%s`", check_key)
+        authstate_logger.debug("putting into queue: checkDatabaseEncryptionKey: `%s`", check_key)
 
-        await params.tdlib_handle.send(check_key)
+        params.to_telegram_queue.put_nowait(check_key)
 
 
 
@@ -135,9 +141,9 @@ class AuthorizationHandler:
         ask_phone_no_result = self.input.ask_user_for_phone_number()
         set_auth_phone_no = tdg.setAuthenticationPhoneNumber(phone_number=ask_phone_no_result.get_as_one_string(),
             settings=None, extra=utils.new_extra())
-        authstate_logger.debug("calling send with setAuthenticationPhoneNumber: `%s`", set_auth_phone_no)
+        authstate_logger.debug("putting into queue: setAuthenticationPhoneNumber: `%s`", set_auth_phone_no)
 
-        await params.tdlib_handle.send(set_auth_phone_no)
+        params.to_telegram_queue.put_nowait(set_auth_phone_no)
 
 
 
@@ -152,9 +158,9 @@ class AuthorizationHandler:
 
         ask_for_code_result = self.input.ask_user_for_code()
         check_auth_code = tdg.checkAuthenticationCode(code=ask_for_code_result.code, extra=utils.new_extra())
-        authstate_logger.debug("calling send with checkAuthenticationCode: `%s`", check_auth_code)
+        authstate_logger.debug("putting into queue: checkAuthenticationCode: `%s`", check_auth_code)
 
-        await params.tdlib_handle.send(check_auth_code)
+        params.to_telegram_queue.put_nowait(check_auth_code)
 
 
     @handle_auth_state.register
@@ -168,8 +174,9 @@ class AuthorizationHandler:
 
         name_result = self.input.ask_user_for_first_last_name()
         reg_user_ = tdg.registerUser(first_name=name_result.first, last_name=name_result.last, extra=utils.new_extra())
-        authstate_logger.debug("calling send with registerUser: `%s`", reg_user)
-        await params.tdlib_handle.send(reg_user)
+        authstate_logger.debug("putting into queue: registerUser: `%s`", reg_user)
+
+        params.to_telegram_queue.put_nowait(reg_user)
 
 
     @handle_auth_state.register
@@ -183,8 +190,9 @@ class AuthorizationHandler:
         password_result = self.input.ask_user_for_password()
 
         check_password = tdg.checkAuthenticationPassword(password=password_result.password, extra=utils.new_extra())
-        authstate_logger.debug("calling send with checkAuthenticationPassword: `%s`", check_password)
-        await params.tdlib_handle.send(check_password)
+        authstate_logger.debug("putting into queue: checkAuthenticationPassword: `%s`", check_password)
+
+        params.to_telegram_queue.put_nowait(check_password)
 
 
 
