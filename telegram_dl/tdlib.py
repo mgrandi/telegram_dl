@@ -173,7 +173,7 @@ class TdlibHandle:
             raise e
 
 
-    async def create_client(self) -> TdlibHandle:
+    def create_client(self) -> TdlibHandle:
         ''' creates a client and returns a new instance of TdlibHandle with the new client
         '''
 
@@ -186,7 +186,7 @@ class TdlibHandle:
 
         return attr.evolve(self, tdlib_client=new_client)
 
-    async def send(self, obj_to_send:tdlib_generated.RootObject) -> None:
+    def send(self, obj_to_send:tdlib_generated.RootObject) -> None:
 
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.send called when no client has been created")
@@ -203,7 +203,7 @@ class TdlibHandle:
         self.func_client_send(self.tdlib_client, json_bytes)
         send_logger.debug("tdlib client `%s` called successfully", "send")
 
-    async def execute(self, obj_to_send:tdlib_generated.RootObject, without_client_ok:bool=False) -> tdlib_generated.RootObject:
+    def execute(self, obj_to_send:tdlib_generated.RootObject, without_client_ok:bool=False) -> tdlib_generated.RootObject:
 
         if self.tdlib_client is None and not without_client_ok:
             raise Exception("TdlibHandle.send called when no client has been created")
