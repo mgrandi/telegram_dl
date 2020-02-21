@@ -1,6 +1,7 @@
 import logging
 import asyncio
 import concurrent.futures
+import functools
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -11,6 +12,7 @@ from telegram_dl import handlers
 from telegram_dl import tdlib_generated
 from telegram_dl import input
 from telegram_dl import config, constants
+from telegram_dl import db_actions
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +21,9 @@ send_messages_to_tl_logger = task_logger.getChild("SendMessagesToTelegramTask")
 receive_messages_from_tl_logger = task_logger.getChild("ReceiveMessagesFromTelegramTask")
 process_messages_from_tl_logger = task_logger.getChild("ProcessMessagesFromTelegram")
 database_task_logger = task_logger.getChild("DatabaseTask")
+
+database_task_action_logger = database_task_logger.getChild("actions")
+
 
 
 class Application:
@@ -48,6 +53,7 @@ class Application:
         # `asyncio.get_event_loop()` which is not the same loop that `asyncio.run()` uses
         self.to_telegram_queue = None
         self.from_telegram_queue = None
+        self.database_queue = None
         self.stop_event = None
 
     def should_stop_loop(self):
@@ -59,6 +65,7 @@ class Application:
 
         self.to_telegram_queue = asyncio.Queue()
         self.from_telegram_queue = asyncio.Queue()
+        self.database_queue = asyncio.Queue()
         self.stop_event = asyncio.Event()
 
         # register Ctrl+C/D/whatever signal
@@ -91,13 +98,16 @@ class Application:
         recieve_messages_task_notstarted = ReceiveMessagesFromTelegramTask(self.stop_event, self.tdlib_handle, self.from_telegram_queue)
         receive_message_task = asyncio.create_task(recieve_messages_task_notstarted.run(), name="ReceiveMessagesFromTelegramTask")
 
-        process_messages_task_notstarted = ProcessMessagesFromTelegram(self.stop_event, self.tdlib_handle, self.from_telegram_queue, self.to_telegram_queue, self.message_handler)
+        process_messages_task_notstarted = ProcessMessagesFromTelegram(self.stop_event, self.tdlib_handle, self.from_telegram_queue, self.to_telegram_queue, self.database_queue, self.message_handler)
         process_message_task = asyncio.create_task(process_messages_task_notstarted.run(), name="ProcessMessagesFromTelegram")
 
         send_messages_task_notstarted = SendMessagesToTelegramTask(self.stop_event, self.tdlib_handle, self.to_telegram_queue)
         send_messages_task = asyncio.create_task(send_messages_task_notstarted.run(), name="SendMessagesToTelegramTask")
 
-        all_tasks = [receive_message_task, process_message_task, send_messages_task]
+        database_task_notstarted = DatabaseTask(self.stop_event, self.database_queue, self.sessionmaker)
+        database_task = asyncio.create_task(database_task_notstarted.run(), name="DatabaseTask")
+
+        all_tasks = [receive_message_task, process_message_task, send_messages_task, database_task]
 
         logger.info("created tasks: `%s`", all_tasks)
 
@@ -120,12 +130,75 @@ class Application:
 
 
 class DatabaseTask:
-   async def run(self):
+
+    def __init__(self, stop_event, db_input_queue, sqla_sessionmaker):
+
+        self.stop_event = stop_event
+        self.db_input_queue = db_input_queue
+        self.sqla_sessionmaker = sqla_sessionmaker
+
+    @functools.singledispatchmethod
+    async def handle_database_action(self, obj_to_handle:db_actions.BaseDatabaseAction, session):
+
+        database_task_action_logger.info("handle_database_action: got object: `%s`", obj_to_handle)
+
+
+    @handle_database_action.register
+    async def handle_insert_database_action(self, obj_to_handle:db_actions.InsertDatabaseAction, session):
+
+        database_task_action_logger.info("handle_insert_database_action got object: `%s`", obj_to_handle)
+
+
+        session.add(obj_to_handle.object_to_insert)
+
+
+
+    async def run(self):
 
         while not self.stop_event.is_set():
 
+            database_task_logger.debug("loop iteration")
 
-            pass
+
+            try:
+                result_obj = await asyncio.wait_for(self.db_input_queue.get(), constants.PROCESS_MESSAGE_QUEUE_TIMEOUT)
+
+
+                session = self.sqla_sessionmaker()
+
+                try:
+
+                    database_task_logger.debug("got object: `%s`, sending to single dispatch")
+                    await self.handle_database_action(result_obj, session)
+
+
+                    session.commit()
+
+                except Exception as e:
+
+                    database_task_logger.exception("Uncaught exception with database action, rolling back session")
+                    session.rollback()
+                    raise e
+
+                finally:
+
+                    database_task_logger.debug("closing session")
+                    session.close()
+
+                database_task_logger.debug("object handled successfully, marking queue object as done")
+                self.db_input_queue.task_done()
+
+
+            except asyncio.TimeoutError as e:
+
+                continue
+
+            except Exception as e:
+
+                database_task_logger.exception("uncaught exception!")
+
+        database_task_logger.info("stop event is set, returning")
+
 
 class SendMessagesToTelegramTask:
 
@@ -219,11 +292,13 @@ class ReceiveMessagesFromTelegramTask:
 
 class ProcessMessagesFromTelegram:
 
-    def __init__(self, stop_event, tdlib_handle, from_telegram_queue, to_telegram_queue, message_handler):
+    def __init__(self, stop_event, tdlib_handle, from_telegram_queue, to_telegram_queue, database_queue, message_handler):
         self.stop_event = stop_event
         self.tdlib_handle = tdlib_handle
         self.from_telegram_queue = from_telegram_queue
         self.to_telegram_queue = to_telegram_queue
+        self.database_queue = database_queue
+
         self.message_handler = message_handler
 
 
@@ -234,7 +309,10 @@ class ProcessMessagesFromTelegram:
             process_messages_from_tl_logger.debug("loop iteration")
 
             # FIXME should i regenerate this every time or cache it?
-            handler_params =  handlers.HandlerParameters(tdlib_handle=self.tdlib_handle, to_telegram_queue=self.to_telegram_queue)
+            handler_params =  handlers.HandlerParameters(
+                tdlib_handle=self.tdlib_handle,
+                to_telegram_queue=self.to_telegram_queue,
+                database_queue=self.database_queue)
 
             try:
                 result_obj = await asyncio.wait_for(self.from_telegram_queue.get(), constants.PROCESS_MESSAGE_QUEUE_TIMEOUT)

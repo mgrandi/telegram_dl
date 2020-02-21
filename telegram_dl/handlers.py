@@ -10,6 +10,8 @@ from telegram_dl import tdlib
 from telegram_dl import constants
 from telegram_dl import tdlib_generated as tdg
 from telegram_dl import utils
+from telegram_dl import db_model
+from telegram_dl import db_actions
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +26,7 @@ class HandlerParameters:
 
     tdlib_handle:tdlib.TdlibHandle = attr.ib()
     to_telegram_queue:asyncio.Queue = attr.ib()
+    database_queue:asyncio.Queue = attr.ib()
 
 
 class TdlibBaseMessageHandler:
@@ -75,6 +78,19 @@ class TdlibBaseMessageHandler:
 
 
         # TODO: DO SOMETHING
+
+        tmp_photo = message.user.profile_photo
+
+        if tmp_photo:
+            tmp_file = message.user.profile_photo.small
+
+            new_file =db_model.File(tg_file_id=tmp_file.id,
+                size=tmp_file.size,
+                expected_size=tmp_file.expected_size,
+                remote_file_id=tmp_file.remote.id)
+
+
+            params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=new_file))
 
         return tdlib.TdlibResult(
                 code=constants.TDLIB_RESULT_CODE_OK,
