@@ -24,8 +24,11 @@ class InsertDatabaseAction(BaseDatabaseAction):
     object_to_insert:tdlib_generated.RootObject = attr.ib()
 
 
-
 class DbActionHandler:
+
+    def __init__(self):
+
+        self.insert_or_update_handler = InsertOrUpdateHandler()
 
     @functools.singledispatchmethod
     async def handle_database_action(self, obj_to_handle:BaseDatabaseAction, session):
@@ -38,8 +41,7 @@ class DbActionHandler:
 
         dbaction_handler_logger.debug("handle_insert_database_action got object: `%s`", obj_to_handle)
 
-
-        session.add(obj_to_handle.object_to_insert)
+        await self.insert_or_update_handler.handle_insert_or_update(obj_to_handle.object_to_insert, session)
 
 
 
@@ -51,6 +53,20 @@ class InsertOrUpdateHandler:
         insert_or_update_logger.error("handle_insert_or_update got object: `%s` UNHANDLED", obj_to_handle)
 
 
-    # @handle_insert_or_update.register
-    # async def handle_insert_or_update_user(self, object_to_handle, session):
-    #     pass
+    @handle_insert_or_update.register
+    async def file(self, object_to_handle:db_model.File, session):
+
+
+        # Files should only have one entry per file, we don't do versioning
+
+        # see if it exists
+        maybe_existing = session.query(db_model.File).filter(db_model.File.remote_file_id == object_to_handle.remote_file_id).first()
+
+        if not maybe_existing:
+
+            insert_or_update_logger.debug("adding db_model.File object `%s` to session", object_to_handle)
+            session.add(object_to_handle)
+
+        else:
+
+            insert_or_update_logger.debug("not adding db_model.File object `%s` because it already exists", object_to_handle)
