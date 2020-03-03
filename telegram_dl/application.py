@@ -40,6 +40,8 @@ class Application:
 
         self.message_handler = handlers.TdlibBaseMessageHandler(handlers.AuthorizationHandler(input.TTYInput()))
 
+        self.dbaction_handler = db_actions.DbActionHandler()
+
         # load config stuff
         logger.info("creating TdlibConfiguration")
         self.app_config = config.ApplicationConfiguration.init_from_config(self.args.config)
@@ -104,7 +106,7 @@ class Application:
         send_messages_task_notstarted = SendMessagesToTelegramTask(self.stop_event, self.tdlib_handle, self.to_telegram_queue)
         send_messages_task = asyncio.create_task(send_messages_task_notstarted.run(), name="SendMessagesToTelegramTask")
 
-        database_task_notstarted = DatabaseTask(self.stop_event, self.database_queue, self.sessionmaker)
+        database_task_notstarted = DatabaseTask(self.stop_event, self.database_queue, self.sessionmaker, self.dbaction_handler)
         database_task = asyncio.create_task(database_task_notstarted.run(), name="DatabaseTask")
 
         all_tasks = [receive_message_task, process_message_task, send_messages_task, database_task]
@@ -131,26 +133,12 @@ class Application:
 
 class DatabaseTask:
 
-    def __init__(self, stop_event, db_input_queue, sqla_sessionmaker):
+    def __init__(self, stop_event, db_input_queue, sqla_sessionmaker, dbaction_handler):
 
         self.stop_event = stop_event
         self.db_input_queue = db_input_queue
         self.sqla_sessionmaker = sqla_sessionmaker
-
-    @functools.singledispatchmethod
-    async def handle_database_action(self, obj_to_handle:db_actions.BaseDatabaseAction, session):
-
-        database_task_action_logger.info("handle_database_action: got object: `%s`", obj_to_handle)
-
-
-    @handle_database_action.register
-    async def handle_insert_database_action(self, obj_to_handle:db_actions.InsertDatabaseAction, session):
-
-        database_task_action_logger.info("handle_insert_database_action got object: `%s`", obj_to_handle)
-
-
-        session.add(obj_to_handle.object_to_insert)
-
+        self.dbaction_handler = dbaction_handler
 
 
     async def run(self):
@@ -169,7 +157,7 @@ class DatabaseTask:
                 try:
 
                     database_task_logger.debug("got object: `%s`, sending to single dispatch")
-                    await self.handle_database_action(result_obj, session)
+                    await self.dbaction_handler.handle_database_action(result_obj, session)
 
 
                     session.commit()
