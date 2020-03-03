@@ -32,12 +32,10 @@ def upgrade():
         sa.PrimaryKeyConstraint('file_id', name='PK-file-file_id')
     )
 
-    op.create_index('IX-file-remote_file_id', 'file', ['remote_file_id'], unique=False)
-    op.create_index('IXUQ-file-tg_file_id', 'file', ['tg_file_id'], unique=True)
+    op.create_index('IXUQ-file-remote_file_id', 'file', ['remote_file_id'], unique=True)
 
 
 def downgrade():
 
-    op.drop_index('IXUQ-file-tg_file_id', table_name='file')
-    op.drop_index('IX-file-remote_file_id', table_name='file')
+    op.drop_index('IXUQ-file-remote_file_id', table_name='file')
     op.drop_table('file')

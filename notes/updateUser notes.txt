@@ -164,6 +164,31 @@ class profilePhoto(ProfilePhoto):
 file
 #########################
 
+NOTE: THE ID IS NOT UNIQUE
+
+i can't verify it atm but my guess is that 'id' is the primary key of the file in the tdlib's own database
+
+i ran the downloader to just insert the small user thumbnails and then deleted the tdlib working dir and relogged in
+and tried again and i got two different 'remote ids' for the same 'tg_file_id'
+
+```plaintext
+
+PS C:\Users\auror\Code\personal\telegram_dl> sqlite3
+SQLite version 3.10.1 2016-01-13 21:41:56
+Enter ".help" for usage hints.
+Connected to a transient in-memory database.
+Use ".open FILENAME" to reopen on a persistent database.
+sqlite> .open C:/Users/auror/Temp/telegram_dl_scratch/db/telegram_dl.sqlite
+
+sqlite> select * from file where tg_file_id = 29;
+14|29|0|0|AQADAQADJasxG0gIEQUACL1pEjAABAIAA0gIEQUABD-KBr1BLEI-W6wAAhYE
+sqlite> .open "C:/Users/auror/Temp/telegram_dl_scratch/db/telegram_dl - Copy.sqlite"
+sqlite> select * from file where tg_file_id = 29;
+15|29|0|0|AQADAQADzK0xG11WZQUACOUYFDAABAIAA11WZQUABKkgmu-8cia_hbcFAAEWBA
+sqlite>
+
+```
+
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class file(File):

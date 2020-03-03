@@ -87,8 +87,7 @@ class File(CustomDeclarativeBase):
 
     __table_args__ = (
         PrimaryKeyConstraint("file_id", name="PK-file-file_id"),
-        Index("IXUQ-file-tg_file_id", "tg_file_id", unique=True),
-        Index("IX-file-remote_file_id", "remote_file_id"),
+        Index("IXUQ-file-remote_file_id", "remote_file_id", unique=True),
     )
 
 
