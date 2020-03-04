@@ -25,7 +25,6 @@ def upgrade():
 
     op.create_table('profile_photo',
         sa.Column('profile_photo_id', sa.Integer(), nullable=False),
-        sa.Column('as_of', sqlalchemy_utils.types.arrow.ArrowType(), nullable=True),
         sa.Column('tg_profile_photo_id', sa.Integer(), nullable=True),
         sa.Column('big_id', sa.Integer(), nullable=True),
         sa.Column('small_id', sa.Integer(), nullable=True),
@@ -34,10 +33,8 @@ def upgrade():
         sa.PrimaryKeyConstraint('profile_photo_id', name='PK-profile_photo-profile_photo_id')
     )
 
-    op.create_index('IXUQ-profile_photo-profile_photo_id-as_of', 'profile_photo', ['profile_photo_id', 'as_of'], unique=True)
 
 
 def downgrade():
 
-    op.drop_index('IXUQ-profile_photo-profile_photo_id-as_of_date', table_name='profile_photo')
     op.drop_table('profile_photo')

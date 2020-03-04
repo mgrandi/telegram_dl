@@ -98,8 +98,6 @@ class ProfilePhoto(CustomDeclarativeBase):
     # primary key column
     profile_photo_id = Column(Integer)
 
-    as_of = Column(ArrowType)
-
     # unlike User.tg_file_id, this isn't a super low number, not sure if it it can change
     # if the tdlib working copy gets regenerated?
     tg_profile_photo_id = Column(Integer)
@@ -113,7 +111,6 @@ class ProfilePhoto(CustomDeclarativeBase):
 
     __table_args__ = (
         PrimaryKeyConstraint("profile_photo_id", name="PK-profile_photo-profile_photo_id"),
-        Index("IXUQ-profile_photo-profile_photo_id-as_of", "profile_photo_id", "as_of", unique=True),
     )
 
 
