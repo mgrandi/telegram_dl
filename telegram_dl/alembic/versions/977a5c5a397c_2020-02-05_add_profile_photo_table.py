@@ -34,10 +34,10 @@ def upgrade():
         sa.PrimaryKeyConstraint('profile_photo_id', name='PK-profile_photo-profile_photo_id')
     )
 
-    op.create_index('IXUQ-profile_photo-tg_profile_photo_id-as_of', 'profile_photo', ['tg_profile_photo_id', 'as_of'], unique=True)
+    op.create_index('IXUQ-profile_photo-profile_photo_id-as_of', 'profile_photo', ['profile_photo_id', 'as_of'], unique=True)
 
 
 def downgrade():
 
-    op.drop_index('IXUQ-profile_photo-tg_profile_photo_id-as_of_date', table_name='profile_photo')
+    op.drop_index('IXUQ-profile_photo-profile_photo_id-as_of_date', table_name='profile_photo')
     op.drop_table('profile_photo')

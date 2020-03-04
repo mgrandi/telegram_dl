@@ -29,7 +29,7 @@ class User(CustomDeclarativeBase):
     # i don't really care about the status so i won't store it, or have a UserStatus type really
     # status = Column()
 
-    profile_photo_id = Column(Unicode(100), ForeignKey("profile_photo.tg_profile_photo_id"))
+    profile_photo_id = Column(Unicode(100), ForeignKey("profile_photo.profile_photo_id"))
 
     outgoing_link = Column(ChoiceType(dbme.LinkStateEnum, impl=Integer()))
     incoming_link = Column(ChoiceType(dbme.LinkStateEnum, impl=Integer()))
@@ -100,7 +100,10 @@ class ProfilePhoto(CustomDeclarativeBase):
 
     as_of = Column(ArrowType)
 
+    # unlike User.tg_file_id, this isn't a super low number, not sure if it it can change
+    # if the tdlib working copy gets regenerated?
     tg_profile_photo_id = Column(Integer)
+
     big_id = Column(Integer, ForeignKey("file.tg_file_id"))
     small_id = Column(Integer, ForeignKey("file.tg_file_id"))
 
@@ -110,7 +113,7 @@ class ProfilePhoto(CustomDeclarativeBase):
 
     __table_args__ = (
         PrimaryKeyConstraint("profile_photo_id", name="PK-profile_photo-profile_photo_id"),
-        Index("IXUQ-profile_photo-tg_profile_photo_id-as_of", "tg_profile_photo_id", "as_of", unique=True),
+        Index("IXUQ-profile_photo-profile_photo_id-as_of", "profile_photo_id", "as_of", unique=True),
     )
 
 
