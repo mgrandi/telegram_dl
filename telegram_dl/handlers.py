@@ -76,27 +76,7 @@ class TdlibBaseMessageHandler:
 
         logger.debug("handle_message_update_user.handle_message got `%s`", message)
 
-
-        # TODO: DO SOMETHING
-
-        tmp_photo = message.user.profile_photo
-
-        if tmp_photo:
-            tmp_file = message.user.profile_photo.small
-
-            new_file =db_model.File(tg_file_id=tmp_file.id,
-                size=tmp_file.size,
-                expected_size=tmp_file.expected_size,
-                remote_file_id=tmp_file.remote.id)
-
-
-            params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=new_file))
-
-        return tdlib.TdlibResult(
-                code=constants.TDLIB_RESULT_CODE_OK,
-                message=f"OK",
-                result_obj=None)
-
+        params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.user))
 
 
 class AuthorizationHandler:
