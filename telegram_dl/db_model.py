@@ -23,6 +23,12 @@ class User(CustomDeclarativeBase):
     first_name = Column(Unicode(length=100))
     last_name = Column(Unicode(length=100))
     user_name = Column(Unicode(length=100))
+
+    # from https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#sqlalchemy_utils.types.phone_number.PhoneNumberType:
+    #
+    # Changes PhoneNumber objects to a string representation on the way in and changes them back to PhoneNumber
+    # objects on the way out. If E164 is used as storing format, no country code is needed for parsing the database
+    # value to PhoneNumber object.
     phone_number = Column(PhoneNumberType)
 
 
