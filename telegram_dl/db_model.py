@@ -48,6 +48,7 @@ class User(CustomDeclarativeBase):
 
     __table_args__ = (
         PrimaryKeyConstraint("user_id", name="PK-user-user_id"),
+        Index("IX-user-tg_user_id", "tg_user_id"),
         Index("IXUQ-user-tg_user_id-as_of", "tg_user_id", "as_of", unique=True),
         Index("IX-user-phone_number", "phone_number"),
         Index("IX-user-user_type", "user_type"),

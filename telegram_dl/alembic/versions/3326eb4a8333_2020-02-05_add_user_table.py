@@ -45,6 +45,8 @@ def upgrade():
         sa.PrimaryKeyConstraint('user_id', name='PK-user-user_id')
     )
 
+
+    op.create_index('IX-user-tg_user_id', 'user', ['tg_user_id'], unique=False)
     op.create_index('IX-user-phone_number', 'user', ['phone_number'], unique=False)
     op.create_index('IX-user-user_type', 'user', ['user_type'], unique=False)
     op.create_index('IXUQ-user-tg_user_id-as_of', 'user', ['tg_user_id', 'as_of'], unique=True)
@@ -55,4 +57,5 @@ def downgrade():
     op.drop_index('IXUQ-user-tg_user_id-as_of', table_name='user')
     op.drop_index('IX-user-user_type', table_name='user')
     op.drop_index('IX-user-phone_number', table_name='user')
+    op.drop_index('IX-user-tg_user_id', table_name='user')
     op.drop_table('user')

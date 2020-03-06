@@ -33,8 +33,6 @@ def upgrade():
         sa.PrimaryKeyConstraint('profile_photo_id', name='PK-profile_photo-profile_photo_id')
     )
 
-
-
 def downgrade():
 
     op.drop_table('profile_photo')
