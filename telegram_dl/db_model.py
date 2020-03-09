@@ -1,3 +1,5 @@
+import logging
+
 from sqlalchemy import Column, Index, Integer, Unicode, Boolean, ForeignKey, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -5,9 +7,15 @@ from sqlalchemy_repr import RepresentableBase
 
 from sqlalchemy_utils import PhoneNumberType, ChoiceType, ArrowType
 
+import phonenumbers
+
 import telegram_dl.db_model_enums as dbme
+import telegram_dl.tdlib_generated as tdg
+from telegram_dl import utils
 
 CustomDeclarativeBase = declarative_base(cls=RepresentableBase, name="CustomDeclarativeBase")
+
+logger = logging.getLogger(__name__)
 
 class User(CustomDeclarativeBase):
 
@@ -61,6 +69,68 @@ class User(CustomDeclarativeBase):
     )
 
 
+    def equals_tdg(self, other:tdg.user):
+        ''' basically overloading __eq__ because sqlalchemy takes over that to
+        test by identity for its ORM stuff
+        '''
+
+        result = other is not None \
+            and isinstance(other, tdg.user) \
+            and self.tg_user_id == other.id \
+            and self.first_name == other.first_name \
+            and self.last_name == other.last_name \
+            and self.user_name == other.username \
+            and self.outgoing_link == dbme.LinkStateEnum.parse_from_tdg_linkstate(other.outgoing_link) \
+            and self.incoming_link == dbme.LinkStateEnum.parse_from_tdg_linkstate(other.incoming_link) \
+            and self.is_verified == other.is_verified \
+            and self.is_support == other.is_support \
+            and self.restriction_reason == other.restriction_reason \
+            and self.is_scam == other.is_scam \
+            and self.have_access == other.have_access \
+            and self.user_type == dbme.UserTypeEnum.parse_from_tdg_usertype(other.type) \
+            and self.language_code == other.language_code
+
+        profilephoto_result = False
+
+
+
+        # haandle where the user might not have a profile photo
+        if self.profile_photo is None:
+            profilephoto_result = self.profile_photo == other.profile_photo
+        else:
+            profilephoto_result = self.profile_photo.equals_tdg(other.profile_photo)
+
+        # handle where we get a str from telegram but a Phonenumber object from the database
+        # or the user has no phone number at all
+        phoneno_result = False
+
+        if not self.phone_number:
+
+            if not other.phone_number:
+                # both phone numbers are empty, just mark as unchanged right
+                phoneno_result = True
+            else:
+                # old phone number doesn't exist but the new one does exist, mark as different
+                phoneno_result = False
+        else:
+            if not other.phone_number:
+                # old phone exists but new one doesn't, mark as different
+                phoneno_result = False
+            else:
+                # both old and new phone numbers exist, compare
+                phoneno_result = self.phone_number == phonenumbers.parse(utils.fix_phone_number(other.phone_number))
+
+
+        final = result and profilephoto_result and phoneno_result
+
+        if not final:
+            logging.debug("equals_tdg: user result: `%s`, profile photo result: `%s`, phone # result: `%s`",
+                result, profilephoto_result, phoneno_result)
+
+        return final
+
+
+
 class File(CustomDeclarativeBase):
 
     __tablename__ = "file"
@@ -97,6 +167,12 @@ class File(CustomDeclarativeBase):
         Index("IXUQ-file-remote_file_id", "remote_file_id", unique=True),
     )
 
+    def equals_tdg(self, other:tdg.file):
+
+        return other is not None \
+            and isinstance(other, tdg.file) \
+            and self.remote_file_id == other.remote.id
+
 
 class ProfilePhoto(CustomDeclarativeBase):
 
@@ -120,6 +196,13 @@ class ProfilePhoto(CustomDeclarativeBase):
         PrimaryKeyConstraint("profile_photo_id", name="PK-profile_photo-profile_photo_id"),
     )
 
+
+    def equals_tdg(self, other:tdg.profilePhoto):
+
+        return other is not None \
+            and isinstance(other, tdg.profilePhoto) \
+            and self.big.equals_tdg(other.big) \
+            and self.small.equals_tdg(other.small)
 
 
 

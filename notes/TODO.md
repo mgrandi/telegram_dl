@@ -3,6 +3,8 @@
 TODO:
 
 
+make sqlite use WAL
+
 RootObject doesn't need _extra as an attrib, as that is only on the top most object
 
 look into cattrs and figure out how to maybe use a converter to add the @type JSON keys for every object recursively? https://cattrs.readthedocs.io/en/latest/converters.html right now i have no way to turn the JSON i get back from tdjson into an object
