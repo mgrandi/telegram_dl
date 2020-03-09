@@ -26,6 +26,15 @@ structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
 
 
+def fix_phone_number(phone_number:str) -> str:
+    ''' add a plus infront of the phone number if it
+    doesn't have one so `phonenumbers` can parse it
+    '''
+    if not phone_number.startswith("+"):
+        return f"+{phone_number}"
+    else:
+        return phone_number
+
 def get_sqlalchemy_url_from_hocon_config(config:pyhocon.ConfigTree) -> URL:
 
     driver = config.get_string(constants.CONFIG_KEY_DATABASE_DRIVER)

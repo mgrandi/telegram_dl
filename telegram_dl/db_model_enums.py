@@ -9,6 +9,12 @@ from telegram_dl import tdlib_generated as tdg
 # enum.auto() here because it makes it harder to reference the source code
 # to see what enum value goes to what
 
+
+class DatabaseChangeEnum(enum.Enum):
+    NO_CHANGE = 0
+    NEW = 1
+    UPDATED = 2
+
 class LinkStateEnum(enum.Enum):
 
     LINK_STATE_NONE = 0
