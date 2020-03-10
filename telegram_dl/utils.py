@@ -26,6 +26,25 @@ structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
 
 
+
+class AllowEverythingButThisLoggerFilter:
+    ''' logging filter that allows everything but the string specified
+    '''
+
+    def __init__(self, dont_allow_this):
+        self.dont_allow_this = dont_allow_this
+
+    def filter(self, record):
+        '''
+        Is the specified record to be logged? Returns zero for no, nonzero for yes.
+        If deemed appropriate, the record may be modified in-place by this method
+        '''
+
+        if self.dont_allow_this in record.name:
+            return 0
+        else:
+            return 1
+
 def fix_phone_number(phone_number:str) -> str:
     ''' add a plus infront of the phone number if it
     doesn't have one so `phonenumbers` can parse it

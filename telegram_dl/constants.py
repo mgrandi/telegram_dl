@@ -1,5 +1,10 @@
 import re
 
+
+# logger that just only logs the raw messages we get
+# from telegram
+MESSAGE_ARCHIVE_LOGGER_NAME = "telegram_dl.message_archive"
+
 # in seconds
 TDLIB_CLIENT_RECEIVE_TIMEOUT = 2.0
 PROCESS_MESSAGE_QUEUE_TIMEOUT = 2.0

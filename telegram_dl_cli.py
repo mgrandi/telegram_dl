@@ -17,7 +17,6 @@ from telegram_dl.application import Application
 from telegram_dl import utils
 
 
-
 if __name__ == "__main__":
     # if we are being run as a real program
 
@@ -34,14 +33,12 @@ if __name__ == "__main__":
     root_logger.addHandler(logging_handler)
 
 
-
     parser.add_argument('config', type=utils.hocon_config_file_type, help="the configuration file")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--verbose", action="store_true", help="Increase logging verbosity")
     group.add_argument("--logging-config", dest="logging_config",
         type=utils.isFileType, help="Specify a JSON file representing logging configuration")
-
 
 
     try:

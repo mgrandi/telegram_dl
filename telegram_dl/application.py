@@ -16,6 +16,8 @@ from telegram_dl import db_actions
 
 logger = logging.getLogger(__name__)
 
+
+message_archive_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_NAME)
 task_logger = logger.getChild("task")
 send_messages_to_tl_logger = task_logger.getChild("SendMessagesToTelegramTask")
 receive_messages_from_tl_logger = task_logger.getChild("ReceiveMessagesFromTelegramTask")
@@ -260,6 +262,9 @@ class ReceiveMessagesFromTelegramTask:
 
                     receive_messages_from_tl_logger.debug("recieved something from receive: `%s`", result_obj_from_receive)
 
+                    # log the raw message from telegram
+                    if result_obj_from_receive is not None:
+                        message_archive_logger.info("%s", result_obj_from_receive)
 
                     if not result_obj_from_receive:
                         receive_messages_from_tl_logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")
