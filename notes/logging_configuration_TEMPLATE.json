@@ -1,0 +1,134 @@
+{
+
+    "version": 1,
+
+    "disable_existing_loggers": false,
+
+    "formatters": {
+
+        "arrow": {
+
+            "()": "telegram_dl.utils.ArrowLoggingFormatter",
+            "fmt": "%(asctime)s %(threadName)-10s %(name)-30s %(levelname)-8s: %(message)s"
+        },
+
+        "only_message": {
+            "format": "%(message)s"
+        }
+    },
+
+    "filters": {
+
+        "dont_log_these": {
+
+            "()": "telegram_dl.utils.AllowEverythingButThisLoggerFilter",
+            "dont_allow_this": "telegram_dl.message_archive"
+
+        },
+
+        "only_log_message_archive": {
+
+            "name": "telegram_dl.message_archive"
+
+        }
+    },
+
+    "handlers": {
+
+        "default_handler": {
+
+            "class": "logging.FileHandler",
+            "formatter": "arrow",
+            "level": "DEBUG",
+            "filters": ["dont_log_these"],
+
+            "filename": "telegram_dl.log",
+            "mode": "a",
+            "encoding": "utf-8"
+        },
+
+        "console": {
+
+            "class": "logging.StreamHandler",
+            "formatter": "arrow",
+            "level": "INFO",
+            "filters": ["dont_log_these"],
+
+            "stream": "ext://sys.stdout"
+
+        },
+
+        "message_archive_handler": {
+            "class": "logging.FileHandler",
+            "formatter": "only_message",
+            "level": "DEBUG",
+            "filters": ["only_log_message_archive"],
+
+            "filename": "telegram_dl_message_archive.log",
+            "mode": "a",
+            "encoding": "utf-8"
+        }
+
+    },
+
+    "loggers": {
+
+        "telegram_dl.message_archive": {
+
+            "level": "INFO"
+        },
+
+        "telegram_dl.utils.converter": {
+
+            "level": "INFO"
+
+        },
+
+        "telegram_dl.application.task": {
+
+            "level": "DEBUG"
+        },
+        "telegram_dl.application.task.SendMessagesToTelegramTask": {
+
+            "level": "INFO"
+        },
+        "telegram_dl.application.task.ReceiveMessagesFromTelegramTask": {
+
+            "level": "INFO"
+        },
+        "telegram_dl.application.task.ProcessMessagesFromTelegram": {
+
+            "level": "DEBUG"
+        },
+        "telegram_dl.application.task.DatabaseTask": {
+
+            "level": "INFO"
+        },
+
+        "telegram_dl.handlers": {
+
+            "level": "INFO"
+        },
+
+        "telegram_dl.db_actions": {
+
+            "level": "INFO"
+        },
+
+        "telegram_dl.tdlib": {
+
+            "level": "INFO"
+        }
+
+    },
+
+    "root": {
+
+        "level": "DEBUG",
+        "handlers": ["console", "default_handler", "message_archive_handler"]
+    }
+
+
+
+
+}
