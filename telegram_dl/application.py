@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 message_archive_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_NAME)
 task_logger = logger.getChild("task")
+logic_task_logger = task_logger.getChild("LogicTask")
 send_messages_to_tl_logger = task_logger.getChild("SendMessagesToTelegramTask")
 receive_messages_from_tl_logger = task_logger.getChild("ReceiveMessagesFromTelegramTask")
 process_messages_from_tl_logger = task_logger.getChild("ProcessMessagesFromTelegram")
@@ -111,7 +112,10 @@ class Application:
         database_task_notstarted = DatabaseTask(self.stop_event, self.database_queue, self.sessionmaker, self.dbaction_handler)
         database_task = asyncio.create_task(database_task_notstarted.run(), name="DatabaseTask")
 
-        all_tasks = [receive_message_task, process_message_task, send_messages_task, database_task]
+        logic_task_notstarted = LogicTask(self.stop_event, self.to_telegram_queue)
+        logic_task = asyncio.create_task(logic_task_notstarted.run(), name="LogicTask")
+
+        all_tasks = [receive_message_task, process_message_task, send_messages_task, database_task, logic_task]
 
         logger.info("created tasks: `%s`", all_tasks)
 
@@ -132,6 +136,48 @@ class Application:
         self.tdlib_handle = self.tdlib_handle.destroy_client()
         logger.info("tdlib handle destroyed successfully")
 
+
+
+class LogicTask:
+
+    def __init__(self, stop_event, to_telegram_queue):
+
+        self.stop_event = stop_event
+        self.to_telegram_queue = to_telegram_queue
+
+        self.temp = True
+
+
+    async def run(self):
+
+
+        # TODO: SOMEHOW need to figure out when the tdlibParameters have been sent and we can send messages
+
+        await asyncio.sleep(5)
+        while not self.stop_event.is_set():
+
+            logic_task_logger.debug("loop iteration")
+
+            if self.temp:
+
+                import uuid
+
+
+                x = tdlib_generated.getChats(extra=uuid.uuid4(), offset_order=0, offset_chat_id=0, limit=1000)
+
+
+
+                logic_task_logger.info("sending get chat message: `%s`", x)
+
+                self.temp = False
+                self.to_telegram_queue.put_nowait(x)
+            else:
+
+
+                await asyncio.sleep(5)
+
+
+        logic_task_logger.info("stop event is set, returning")
 
 class DatabaseTask:
 

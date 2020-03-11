@@ -44,7 +44,6 @@ class TdlibBaseMessageHandler:
             message=f"Unimplemented message of type `{type(message)}`: `{message}`",
             result_obj=None)
 
-
     @handle_message.register
     async def handle_message_ok(self, message:tdg.ok, params:HandlerParameters) -> tdlib.TdlibResult:
 
