@@ -1,6 +1,13 @@
 import re
 
 
+# according to this page, short codes are not actually E164 and are 5-6 digits in length
+# https://support.twilio.com/hc/en-us/articles/360013980754-Formatting-Short-Code-Numbers
+PHONE_NUMBER_SHORT_CODE_MIN_LENGTH = 5
+PHONE_NUMBER_SHORT_CODE_MAX_LENGTH = 6
+PHONE_NUMBER_DEFAULT_REGION = "US"
+PHONE_NUMBER_MAX_LENGTH = 20
+
 # logger that just only logs the raw messages we get
 # from telegram
 MESSAGE_ARCHIVE_LOGGER_NAME = "telegram_dl.message_archive"

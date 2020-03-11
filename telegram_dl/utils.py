@@ -12,6 +12,7 @@ import base64
 import cattr
 import arrow
 import pyhocon
+import phonenumbers
 
 from telegram_dl import tdlib_generated
 from telegram_dl import constants
@@ -45,12 +46,29 @@ class AllowEverythingButThisLoggerFilter:
         else:
             return 1
 
+def parse_phone_number_from_str(phone_number_str:str) -> phonenumbers.PhoneNumber:
+
+    return phonenumbers.parse(phone_number_str, region=constants.PHONE_NUMBER_DEFAULT_REGION)
+
+
 def fix_phone_number(phone_number:str) -> str:
     ''' add a plus infront of the phone number if it
     doesn't have one so `phonenumbers` can parse it
     '''
+
+    # NOTE: it seems that we are NOT supposed to put a plus infront of the number
+    # if it is a short code number
+    # see:
+    # https://support.twilio.com/hc/en-us/articles/223182068-What-is-a-Messaging-Short-Code-
+    # https://support.twilio.com/hc/en-us/articles/360013980754-Formatting-Short-Code-Numbers
     if not phone_number.startswith("+"):
-        return f"+{phone_number}"
+
+        if len(phone_number) >= constants.PHONE_NUMBER_SHORT_CODE_MIN_LENGTH \
+            and len(phone_number) <= constants.PHONE_NUMBER_SHORT_CODE_MIN_LENGTH:
+
+            return phone_number
+        else:
+            return f"+{phone_number}"
     else:
         return phone_number
 

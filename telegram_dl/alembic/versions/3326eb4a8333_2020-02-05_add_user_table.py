@@ -30,7 +30,7 @@ def upgrade():
         sa.Column('first_name', sa.Unicode(length=100), nullable=True),
         sa.Column('last_name', sa.Unicode(length=100), nullable=True),
         sa.Column('user_name', sa.Unicode(length=100), nullable=True),
-        sa.Column('phone_number', sqlalchemy_utils.types.phone_number.PhoneNumberType(length=20), nullable=True),
+        sa.Column('phone_number', sqlalchemy_utils.types.phone_number.PhoneNumberType(region="US", max_length=20), nullable=True),
         sa.Column('profile_photo_id', sa.Unicode(length=100), nullable=True),
         sa.Column('incoming_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
         sa.Column('outgoing_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),

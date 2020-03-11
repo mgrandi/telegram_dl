@@ -12,6 +12,7 @@ import phonenumbers
 import telegram_dl.db_model_enums as dbme
 import telegram_dl.tdlib_generated as tdg
 from telegram_dl import utils
+from telegram_dl import constants
 
 CustomDeclarativeBase = declarative_base(cls=RepresentableBase, name="CustomDeclarativeBase")
 
@@ -37,8 +38,9 @@ class User(CustomDeclarativeBase):
     # Changes PhoneNumber objects to a string representation on the way in and changes them back to PhoneNumber
     # objects on the way out. If E164 is used as storing format, no country code is needed for parsing the database
     # value to PhoneNumber object.
-    phone_number = Column(PhoneNumberType)
-
+    phone_number = Column(PhoneNumberType(
+        region=constants.PHONE_NUMBER_DEFAULT_REGION,
+        max_length=constants.PHONE_NUMBER_MAX_LENGTH))
 
     # i don't really care about the status so i won't store it, or have a UserStatus type really
     # status = Column()
@@ -92,8 +94,6 @@ class User(CustomDeclarativeBase):
 
         profilephoto_result = False
 
-
-
         # haandle where the user might not have a profile photo
         if self.profile_photo is None:
             profilephoto_result = self.profile_photo == other.profile_photo
@@ -118,13 +118,13 @@ class User(CustomDeclarativeBase):
                 phoneno_result = False
             else:
                 # both old and new phone numbers exist, compare
-                phoneno_result = self.phone_number == phonenumbers.parse(utils.fix_phone_number(other.phone_number))
+                phoneno_result = self.phone_number == utils.parse_phone_number_from_str(utils.fix_phone_number(other.phone_number))
 
 
         final = result and profilephoto_result and phoneno_result
 
         if not final:
-            logging.debug("equals_tdg: user result: `%s`, profile photo result: `%s`, phone # result: `%s`",
+            logger.debug("equals_tdg: user result: `%s`, profile photo result: `%s`, phone # result: `%s`",
                 result, profilephoto_result, phoneno_result)
 
         return final
