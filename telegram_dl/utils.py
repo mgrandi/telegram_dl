@@ -241,6 +241,7 @@ class CustomCattrConverter(cattr.Converter):
         # CUSTOM MODIFICATIONS
         if isinstance(obj, tdlib_generated.RootObject):
             rv[constants.TDLIB_JSON_TYPE_STR] = getattr(obj, constants.TDLIB_TYPE_VAR_NAME)
+
         # END CUSTOM MODIFICATIONS
 
         return rv
@@ -310,6 +311,9 @@ class CustomCattrConverter(cattr.Converter):
 
                 structure_logger.debug("---- new type is now `%s`, original type was a subclass of RootObject so we use the type in the dict's `%s` key/value",
                     newtype, constants.TDLIB_JSON_TYPE_STR)
+
+                if constants.TDLIB_JSON_EXTRA_STR in  dict_to_unstructure.keys():
+                    conv_obj[constants.TDLIB_ORIGINAL_JSON_EXTRA_STR] = dict_to_unstructure[constants.TDLIB_JSON_EXTRA_STR]
 
                 type_ = newtype
 

@@ -197,8 +197,16 @@ class TdlibHandle:
         # TODO: replace cattrs
         obj_as_dict = self.cattr_converter.unstructure(obj_to_send)
 
+        # TODO FIXME
+        # TEMPORARY
+        obj_as_dict[constants.TDLIB_JSON_EXTRA_STR] = obj_as_dict[constants.TDLIB_ORIGINAL_JSON_EXTRA_STR]
+        del obj_as_dict[constants.TDLIB_ORIGINAL_JSON_EXTRA_STR]
+        ###########################
+
         json_str = json.dumps(obj_as_dict, cls=utils.CustomJSONEncoder)
         json_bytes = json_str.encode("utf-8")
+
+        send_logger.debug("SEND: RAW: `%s`", json_bytes)
 
         self.func_client_send(self.tdlib_client, json_bytes)
         send_logger.debug("tdlib client `%s` called successfully", "send")
