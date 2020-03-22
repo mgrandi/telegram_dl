@@ -2,6 +2,7 @@
 
 TODO:
 
+handle updateConnectionState
 
 make sqlite use WAL
 
