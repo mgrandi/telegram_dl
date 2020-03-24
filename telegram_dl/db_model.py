@@ -185,8 +185,8 @@ class ProfilePhoto(CustomDeclarativeBase):
     # if the tdlib working copy gets regenerated?
     tg_profile_photo_id = Column(Integer)
 
-    big_id = Column(Integer, ForeignKey("file.tg_file_id"))
-    small_id = Column(Integer, ForeignKey("file.tg_file_id"))
+    big_id = Column(Integer, ForeignKey("file.file_id"))
+    small_id = Column(Integer, ForeignKey("file.file_id"))
 
     # see https://docs.sqlalchemy.org/en/14/orm/join_conditions.html#handling-multiple-join-paths
     big = relationship("File", foreign_keys=[big_id])
