@@ -2,6 +2,7 @@ import logging
 import asyncio
 import concurrent.futures
 import functools
+import json
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -17,7 +18,9 @@ from telegram_dl import db_actions
 logger = logging.getLogger(__name__)
 
 
-message_archive_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_NAME)
+message_archive_from_tl_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_FROM_TELEGRAM_NAME)
+message_archive_to_tl_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_TO_TELEGRAM_NAME)
+
 task_logger = logger.getChild("task")
 logic_task_logger = task_logger.getChild("LogicTask")
 send_messages_to_tl_logger = task_logger.getChild("SendMessagesToTelegramTask")
@@ -96,9 +99,7 @@ class Application:
         logger.info("creating TDLib client")
         self.tdlib_handle = self.tdlib_handle.create_client()
 
-
         logger.info("Starting tasks")
-
 
         recieve_messages_task_notstarted = ReceiveMessagesFromTelegramTask(self.stop_event, self.tdlib_handle, self.from_telegram_queue)
         receive_message_task = asyncio.create_task(recieve_messages_task_notstarted.run(), name="ReceiveMessagesFromTelegramTask")
@@ -262,6 +263,12 @@ class SendMessagesToTelegramTask:
                     result_obj_from_receive = await asyncio.get_running_loop().run_in_executor(
                         thread_pool_executor, self.tdlib_handle.send, result_obj)
 
+                    if result_obj is not None:
+                        if message_archive_to_tl_logger.isEnabledFor(logging.DEBUG):
+
+                            j = json.dumps(self.tdlib_handle.cattr_converter.unstructure(result_obj), cls=utils.CustomJSONEncoder)
+                            message_archive_to_tl_logger.debug("%s", j)
+
                     send_messages_to_tl_logger.debug("send successful")
                     self.to_telegram_queue.task_done()
 
@@ -306,7 +313,9 @@ class ReceiveMessagesFromTelegramTask:
 
                     # log the raw message from telegram
                     if result_obj_from_receive is not None:
-                        message_archive_logger.info("%s", result_obj_from_receive)
+                        if message_archive_from_tl_logger.isEnabledFor(logging.DEBUG):
+                            j = json.dumps(self.tdlib_handle.cattr_converter.unstructure(result_obj_from_receive), cls=utils.CustomJSONEncoder)
+                            message_archive_from_tl_logger.debug("%s", j)
 
                     if not result_obj_from_receive:
                         receive_messages_from_tl_logger.debug("tdjson_receive timed out and returned None, not sending to singledispatch method")

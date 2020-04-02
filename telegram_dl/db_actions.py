@@ -131,7 +131,6 @@ class InsertOrUpdateHandler:
 
         if not maybe_existing or not is_equal:
 
-
             big_photo_file = await self.handle_insert_or_update(incoming_profile_photo.big, params)
             small_photo_file = await self.handle_insert_or_update(incoming_profile_photo.small, params)
 

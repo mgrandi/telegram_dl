@@ -205,6 +205,8 @@ class CustomJSONEncoder(json.JSONEncoder):
             return str(obj)
         elif isinstance(obj, uuid.UUID):
             return str(obj)
+        elif isinstance(obj, bytes):
+            return base64.b64encode(obj).decode("utf-8")
 
         # Let the base class default method raise the TypeError
         return json.JSONEncoder.default(self, obj)
