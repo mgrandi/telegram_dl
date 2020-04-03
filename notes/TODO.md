@@ -2,6 +2,13 @@
 
 TODO:
 
+check out poetry instead of pipenv?
+
+get the version of the app dynamically, maybe using something like this:
+https://github.com/pypa/setuptools_scm/
+https://github.com/pypa/setuptools_scm/#retrieving-package-version-at-runtime
+https://pypi.org/project/importlib-metadata/ (or just the importlib library included in python 3.8?)
+
 handle updateConnectionState
 
 make sqlite use WAL
