@@ -1,29 +1,114 @@
 # `message` type notes
 
-
-## class references
+## Messages
 
 `updateNewMessage`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1update_new_message.html
 
 `message`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message.html
 
-`messageForwardInfo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_forward_info.html
+messages usually come from the `updateNewMessage` object, which contains a `message` object, and inside the `message` object
+is a `content` member that is of type `MessageContent`
 
-`MessageContent` (supertype): https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1_message_content.html
+## Contents of messages
 
+`MessageContent` (superclasss): https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1_message_content.html
+
+`messageAnimation`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_animation.html
+`messageAudio`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_audio.html
+`messageBasicGroupChatCreate`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_basic_group_chat_create.html
+`messageCall`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_call.html
+`messageChatAddMembers`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_add_members.html
+`messageChatChangePhoto`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_change_photo.html
+`messageChatChangeTitle`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_change_title.html
+`messageChatDeleteMember`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_delete_member.html
+`messageChatDeletePhoto`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_delete_photo.html
+`messageChatJoinByLink`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_join_by_link.html
+`messageChatSetTtl`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_set_ttl.html
+`messageChatUpgradeFrom`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_upgrade_from.html
+`messageChatUpgradeTo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_chat_upgrade_to.html
+`messageContact`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_contact.html
+`messageContactRegistered`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_contact_registered.html
+`messageCustomServiceAction`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_custom_service_action.html
+`messageDocument`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_document.html
+`messageExpiredPhoto`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_expired_photo.html
+`messageExpiredVideo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_expired_video.html
+`messageGame`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_game.html
+`messageGameScore`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_game_score.html
+`messageInvoice`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_invoice.html
+`messageLocation`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_location.html
+`messagePassportDataReceived`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_passport_data_received.html
+`messagePassportDataSent`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_passport_data_sent.html
+`messagePaymentSuccessful`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_payment_successful.html
+`messagePaymentSuccessfulBot`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_payment_successful_bot.html
+`messagePhoto`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_photo.html
+`messagePinMessage`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_pin_message.html
+`messagePoll`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_poll.html
+`messageScreenshotTaken`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_screenshot_taken.html
 `messageSticker`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_sticker.html
+`messageSupergroupChatCreate`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_supergroup_chat_create.html
+`messageText`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_text.html
+`messageUnsupported`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_unsupported.html
+`messageVenue`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_venue.html
+`messageVideo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_video.html
+`messageVideoNote`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_video_note.html
+`messageVoiceNote`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_voice_note.html
+
+
+## stuff messages contain
 
 `photo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1photo.html
-`messagePhoto`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_photo.html
 
-## message types
+`messageForwardInfo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_forward_info.html
+
+## message content
+
+### `messageText`
+
+```json
+{
+  "_extra": null,
+  "message": {
+    "_extra": null,
+    "id": 123,
+    "sender_user_id": 12345,
+    "chat_id": 1234567,
+    "sending_state": null,
+    "is_outgoing": true,
+    "can_be_edited": true,
+    "can_be_forwarded": true,
+    "can_be_deleted_only_for_self": true,
+    "can_be_deleted_for_all_users": false,
+    "is_channel_post": false,
+    "contains_unread_mention": false,
+    "date": 1585887938,
+    "edit_date": 0,
+    "forward_info": null,
+    "reply_to_message_id": 0,
+    "ttl": 0,
+    "ttl_expires_in": "0",
+    "via_bot_user_id": 0,
+    "author_signature": "",
+    "views": 0,
+    "media_album_id": 0,
+    "content": {
+      "_extra": null,
+      "text": {
+        "_extra": null,
+        "text": "TESTING MESSAGE 1 2 3 4 5",
+        "entities": [],
+        "@type": "formattedText"
+      },
+      "web_page": null,
+      "@type": "messageText"
+    },
+    "reply_markup": null,
+    "@type": "message"
+  },
+  "@type": "updateNewMessage"
+}
+```
 
 ### `messageSticker`
-
-#### class reference
-
-
-#### example
 
 ```json
 {
@@ -135,8 +220,6 @@
 ```
 
 ### `messagePhoto`
-
-#### example
 
 ```json
 {
