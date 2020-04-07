@@ -49,8 +49,8 @@ class User(CustomDeclarativeBase):
         ForeignKey("profile_photo.profile_photo_id",
             name="FK-user-profile_photo_id-profile_photo-profile_photo_id"))
 
-    outgoing_link = Column(ChoiceType(dbme.LinkStateEnum, impl=Integer()))
-    incoming_link = Column(ChoiceType(dbme.LinkStateEnum, impl=Integer()))
+    is_contact = Column(Boolean)
+    is_mutual_contact = Column(Boolean)
     is_verified = Column(Boolean)
     is_support = Column(Boolean)
     restriction_reason = Column(Unicode(length=255))

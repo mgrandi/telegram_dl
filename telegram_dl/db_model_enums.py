@@ -16,6 +16,13 @@ class DatabaseChangeEnum(enum.Enum):
     UPDATED = 2
 
 class LinkStateEnum(enum.Enum):
+    '''
+    FIXME: NOT USED ANYMORE
+    but cannot delete until i figure out how i want to handle this
+    becasue the 'add user table' alembic script is still referring to
+    this enum class
+
+    '''
 
     LINK_STATE_NONE = 0
     LINK_STATE_IS_CONTACT = 1
