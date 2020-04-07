@@ -45,7 +45,9 @@ class User(CustomDeclarativeBase):
     # i don't really care about the status so i won't store it, or have a UserStatus type really
     # status = Column()
 
-    profile_photo_id = Column(Unicode(100), ForeignKey("profile_photo.profile_photo_id"))
+    profile_photo_id = Column(Unicode(100),
+        ForeignKey("profile_photo.profile_photo_id",
+            name="FK-user-profile_photo_id-profile_photo-profile_photo_id"))
 
     outgoing_link = Column(ChoiceType(dbme.LinkStateEnum, impl=Integer()))
     incoming_link = Column(ChoiceType(dbme.LinkStateEnum, impl=Integer()))
@@ -185,8 +187,12 @@ class ProfilePhoto(CustomDeclarativeBase):
     # if the tdlib working copy gets regenerated?
     tg_profile_photo_id = Column(Integer)
 
-    big_id = Column(Integer, ForeignKey("file.file_id"))
-    small_id = Column(Integer, ForeignKey("file.file_id"))
+    big_id = Column(Integer,
+        ForeignKey("file.file_id",
+            name="FK-profile_photo-big_id-file-file_id"))
+    small_id = Column(Integer,
+        ForeignKey("file.file_id",
+            name="FK-profile_photo-small_id-file-file_id"))
 
     # see https://docs.sqlalchemy.org/en/14/orm/join_conditions.html#handling-multiple-join-paths
     big = relationship("File", foreign_keys=[big_id])

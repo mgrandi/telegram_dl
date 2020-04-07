@@ -42,7 +42,7 @@ def upgrade():
         sa.Column('have_access', sa.Boolean(), nullable=True),
         sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.UserTypeEnum, impl=sa.Integer()), nullable=True),
         sa.Column('language_code', sa.Unicode(length=20), nullable=True),
-        sa.ForeignKeyConstraint(['profile_photo_id'], ['profile_photo.profile_photo_id'], ),
+        sa.ForeignKeyConstraint(['profile_photo_id'], ['profile_photo.profile_photo_id'], name="FK-user-profile_photo_id-profile_photo-profile_photo_id"),
         sa.PrimaryKeyConstraint('user_id', name='PK-user-user_id')
     )
 
