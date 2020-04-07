@@ -68,6 +68,11 @@ class Background(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class BackgroundFill(RootObject):
+    __tdlib_type__ = "BackgroundFill"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class BackgroundType(RootObject):
     __tdlib_type__ = "BackgroundType"
 
@@ -75,6 +80,16 @@ class BackgroundType(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class Backgrounds(RootObject):
     __tdlib_type__ = "Backgrounds"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class BankCardActionOpenUrl(RootObject):
+    __tdlib_type__ = "BankCardActionOpenUrl"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class BankCardInfo(RootObject):
+    __tdlib_type__ = "BankCardInfo"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -143,6 +158,11 @@ class CallbackQueryPayload(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class CanTransferOwnershipResult(RootObject):
+    __tdlib_type__ = "CanTransferOwnershipResult"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class Chat(RootObject):
     __tdlib_type__ = "Chat"
 
@@ -150,6 +170,21 @@ class Chat(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class ChatAction(RootObject):
     __tdlib_type__ = "ChatAction"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatActionBar(RootObject):
+    __tdlib_type__ = "ChatActionBar"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatAdministrator(RootObject):
+    __tdlib_type__ = "ChatAdministrator"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatAdministrators(RootObject):
+    __tdlib_type__ = "ChatAdministrators"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -183,6 +218,16 @@ class ChatInviteLinkInfo(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatList(RootObject):
+    __tdlib_type__ = "ChatList"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatLocation(RootObject):
+    __tdlib_type__ = "ChatLocation"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class ChatMember(RootObject):
     __tdlib_type__ = "ChatMember"
 
@@ -200,6 +245,11 @@ class ChatMembers(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class ChatMembersFilter(RootObject):
     __tdlib_type__ = "ChatMembersFilter"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatNearby(RootObject):
+    __tdlib_type__ = "ChatNearby"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -223,8 +273,13 @@ class ChatReportReason(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class ChatReportSpamState(RootObject):
-    __tdlib_type__ = "ChatReportSpamState"
+class ChatStatistics(RootObject):
+    __tdlib_type__ = "ChatStatistics"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatStatisticsMessageInteractionCounters(RootObject):
+    __tdlib_type__ = "ChatStatisticsMessageInteractionCounters"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -235,6 +290,11 @@ class ChatType(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class Chats(RootObject):
     __tdlib_type__ = "Chats"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class ChatsNearby(RootObject):
+    __tdlib_type__ = "ChatsNearby"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -280,6 +340,11 @@ class DatabaseStatistics(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class Date(RootObject):
     __tdlib_type__ = "Date"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class DateRange(RootObject):
+    __tdlib_type__ = "DateRange"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -523,11 +588,6 @@ class LanguagePackStrings(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class LinkState(RootObject):
-    __tdlib_type__ = "LinkState"
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class LocalFile(RootObject):
     __tdlib_type__ = "LocalFile"
 
@@ -555,6 +615,11 @@ class LogTags(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class LogVerbosityLevel(RootObject):
     __tdlib_type__ = "LogVerbosityLevel"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class LoginUrlInfo(RootObject):
+    __tdlib_type__ = "LoginUrlInfo"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -590,6 +655,11 @@ class MessageForwardOrigin(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class MessageLinkInfo(RootObject):
     __tdlib_type__ = "MessageLinkInfo"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class MessageSchedulingState(RootObject):
+    __tdlib_type__ = "MessageSchedulingState"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -803,6 +873,11 @@ class PollOption(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class PollType(RootObject):
+    __tdlib_type__ = "PollType"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class ProfilePhoto(RootObject):
     __tdlib_type__ = "ProfilePhoto"
 
@@ -820,6 +895,11 @@ class Proxy(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class ProxyType(RootObject):
     __tdlib_type__ = "ProxyType"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class PublicChatType(RootObject):
+    __tdlib_type__ = "PublicChatType"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -888,6 +968,11 @@ class SecretChatState(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class SendMessageOptions(RootObject):
+    __tdlib_type__ = "SendMessageOptions"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class Session(RootObject):
     __tdlib_type__ = "Session"
 
@@ -900,6 +985,16 @@ class Sessions(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class ShippingOption(RootObject):
     __tdlib_type__ = "ShippingOption"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class StatisticsGraph(RootObject):
+    __tdlib_type__ = "StatisticsGraph"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class StatisticsValue(RootObject):
+    __tdlib_type__ = "StatisticsValue"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1050,16 +1145,6 @@ class TextEntityType(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class TextParseMode(RootObject):
     __tdlib_type__ = "TextParseMode"
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class TonLiteServerResponse(RootObject):
-    __tdlib_type__ = "TonLiteServerResponse"
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class TonWalletPasswordSalt(RootObject):
-    __tdlib_type__ = "TonWalletPasswordSalt"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1277,6 +1362,12 @@ class authorizationStateWaitEncryptionKey(AuthorizationState):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class authorizationStateWaitOtherDeviceConfirmation(AuthorizationState):
+    __tdlib_type__ = "authorizationStateWaitOtherDeviceConfirmation"
+    link:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class authorizationStateWaitPassword(AuthorizationState):
     __tdlib_type__ = "authorizationStateWaitPassword"
     password_hint:str = attr.ib()
@@ -1307,6 +1398,7 @@ class autoDownloadSettings(AutoDownloadSettings):
     max_photo_file_size:int = attr.ib()
     max_video_file_size:int = attr.ib()
     max_other_file_size:int = attr.ib()
+    video_upload_bitrate:int = attr.ib()
     preload_large_videos:bool = attr.ib()
     preload_next_audio:bool = attr.ib()
     use_less_data_for_calls:bool = attr.ib()
@@ -1332,17 +1424,31 @@ class background(Background):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class backgroundTypePattern(BackgroundType):
-    __tdlib_type__ = "backgroundTypePattern"
-    is_moving:bool = attr.ib()
-    color:int = attr.ib()
-    intensity:int = attr.ib()
+class backgroundFillGradient(BackgroundFill):
+    __tdlib_type__ = "backgroundFillGradient"
+    top_color:int = attr.ib()
+    bottom_color:int = attr.ib()
+    rotation_angle:int = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class backgroundTypeSolid(BackgroundType):
-    __tdlib_type__ = "backgroundTypeSolid"
+class backgroundFillSolid(BackgroundFill):
+    __tdlib_type__ = "backgroundFillSolid"
     color:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class backgroundTypeFill(BackgroundType):
+    __tdlib_type__ = "backgroundTypeFill"
+    fill:BackgroundFill = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class backgroundTypePattern(BackgroundType):
+    __tdlib_type__ = "backgroundTypePattern"
+    fill:BackgroundFill = attr.ib()
+    intensity:int = attr.ib()
+    is_moving:bool = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1356,6 +1462,20 @@ class backgroundTypeWallpaper(BackgroundType):
 class backgrounds(Backgrounds):
     __tdlib_type__ = "backgrounds"
     backgrounds:typing.Sequence[background] = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class bankCardActionOpenUrl(BankCardActionOpenUrl):
+    __tdlib_type__ = "bankCardActionOpenUrl"
+    text:str = attr.ib()
+    url:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class bankCardInfo(BankCardInfo):
+    __tdlib_type__ = "bankCardInfo"
+    title:str = attr.ib()
+    actions:typing.Sequence[bankCardActionOpenUrl] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1483,6 +1603,7 @@ class callProtocol(CallProtocol):
     udp_reflector:bool = attr.ib()
     min_layer:int = attr.ib()
     max_layer:int = attr.ib()
+    library_versions:typing.Sequence[str] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1548,10 +1669,33 @@ class callbackQueryPayloadGame(CallbackQueryPayload):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class canTransferOwnershipResultOk(CanTransferOwnershipResult):
+    __tdlib_type__ = "canTransferOwnershipResultOk"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class canTransferOwnershipResultPasswordNeeded(CanTransferOwnershipResult):
+    __tdlib_type__ = "canTransferOwnershipResultPasswordNeeded"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class canTransferOwnershipResultPasswordTooFresh(CanTransferOwnershipResult):
+    __tdlib_type__ = "canTransferOwnershipResultPasswordTooFresh"
+    retry_after:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class canTransferOwnershipResultSessionTooFresh(CanTransferOwnershipResult):
+    __tdlib_type__ = "canTransferOwnershipResultSessionTooFresh"
+    retry_after:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chat(Chat):
     __tdlib_type__ = "chat"
     id:int = attr.ib()
     type:ChatType = attr.ib()
+    chat_list:ChatList = attr.ib()
     title:str = attr.ib()
     photo:chatPhoto = attr.ib()
     permissions:chatPermissions = attr.ib()
@@ -1560,6 +1704,7 @@ class chat(Chat):
     is_pinned:bool = attr.ib()
     is_marked_as_unread:bool = attr.ib()
     is_sponsored:bool = attr.ib()
+    has_scheduled_messages:bool = attr.ib()
     can_be_deleted_only_for_self:bool = attr.ib()
     can_be_deleted_for_all_users:bool = attr.ib()
     can_be_reported:bool = attr.ib()
@@ -1569,10 +1714,36 @@ class chat(Chat):
     last_read_outbox_message_id:int = attr.ib()
     unread_mention_count:int = attr.ib()
     notification_settings:chatNotificationSettings = attr.ib()
+    action_bar:ChatActionBar = attr.ib()
     pinned_message_id:int = attr.ib()
     reply_markup_message_id:int = attr.ib()
     draft_message:draftMessage = attr.ib()
     client_data:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatActionBarAddContact(ChatActionBar):
+    __tdlib_type__ = "chatActionBarAddContact"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatActionBarReportAddBlock(ChatActionBar):
+    __tdlib_type__ = "chatActionBarReportAddBlock"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatActionBarReportSpam(ChatActionBar):
+    __tdlib_type__ = "chatActionBarReportSpam"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatActionBarReportUnrelatedLocation(ChatActionBar):
+    __tdlib_type__ = "chatActionBarReportUnrelatedLocation"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatActionBarSharePhoneNumber(ChatActionBar):
+    __tdlib_type__ = "chatActionBarSharePhoneNumber"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1646,6 +1817,20 @@ class chatActionUploadingVoiceNote(ChatAction):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatAdministrator(ChatAdministrator):
+    __tdlib_type__ = "chatAdministrator"
+    user_id:int = attr.ib()
+    custom_title:str = attr.ib()
+    is_owner:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatAdministrators(ChatAdministrators):
+    __tdlib_type__ = "chatAdministrators"
+    administrators:typing.Sequence[chatAdministrator] = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chatEvent(ChatEvent):
     __tdlib_type__ = "chatEvent"
     id:int = attr.ib()
@@ -1671,6 +1856,20 @@ class chatEventInvitesToggled(ChatEventAction):
 class chatEventIsAllHistoryAvailableToggled(ChatEventAction):
     __tdlib_type__ = "chatEventIsAllHistoryAvailableToggled"
     is_all_history_available:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatEventLinkedChatChanged(ChatEventAction):
+    __tdlib_type__ = "chatEventLinkedChatChanged"
+    old_linked_chat_id:int = attr.ib()
+    new_linked_chat_id:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatEventLocationChanged(ChatEventAction):
+    __tdlib_type__ = "chatEventLocationChanged"
+    old_location:chatLocation = attr.ib()
+    new_location:chatLocation = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1772,6 +1971,13 @@ class chatEventSignMessagesToggled(ChatEventAction):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatEventSlowModeDelayChanged(ChatEventAction):
+    __tdlib_type__ = "chatEventSlowModeDelayChanged"
+    old_slow_mode_delay:int = attr.ib()
+    new_slow_mode_delay:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chatEventStickerSetChanged(ChatEventAction):
     __tdlib_type__ = "chatEventStickerSetChanged"
     old_sticker_set_id:int = attr.ib()
@@ -1817,6 +2023,23 @@ class chatInviteLinkInfo(ChatInviteLinkInfo):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatListArchive(ChatList):
+    __tdlib_type__ = "chatListArchive"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatListMain(ChatList):
+    __tdlib_type__ = "chatListMain"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatLocation(ChatLocation):
+    __tdlib_type__ = "chatLocation"
+    location:location = attr.ib()
+    address:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chatMember(ChatMember):
     __tdlib_type__ = "chatMember"
     user_id:int = attr.ib()
@@ -1829,6 +2052,7 @@ class chatMember(ChatMember):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chatMemberStatusAdministrator(ChatMemberStatus):
     __tdlib_type__ = "chatMemberStatusAdministrator"
+    custom_title:str = attr.ib()
     can_be_edited:bool = attr.ib()
     can_change_info:bool = attr.ib()
     can_post_messages:bool = attr.ib()
@@ -1849,6 +2073,7 @@ class chatMemberStatusBanned(ChatMemberStatus):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chatMemberStatusCreator(ChatMemberStatus):
     __tdlib_type__ = "chatMemberStatusCreator"
+    custom_title:str = attr.ib()
     is_member:bool = attr.ib()
 
 
@@ -1905,6 +2130,13 @@ class chatMembersFilterMembers(ChatMembersFilter):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chatMembersFilterRestricted(ChatMembersFilter):
     __tdlib_type__ = "chatMembersFilterRestricted"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatNearby(ChatNearby):
+    __tdlib_type__ = "chatNearby"
+    chat_id:int = attr.ib()
+    distance:int = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -1969,14 +2201,41 @@ class chatReportReasonSpam(ChatReportReason):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatReportReasonUnrelatedLocation(ChatReportReason):
+    __tdlib_type__ = "chatReportReasonUnrelatedLocation"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class chatReportReasonViolence(ChatReportReason):
     __tdlib_type__ = "chatReportReasonViolence"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class chatReportSpamState(ChatReportSpamState):
-    __tdlib_type__ = "chatReportSpamState"
-    can_report_spam:bool = attr.ib()
+class chatStatistics(ChatStatistics):
+    __tdlib_type__ = "chatStatistics"
+    period:dateRange = attr.ib()
+    member_count:statisticsValue = attr.ib()
+    mean_view_count:statisticsValue = attr.ib()
+    mean_share_count:statisticsValue = attr.ib()
+    enabled_notifications_percentage:decimal.Decimal = attr.ib()
+    member_count_graph:StatisticsGraph = attr.ib()
+    join_graph:StatisticsGraph = attr.ib()
+    mute_graph:StatisticsGraph = attr.ib()
+    view_count_by_hour_graph:StatisticsGraph = attr.ib()
+    view_count_by_source_graph:StatisticsGraph = attr.ib()
+    join_by_source_graph:StatisticsGraph = attr.ib()
+    language_graph:StatisticsGraph = attr.ib()
+    message_interaction_graph:StatisticsGraph = attr.ib()
+    instant_view_interaction_graph:StatisticsGraph = attr.ib()
+    recent_message_interactions:typing.Sequence[chatStatisticsMessageInteractionCounters] = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatStatisticsMessageInteractionCounters(ChatStatisticsMessageInteractionCounters):
+    __tdlib_type__ = "chatStatisticsMessageInteractionCounters"
+    message_id:int = attr.ib()
+    view_count:int = attr.ib()
+    forward_count:int = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -2009,6 +2268,13 @@ class chatTypeSupergroup(ChatType):
 class chats(Chats):
     __tdlib_type__ = "chats"
     chat_ids:typing.Sequence[int] = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class chatsNearby(ChatsNearby):
+    __tdlib_type__ = "chatsNearby"
+    users_nearby:typing.Sequence[chatNearby] = attr.ib()
+    supergroups_nearby:typing.Sequence[chatNearby] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -2118,6 +2384,13 @@ class date(Date):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class dateRange(DateRange):
+    __tdlib_type__ = "dateRange"
+    start_date:int = attr.ib()
+    end_date:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class datedFile(DatedFile):
     __tdlib_type__ = "datedFile"
     file:file = attr.ib()
@@ -2217,6 +2490,7 @@ class document(Document):
 class draftMessage(DraftMessage):
     __tdlib_type__ = "draftMessage"
     reply_to_message_id:int = attr.ib()
+    date:int = attr.ib()
     input_message_text:InputMessageContent = attr.ib()
 
 
@@ -2854,6 +3128,11 @@ class inputMessageContact(InputMessageContent):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class inputMessageDice(InputMessageContent):
+    __tdlib_type__ = "inputMessageDice"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class inputMessageDocument(InputMessageContent):
     __tdlib_type__ = "inputMessageDocument"
     document:InputFile = attr.ib()
@@ -2918,6 +3197,9 @@ class inputMessagePoll(InputMessageContent):
     __tdlib_type__ = "inputMessagePoll"
     question:str = attr.ib()
     options:typing.Sequence[str] = attr.ib()
+    is_anonymous:bool = attr.ib()
+    type:PollType = attr.ib()
+    is_closed:bool = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -3124,9 +3406,16 @@ class inputPersonalDocument(InputPersonalDocument):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class inputSticker(InputSticker):
-    __tdlib_type__ = "inputSticker"
-    png_sticker:InputFile = attr.ib()
+class inputStickerAnimated(InputSticker):
+    __tdlib_type__ = "inputStickerAnimated"
+    sticker:InputFile = attr.ib()
+    emojis:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class inputStickerStatic(InputSticker):
+    __tdlib_type__ = "inputStickerStatic"
+    sticker:InputFile = attr.ib()
     emojis:str = attr.ib()
     mask_position:maskPosition = attr.ib()
 
@@ -3214,6 +3503,13 @@ class keyboardButtonTypeRequestPhoneNumber(KeyboardButtonType):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class keyboardButtonTypeRequestPoll(KeyboardButtonType):
+    __tdlib_type__ = "keyboardButtonTypeRequestPoll"
+    force_regular:bool = attr.ib()
+    force_quiz:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class keyboardButtonTypeText(KeyboardButtonType):
     __tdlib_type__ = "keyboardButtonTypeText"
 
@@ -3279,21 +3575,6 @@ class languagePackStrings(LanguagePackStrings):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class linkStateIsContact(LinkState):
-    __tdlib_type__ = "linkStateIsContact"
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class linkStateKnowsPhoneNumber(LinkState):
-    __tdlib_type__ = "linkStateKnowsPhoneNumber"
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class linkStateNone(LinkState):
-    __tdlib_type__ = "linkStateNone"
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class localFile(LocalFile):
     __tdlib_type__ = "localFile"
     path:str = attr.ib()
@@ -3349,6 +3630,22 @@ class logVerbosityLevel(LogVerbosityLevel):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class loginUrlInfoOpen(LoginUrlInfo):
+    __tdlib_type__ = "loginUrlInfoOpen"
+    url:str = attr.ib()
+    skip_confirm:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class loginUrlInfoRequestConfirmation(LoginUrlInfo):
+    __tdlib_type__ = "loginUrlInfoRequestConfirmation"
+    url:str = attr.ib()
+    domain:str = attr.ib()
+    bot_user_id:int = attr.ib()
+    request_write_access:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class maskPointChin(MaskPoint):
     __tdlib_type__ = "maskPointChin"
 
@@ -3384,6 +3681,7 @@ class message(Message):
     sender_user_id:int = attr.ib()
     chat_id:int = attr.ib()
     sending_state:MessageSendingState = attr.ib()
+    scheduling_state:MessageSchedulingState = attr.ib()
     is_outgoing:bool = attr.ib()
     can_be_edited:bool = attr.ib()
     can_be_forwarded:bool = attr.ib()
@@ -3401,6 +3699,7 @@ class message(Message):
     author_signature:str = attr.ib()
     views:int = attr.ib()
     media_album_id:int = attr.ib()
+    restriction_reason:str = attr.ib()
     content:MessageContent = attr.ib()
     reply_markup:ReplyMarkup = attr.ib()
 
@@ -3502,6 +3801,12 @@ class messageContactRegistered(MessageContent):
 class messageCustomServiceAction(MessageContent):
     __tdlib_type__ = "messageCustomServiceAction"
     text:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class messageDice(MessageContent):
+    __tdlib_type__ = "messageDice"
+    value:int = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -3647,6 +3952,17 @@ class messagePinMessage(MessageContent):
 class messagePoll(MessageContent):
     __tdlib_type__ = "messagePoll"
     poll:poll = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class messageSchedulingStateSendAtDate(MessageSchedulingState):
+    __tdlib_type__ = "messageSchedulingStateSendAtDate"
+    send_date:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class messageSchedulingStateSendWhenOnline(MessageSchedulingState):
+    __tdlib_type__ = "messageSchedulingStateSendWhenOnline"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -3864,6 +4180,8 @@ class notificationTypeNewPushMessage(NotificationType):
     __tdlib_type__ = "notificationTypeNewPushMessage"
     message_id:int = attr.ib()
     sender_user_id:int = attr.ib()
+    sender_name:str = attr.ib()
+    is_outgoing:bool = attr.ib()
     content:PushMessageContent = attr.ib()
 
 
@@ -4525,6 +4843,9 @@ class poll(Poll):
     question:str = attr.ib()
     options:typing.Sequence[pollOption] = attr.ib()
     total_voter_count:int = attr.ib()
+    recent_voter_user_ids:typing.Sequence[int] = attr.ib()
+    is_anonymous:bool = attr.ib()
+    type:PollType = attr.ib()
     is_closed:bool = attr.ib()
 
 
@@ -4536,6 +4857,18 @@ class pollOption(PollOption):
     vote_percentage:int = attr.ib()
     is_chosen:bool = attr.ib()
     is_being_chosen:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class pollTypeQuiz(PollType):
+    __tdlib_type__ = "pollTypeQuiz"
+    correct_option_id:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class pollTypeRegular(PollType):
+    __tdlib_type__ = "pollTypeRegular"
+    allow_multiple_answers:bool = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -4582,6 +4915,16 @@ class proxyTypeSocks5(ProxyType):
     __tdlib_type__ = "proxyTypeSocks5"
     username:str = attr.ib()
     password:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class publicChatTypeHasUsername(PublicChatType):
+    __tdlib_type__ = "publicChatTypeHasUsername"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class publicChatTypeIsLocationBased(PublicChatType):
+    __tdlib_type__ = "publicChatTypeIsLocationBased"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -4724,6 +5067,7 @@ class pushMessageContentPhoto(PushMessageContent):
 class pushMessageContentPoll(PushMessageContent):
     __tdlib_type__ = "pushMessageContentPoll"
     question:str = attr.ib()
+    is_regular:bool = attr.ib()
     is_pinned:bool = attr.ib()
 
 
@@ -4786,6 +5130,7 @@ class recoveryEmailAddress(RecoveryEmailAddress):
 class remoteFile(RemoteFile):
     __tdlib_type__ = "remoteFile"
     id:str = attr.ib()
+    unique_id:str = attr.ib()
     is_uploading_active:bool = attr.ib()
     is_uploading_completed:bool = attr.ib()
     uploaded_size:int = attr.ib()
@@ -4821,8 +5166,15 @@ class replyMarkupShowKeyboard(ReplyMarkup):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class richTextAnchor(RichText):
     __tdlib_type__ = "richTextAnchor"
+    name:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class richTextAnchorLink(RichText):
+    __tdlib_type__ = "richTextAnchorLink"
     text:RichText = attr.ib()
     name:str = attr.ib()
+    url:str = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -4875,6 +5227,14 @@ class richTextPhoneNumber(RichText):
 class richTextPlain(RichText):
     __tdlib_type__ = "richTextPlain"
     text:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class richTextReference(RichText):
+    __tdlib_type__ = "richTextReference"
+    text:RichText = attr.ib()
+    reference_text:RichText = attr.ib()
+    url:str = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -5046,6 +5406,14 @@ class secretChatStateReady(SecretChatState):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class sendMessageOptions(SendMessageOptions):
+    __tdlib_type__ = "sendMessageOptions"
+    disable_notification:bool = attr.ib()
+    from_background:bool = attr.ib()
+    scheduling_state:MessageSchedulingState = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class session(Session):
     __tdlib_type__ = "session"
     id:int = attr.ib()
@@ -5077,6 +5445,33 @@ class shippingOption(ShippingOption):
     id:str = attr.ib()
     title:str = attr.ib()
     price_parts:typing.Sequence[labeledPricePart] = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class statisticsGraphAsync(StatisticsGraph):
+    __tdlib_type__ = "statisticsGraphAsync"
+    token:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class statisticsGraphData(StatisticsGraph):
+    __tdlib_type__ = "statisticsGraphData"
+    json_data:str = attr.ib()
+    zoom_token:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class statisticsGraphError(StatisticsGraph):
+    __tdlib_type__ = "statisticsGraphError"
+    error_message:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class statisticsValue(StatisticsValue):
+    __tdlib_type__ = "statisticsValue"
+    value:decimal.Decimal = attr.ib()
+    previous_value:decimal.Decimal = attr.ib()
+    growth_rate_percentage:decimal.Decimal = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -5183,7 +5578,10 @@ class supergroup(Supergroup):
     date:int = attr.ib()
     status:ChatMemberStatus = attr.ib()
     member_count:int = attr.ib()
+    has_linked_chat:bool = attr.ib()
+    has_location:bool = attr.ib()
     sign_messages:bool = attr.ib()
+    is_slow_mode_enabled:bool = attr.ib()
     is_channel:bool = attr.ib()
     is_verified:bool = attr.ib()
     restriction_reason:str = attr.ib()
@@ -5198,12 +5596,17 @@ class supergroupFullInfo(SupergroupFullInfo):
     administrator_count:int = attr.ib()
     restricted_count:int = attr.ib()
     banned_count:int = attr.ib()
+    linked_chat_id:int = attr.ib()
+    slow_mode_delay:int = attr.ib()
+    slow_mode_delay_expires_in:decimal.Decimal = attr.ib()
     can_get_members:bool = attr.ib()
     can_set_username:bool = attr.ib()
     can_set_sticker_set:bool = attr.ib()
+    can_set_location:bool = attr.ib()
     can_view_statistics:bool = attr.ib()
     is_all_history_available:bool = attr.ib()
     sticker_set_id:int = attr.ib()
+    location:chatLocation = attr.ib()
     invite_link:str = attr.ib()
     upgraded_from_basic_group_id:int = attr.ib()
     upgraded_from_max_message_id:int = attr.ib()
@@ -5383,6 +5786,11 @@ class textEntity(TextEntity):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class textEntityTypeBankCardNumber(TextEntityType):
+    __tdlib_type__ = "textEntityTypeBankCardNumber"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class textEntityTypeBold(TextEntityType):
     __tdlib_type__ = "textEntityTypeBold"
 
@@ -5445,9 +5853,19 @@ class textEntityTypePreCode(TextEntityType):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class textEntityTypeStrikethrough(TextEntityType):
+    __tdlib_type__ = "textEntityTypeStrikethrough"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class textEntityTypeTextUrl(TextEntityType):
     __tdlib_type__ = "textEntityTypeTextUrl"
     url:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class textEntityTypeUnderline(TextEntityType):
+    __tdlib_type__ = "textEntityTypeUnderline"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -5463,18 +5881,7 @@ class textParseModeHTML(TextParseMode):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class textParseModeMarkdown(TextParseMode):
     __tdlib_type__ = "textParseModeMarkdown"
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class tonLiteServerResponse(TonLiteServerResponse):
-    __tdlib_type__ = "tonLiteServerResponse"
-    response:bytes = attr.ib()
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class tonWalletPasswordSalt(TonWalletPasswordSalt):
-    __tdlib_type__ = "tonWalletPasswordSalt"
-    salt:bytes = attr.ib()
+    version:int = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -5490,6 +5897,11 @@ class topChatCategoryCalls(TopChatCategory):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class topChatCategoryChannels(TopChatCategory):
     __tdlib_type__ = "topChatCategoryChannels"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class topChatCategoryForwardChats(TopChatCategory):
+    __tdlib_type__ = "topChatCategoryForwardChats"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -5539,6 +5951,20 @@ class updateCall(Update):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class updateChatActionBar(Update):
+    __tdlib_type__ = "updateChatActionBar"
+    chat_id:int = attr.ib()
+    action_bar:ChatActionBar = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class updateChatChatList(Update):
+    __tdlib_type__ = "updateChatChatList"
+    chat_id:int = attr.ib()
+    chat_list:ChatList = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class updateChatDefaultDisableNotification(Update):
     __tdlib_type__ = "updateChatDefaultDisableNotification"
     chat_id:int = attr.ib()
@@ -5551,6 +5977,13 @@ class updateChatDraftMessage(Update):
     chat_id:int = attr.ib()
     draft_message:draftMessage = attr.ib()
     order:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class updateChatHasScheduledMessages(Update):
+    __tdlib_type__ = "updateChatHasScheduledMessages"
+    chat_id:int = attr.ib()
+    has_scheduled_messages:bool = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -5751,6 +6184,13 @@ class updateMessageEdited(Update):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class updateMessageLiveLocationViewed(Update):
+    __tdlib_type__ = "updateMessageLiveLocationViewed"
+    chat_id:int = attr.ib()
+    message_id:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class updateMessageMentionRead(Update):
     __tdlib_type__ = "updateMessageMentionRead"
     chat_id:int = attr.ib()
@@ -5911,6 +6351,14 @@ class updatePoll(Update):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class updatePollAnswer(Update):
+    __tdlib_type__ = "updatePollAnswer"
+    poll_id:int = attr.ib()
+    user_id:int = attr.ib()
+    option_ids:typing.Sequence[int] = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class updateRecentStickers(Update):
     __tdlib_type__ = "updateRecentStickers"
     is_attached:bool = attr.ib()
@@ -5979,6 +6427,8 @@ class updateTrendingStickerSets(Update):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class updateUnreadChatCount(Update):
     __tdlib_type__ = "updateUnreadChatCount"
+    chat_list:ChatList = attr.ib()
+    total_count:int = attr.ib()
     unread_count:int = attr.ib()
     unread_unmuted_count:int = attr.ib()
     marked_as_unread_count:int = attr.ib()
@@ -5988,6 +6438,7 @@ class updateUnreadChatCount(Update):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class updateUnreadMessageCount(Update):
     __tdlib_type__ = "updateUnreadMessageCount"
+    chat_list:ChatList = attr.ib()
     unread_count:int = attr.ib()
     unread_unmuted_count:int = attr.ib()
 
@@ -6028,6 +6479,12 @@ class updateUserStatus(Update):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class updateUsersNearby(Update):
+    __tdlib_type__ = "updateUsersNearby"
+    users_nearby:typing.Sequence[chatNearby] = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class updates(Updates):
     __tdlib_type__ = "updates"
     updates:typing.Sequence[Update] = attr.ib()
@@ -6043,8 +6500,8 @@ class user(User):
     phone_number:str = attr.ib()
     status:UserStatus = attr.ib()
     profile_photo:profilePhoto = attr.ib()
-    outgoing_link:LinkState = attr.ib()
-    incoming_link:LinkState = attr.ib()
+    is_contact:bool = attr.ib()
+    is_mutual_contact:bool = attr.ib()
     is_verified:bool = attr.ib()
     is_support:bool = attr.ib()
     restriction_reason:str = attr.ib()
@@ -6060,6 +6517,7 @@ class userFullInfo(UserFullInfo):
     is_blocked:bool = attr.ib()
     can_be_called:bool = attr.ib()
     has_private_calls:bool = attr.ib()
+    need_phone_number_privacy_exception:bool = attr.ib()
     bio:str = attr.ib()
     share_text:str = attr.ib()
     group_in_common_count:int = attr.ib()
@@ -6077,6 +6535,11 @@ class userPrivacySettingAllowChatInvites(UserPrivacySetting):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userPrivacySettingAllowFindingByPhoneNumber(UserPrivacySetting):
+    __tdlib_type__ = "userPrivacySettingAllowFindingByPhoneNumber"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class userPrivacySettingAllowPeerToPeerCalls(UserPrivacySetting):
     __tdlib_type__ = "userPrivacySettingAllowPeerToPeerCalls"
 
@@ -6084,6 +6547,12 @@ class userPrivacySettingAllowPeerToPeerCalls(UserPrivacySetting):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class userPrivacySettingRuleAllowAll(UserPrivacySettingRule):
     __tdlib_type__ = "userPrivacySettingRuleAllowAll"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userPrivacySettingRuleAllowChatMembers(UserPrivacySettingRule):
+    __tdlib_type__ = "userPrivacySettingRuleAllowChatMembers"
+    chat_ids:typing.Sequence[int] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6100,6 +6569,12 @@ class userPrivacySettingRuleAllowUsers(UserPrivacySettingRule):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class userPrivacySettingRuleRestrictAll(UserPrivacySettingRule):
     __tdlib_type__ = "userPrivacySettingRuleRestrictAll"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userPrivacySettingRuleRestrictChatMembers(UserPrivacySettingRule):
+    __tdlib_type__ = "userPrivacySettingRuleRestrictChatMembers"
+    chat_ids:typing.Sequence[int] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6122,6 +6597,11 @@ class userPrivacySettingRules(UserPrivacySettingRules):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class userPrivacySettingShowLinkInForwardedMessages(UserPrivacySetting):
     __tdlib_type__ = "userPrivacySettingShowLinkInForwardedMessages"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class userPrivacySettingShowPhoneNumber(UserPrivacySetting):
+    __tdlib_type__ = "userPrivacySettingShowPhoneNumber"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6273,7 +6753,7 @@ class webPage(WebPage):
     type:str = attr.ib()
     site_name:str = attr.ib()
     title:str = attr.ib()
-    description:str = attr.ib()
+    description:formattedText = attr.ib()
     photo:photo = attr.ib()
     embed_url:str = attr.ib()
     embed_type:str = attr.ib()
@@ -6295,8 +6775,8 @@ class webPage(WebPage):
 class webPageInstantView(WebPageInstantView):
     __tdlib_type__ = "webPageInstantView"
     page_blocks:typing.Sequence[PageBlock] = attr.ib()
+    view_count:int = attr.ib()
     version:int = attr.ib()
-    url:str = attr.ib()
     is_rtl:bool = attr.ib()
     is_full:bool = attr.ib()
 
@@ -6334,6 +6814,12 @@ class resendAuthenticationCode(RootObject):
 class checkAuthenticationCode(RootObject):
     __tdlib_type__ = "checkAuthenticationCode"
     code:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class requestQrCodeAuthentication(RootObject):
+    __tdlib_type__ = "requestQrCodeAuthentication"
+    other_user_ids:typing.Sequence[int] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6379,6 +6865,12 @@ class close(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class destroy(RootObject):
     __tdlib_type__ = "destroy"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class confirmQrCodeAuthentication(RootObject):
+    __tdlib_type__ = "confirmQrCodeAuthentication"
+    link:str = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6557,6 +7049,7 @@ class getRemoteFile(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class getChats(RootObject):
     __tdlib_type__ = "getChats"
+    chat_list:ChatList = attr.ib()
     offset_order:int = attr.ib()
     offset_chat_id:int = attr.ib()
     limit:int = attr.ib()
@@ -6586,6 +7079,12 @@ class searchChatsOnServer(RootObject):
     __tdlib_type__ = "searchChatsOnServer"
     query:str = attr.ib()
     limit:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class searchChatsNearby(RootObject):
+    __tdlib_type__ = "searchChatsNearby"
+    location:location = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6629,6 +7128,23 @@ class checkChatUsername(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class getCreatedPublicChats(RootObject):
     __tdlib_type__ = "getCreatedPublicChats"
+    type:PublicChatType = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class checkCreatedPublicChatsLimit(RootObject):
+    __tdlib_type__ = "checkCreatedPublicChatsLimit"
+    type:PublicChatType = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getSuitableDiscussionChats(RootObject):
+    __tdlib_type__ = "getSuitableDiscussionChats"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getInactiveSupergroupChats(RootObject):
+    __tdlib_type__ = "getInactiveSupergroupChats"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -6672,6 +7188,7 @@ class searchChatMessages(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class searchMessages(RootObject):
     __tdlib_type__ = "searchMessages"
+    chat_list:ChatList = attr.ib()
     query:str = attr.ib()
     offset_date:int = attr.ib()
     offset_chat_id:int = attr.ib()
@@ -6725,6 +7242,12 @@ class getChatMessageCount(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getChatScheduledMessages(RootObject):
+    __tdlib_type__ = "getChatScheduledMessages"
+    chat_id:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class removeNotification(RootObject):
     __tdlib_type__ = "removeNotification"
     notification_group_id:int = attr.ib()
@@ -6764,8 +7287,7 @@ class sendMessage(RootObject):
     __tdlib_type__ = "sendMessage"
     chat_id:int = attr.ib()
     reply_to_message_id:int = attr.ib()
-    disable_notification:bool = attr.ib()
-    from_background:bool = attr.ib()
+    options:sendMessageOptions = attr.ib()
     reply_markup:ReplyMarkup = attr.ib()
     input_message_content:InputMessageContent = attr.ib()
 
@@ -6775,8 +7297,7 @@ class sendMessageAlbum(RootObject):
     __tdlib_type__ = "sendMessageAlbum"
     chat_id:int = attr.ib()
     reply_to_message_id:int = attr.ib()
-    disable_notification:bool = attr.ib()
-    from_background:bool = attr.ib()
+    options:sendMessageOptions = attr.ib()
     input_message_contents:typing.Sequence[InputMessageContent] = attr.ib()
 
 
@@ -6793,8 +7314,7 @@ class sendInlineQueryResultMessage(RootObject):
     __tdlib_type__ = "sendInlineQueryResultMessage"
     chat_id:int = attr.ib()
     reply_to_message_id:int = attr.ib()
-    disable_notification:bool = attr.ib()
-    from_background:bool = attr.ib()
+    options:sendMessageOptions = attr.ib()
     query_id:int = attr.ib()
     result_id:str = attr.ib()
     hide_via_bot:bool = attr.ib()
@@ -6806,8 +7326,7 @@ class forwardMessages(RootObject):
     chat_id:int = attr.ib()
     from_chat_id:int = attr.ib()
     message_ids:typing.Sequence[int] = attr.ib()
-    disable_notification:bool = attr.ib()
-    from_background:bool = attr.ib()
+    options:sendMessageOptions = attr.ib()
     as_album:bool = attr.ib()
     send_copy:bool = attr.ib()
     remove_caption:bool = attr.ib()
@@ -6942,6 +7461,14 @@ class editInlineMessageReplyMarkup(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class editMessageSchedulingState(RootObject):
+    __tdlib_type__ = "editMessageSchedulingState"
+    chat_id:int = attr.ib()
+    message_id:int = attr.ib()
+    scheduling_state:MessageSchedulingState = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class getTextEntities(RootObject):
     __tdlib_type__ = "getTextEntities"
     text:str = attr.ib()
@@ -6952,6 +7479,18 @@ class parseTextEntities(RootObject):
     __tdlib_type__ = "parseTextEntities"
     text:str = attr.ib()
     parse_mode:TextParseMode = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class parseMarkdown(RootObject):
+    __tdlib_type__ = "parseMarkdown"
+    text:formattedText = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getMarkdownText(RootObject):
+    __tdlib_type__ = "getMarkdownText"
+    text:formattedText = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -7002,11 +7541,38 @@ class setPollAnswer(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getPollVoters(RootObject):
+    __tdlib_type__ = "getPollVoters"
+    chat_id:int = attr.ib()
+    message_id:int = attr.ib()
+    option_id:int = attr.ib()
+    offset:int = attr.ib()
+    limit:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class stopPoll(RootObject):
     __tdlib_type__ = "stopPoll"
     chat_id:int = attr.ib()
     message_id:int = attr.ib()
     reply_markup:ReplyMarkup = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getLoginUrlInfo(RootObject):
+    __tdlib_type__ = "getLoginUrlInfo"
+    chat_id:int = attr.ib()
+    message_id:int = attr.ib()
+    button_id:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getLoginUrl(RootObject):
+    __tdlib_type__ = "getLoginUrl"
+    chat_id:int = attr.ib()
+    message_id:int = attr.ib()
+    button_id:int = attr.ib()
+    allow_write_access:bool = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -7187,6 +7753,7 @@ class createNewSupergroupChat(RootObject):
     title:str = attr.ib()
     is_channel:bool = attr.ib()
     description:str = attr.ib()
+    location:chatLocation = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -7199,6 +7766,13 @@ class createNewSecretChat(RootObject):
 class upgradeBasicGroupChatToSupergroupChat(RootObject):
     __tdlib_type__ = "upgradeBasicGroupChatToSupergroupChat"
     chat_id:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class setChatChatList(RootObject):
+    __tdlib_type__ = "setChatChatList"
+    chat_id:int = attr.ib()
+    chat_list:ChatList = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -7272,6 +7846,27 @@ class setChatDescription(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class setChatDiscussionGroup(RootObject):
+    __tdlib_type__ = "setChatDiscussionGroup"
+    chat_id:int = attr.ib()
+    discussion_chat_id:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class setChatLocation(RootObject):
+    __tdlib_type__ = "setChatLocation"
+    chat_id:int = attr.ib()
+    location:chatLocation = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class setChatSlowModeDelay(RootObject):
+    __tdlib_type__ = "setChatSlowModeDelay"
+    chat_id:int = attr.ib()
+    slow_mode_delay:int = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class pinChatMessage(RootObject):
     __tdlib_type__ = "pinChatMessage"
     chat_id:int = attr.ib()
@@ -7318,6 +7913,19 @@ class setChatMemberStatus(RootObject):
     chat_id:int = attr.ib()
     user_id:int = attr.ib()
     status:ChatMemberStatus = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class canTransferOwnership(RootObject):
+    __tdlib_type__ = "canTransferOwnership"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class transferChatOwnership(RootObject):
+    __tdlib_type__ = "transferChatOwnership"
+    chat_id:int = attr.ib()
+    user_id:int = attr.ib()
+    password:str = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -7376,6 +7984,7 @@ class resetAllNotificationSettings(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class setPinnedChats(RootObject):
     __tdlib_type__ = "setPinnedChats"
+    chat_list:ChatList = attr.ib()
     chat_ids:typing.Sequence[int] = attr.ib()
 
 
@@ -7531,6 +8140,13 @@ class getBlockedUsers(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class addContact(RootObject):
+    __tdlib_type__ = "addContact"
+    contact:contact = attr.ib()
+    share_phone_number:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class importContacts(RootObject):
     __tdlib_type__ = "importContacts"
     contacts:typing.Sequence[contact] = attr.ib()
@@ -7568,6 +8184,12 @@ class changeImportedContacts(RootObject):
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class clearImportedContacts(RootObject):
     __tdlib_type__ = "clearImportedContacts"
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class sharePhoneNumber(RootObject):
+    __tdlib_type__ = "sharePhoneNumber"
+    user_id:int = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -7718,6 +8340,7 @@ class searchEmojis(RootObject):
     __tdlib_type__ = "searchEmojis"
     text:str = attr.ib()
     exact_match:bool = attr.ib()
+    input_language_code:str = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -7806,6 +8429,12 @@ class setUsername(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class setLocation(RootObject):
+    __tdlib_type__ = "setLocation"
+    location:location = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class changePhoneNumber(RootObject):
     __tdlib_type__ = "changePhoneNumber"
     phone_number:str = attr.ib()
@@ -7821,6 +8450,12 @@ class resendChangePhoneNumberCode(RootObject):
 class checkChangePhoneNumberCode(RootObject):
     __tdlib_type__ = "checkChangePhoneNumberCode"
     code:str = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class setCommands(RootObject):
+    __tdlib_type__ = "setCommands"
+    commands:typing.Sequence[botCommand] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -8140,16 +8775,9 @@ class deleteAccount(RootObject):
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class getChatReportSpamState(RootObject):
-    __tdlib_type__ = "getChatReportSpamState"
+class removeChatActionBar(RootObject):
+    __tdlib_type__ = "removeChatActionBar"
     chat_id:int = attr.ib()
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class changeChatReportSpamState(RootObject):
-    __tdlib_type__ = "changeChatReportSpamState"
-    chat_id:int = attr.ib()
-    is_spam_chat:bool = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -8166,6 +8794,21 @@ class getChatStatisticsUrl(RootObject):
     chat_id:int = attr.ib()
     parameters:str = attr.ib()
     is_dark:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getChatStatistics(RootObject):
+    __tdlib_type__ = "getChatStatistics"
+    chat_id:int = attr.ib()
+    is_dark:bool = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getChatStatisticsGraph(RootObject):
+    __tdlib_type__ = "getChatStatisticsGraph"
+    chat_id:int = attr.ib()
+    token:str = attr.ib()
+    x:int = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -8194,6 +8837,7 @@ class optimizeStorage(RootObject):
     file_types:typing.Sequence[FileType] = attr.ib()
     chat_ids:typing.Sequence[int] = attr.ib()
     exclude_chat_ids:typing.Sequence[int] = attr.ib()
+    return_deleted_file_statistics:bool = attr.ib()
     chat_limit:int = attr.ib()
 
 
@@ -8230,6 +8874,12 @@ class setAutoDownloadSettings(RootObject):
     __tdlib_type__ = "setAutoDownloadSettings"
     settings:autoDownloadSettings = attr.ib()
     type:NetworkType = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class getBankCardInfo(RootObject):
+    __tdlib_type__ = "getBankCardInfo"
+    bank_card_number:str = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -8369,7 +9019,7 @@ class createNewStickerSet(RootObject):
     title:str = attr.ib()
     name:str = attr.ib()
     is_masks:bool = attr.ib()
-    stickers:typing.Sequence[inputSticker] = attr.ib()
+    stickers:typing.Sequence[InputSticker] = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -8377,7 +9027,15 @@ class addStickerToSet(RootObject):
     __tdlib_type__ = "addStickerToSet"
     user_id:int = attr.ib()
     name:str = attr.ib()
-    sticker:inputSticker = attr.ib()
+    sticker:InputSticker = attr.ib()
+
+
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
+class setStickerSetThumbnail(RootObject):
+    __tdlib_type__ = "setStickerSetThumbnail"
+    user_id:int = attr.ib()
+    name:str = attr.ib()
+    thumbnail:InputFile = attr.ib()
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
@@ -8422,17 +9080,6 @@ class answerCustomQuery(RootObject):
     __tdlib_type__ = "answerCustomQuery"
     custom_query_id:int = attr.ib()
     data:str = attr.ib()
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class sendTonLiteServerRequest(RootObject):
-    __tdlib_type__ = "sendTonLiteServerRequest"
-    request:bytes = attr.ib()
-
-
-@attr.s(auto_attribs=True, frozen=True, kw_only=True)
-class getTonWalletPasswordSalt(RootObject):
-    __tdlib_type__ = "getTonWalletPasswordSalt"
 
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
