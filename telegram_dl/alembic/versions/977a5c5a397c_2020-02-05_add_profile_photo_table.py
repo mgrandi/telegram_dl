@@ -28,8 +28,8 @@ def upgrade():
         sa.Column('tg_profile_photo_id', sa.Integer(), nullable=True),
         sa.Column('big_id', sa.Integer(), nullable=True),
         sa.Column('small_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['big_id'], ['file.tg_file_id'], ),
-        sa.ForeignKeyConstraint(['small_id'], ['file.tg_file_id'], ),
+        sa.ForeignKeyConstraint(['big_id'], ['file.file_id'], ),
+        sa.ForeignKeyConstraint(['small_id'], ['file.file_id'], ),
         sa.PrimaryKeyConstraint('profile_photo_id', name='PK-profile_photo-profile_photo_id')
     )
 
