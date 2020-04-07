@@ -49,7 +49,7 @@ class Application:
         self.dbaction_handler = db_actions.DbActionHandler()
 
         # load config stuff
-        logger.info("creating TdlibConfiguration")
+        logger.info("creating ApplicationConfiguration")
         self.app_config = config.ApplicationConfiguration.init_from_config(self.args.config)
 
         logger.info("creating engine")
@@ -67,9 +67,36 @@ class Application:
     def should_stop_loop(self):
         return self.stop_event.is_set()
 
-    async def run(self):
+    def setup_tdlib_logging(self):
+        ''' metthod to organize the statements for setting up the TDLib / TDJSON internal logging
+        '''
 
-        from telegram_dl import tdlib_generated as tdg
+        app_config = self.tdlib_handle.app_config
+
+        # set the log verbosity
+        set_log_v_obj = tdlib_generated.setLogVerbosityLevel(
+            new_verbosity_level=app_config.tdlib_log_verbosity,
+            extra=utils.new_extra())
+
+        logger.info("setting TDLib log verbosity level: `%s`", set_log_v_obj)
+
+        self.tdlib_handle.execute(set_log_v_obj, without_client_ok=True)
+
+        # set the log stream, which is the file we are logging to
+        log_stream_file_obj = tdlib_generated.logStreamFile(
+                path=app_config.tdlib_log_file_path,
+                max_file_size=app_config.tdlib_log_file_max_size_bytes)
+
+        set_log_stream_obj = tdlib_generated.setLogStream(
+            log_stream=log_stream_file_obj,
+            extra=utils.new_extra())
+
+        logger.info("setting TDLib log file path: `%s`", set_log_stream_obj)
+
+        self.tdlib_handle.execute(set_log_stream_obj, without_client_ok=True)
+
+
+    async def run(self):
 
         self.to_telegram_queue = asyncio.Queue()
         self.from_telegram_queue = asyncio.Queue()
@@ -87,13 +114,7 @@ class Application:
         self.tdlib_handle = await tdlib.TdlibHandle.init_from_config(self.app_config)
 
         # change log settings
-        log_stream_file_obj = tdg.logStreamFile(
-                path=self.tdlib_handle.tdlib_config.tdlib_log_file_path,
-                max_file_size=10000000)
-        set_log_stream_obj = tdlib_generated.setLogStream(log_stream=log_stream_file_obj, extra=utils.new_extra())
-
-        logger.info("setting TDLib log file path: `%s`", set_log_stream_obj)
-        self.tdlib_handle.execute(set_log_stream_obj, without_client_ok=True)
+        self.setup_tdlib_logging()
 
         # create tdlib client
         logger.info("creating TDLib client")

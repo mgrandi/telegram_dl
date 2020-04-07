@@ -18,6 +18,8 @@ class ApplicationConfiguration:
 
     library_path:str = attr.ib()
     tdlib_log_file_path:pathlib.Path = attr.ib()
+    tdlib_log_file_max_size_bytes:int = attr.ib()
+    tdlib_log_verbosity:int = attr.ib()
     api_id:str = attr.ib(repr=False)
     api_hash:str = attr.ib(repr=False)
     tdlib_working_path:pathlib.Path = attr.ib()
@@ -41,6 +43,9 @@ class ApplicationConfiguration:
             if not tmp_tdlib_log_file_path.parent.exists():
                 raise Exception(f"the path provided for the tdlib log file `{tmp_tdlib_log_file_path}`'s parent doesn't exist!")
 
+            tmp_log_max_size = c.get_int(constants.CONFIG_KEY_TDLIB_LOG_FILE_MAX_SIZE_BYTES)
+            tmp_log_verbosity = c.get_int(constants.CONFIG_KEY_TDLIB_LOG_VERBOSITY)
+
             tmp_api_id = c.get_int(constants.CONFIG_KEY_API_ID)
             tmp_api_hash = c.get_string(constants.CONFIG_KEY_API_HASH)
 
@@ -60,6 +65,8 @@ class ApplicationConfiguration:
             tdlibcfg =  ApplicationConfiguration(
                 library_path=tmp_library_path,
                 tdlib_log_file_path=tmp_tdlib_log_file_path,
+                tdlib_log_file_max_size_bytes=tmp_log_max_size,
+                tdlib_log_verbosity=tmp_log_verbosity,
                 api_id=tmp_api_id,
                 api_hash=tmp_api_hash,
                 tdlib_working_path=tmp_tdlib_working_path,

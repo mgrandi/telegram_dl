@@ -4,6 +4,19 @@ telegram_dl {
 
     tdlib_log_file_path = "C:/Users/Bob/some_path_here/tdjson.dll"
 
+    # 100 MiB
+    # 1024 * 1024 * 100
+    tdlib_log_file_max_size_bytes = 104857600
+
+    # 0 is fatal errors
+    # 1 is errors
+    # 2 is warnings/debug warnings
+    # 3 is information
+    # 4 is debug
+    # 5 is verbose debug
+    # 6-1023 even more verbose debug
+    tdlib_log_verbosity = 3
+
     api_id = 123456
 
     api_hash = "00000000000000000000000000000000"

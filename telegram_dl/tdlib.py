@@ -41,7 +41,7 @@ class TdlibHandle:
 
     tdlib_shared_library:ctypes.CDLL = attr.ib()
 
-    tdlib_config:TdlibConfiguration = attr.ib()
+    app_config:ApplicationConfiguration = attr.ib()
 
     tdlib_parameters_config:tdlibParameters = attr.ib(repr=False)
 
@@ -153,7 +153,7 @@ class TdlibHandle:
 
             tdlib_handle = TdlibHandle(
                 tdlib_shared_library=tdjson,
-                tdlib_config=config,
+                app_config=config,
                 tdlib_parameters_config=tdlib_parameters_config,
                 tdlib_client=None, # no client yet
                 func_client_create=td_json_client_create,
