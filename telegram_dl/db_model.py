@@ -84,8 +84,8 @@ class User(CustomDeclarativeBase):
             and self.first_name == other.first_name \
             and self.last_name == other.last_name \
             and self.user_name == other.username \
-            and self.outgoing_link == dbme.LinkStateEnum.parse_from_tdg_linkstate(other.outgoing_link) \
-            and self.incoming_link == dbme.LinkStateEnum.parse_from_tdg_linkstate(other.incoming_link) \
+            and self.is_contact == other.is_contact \
+            and self.is_mutual_contact == other.is_mutual_contact \
             and self.is_verified == other.is_verified \
             and self.is_support == other.is_support \
             and self.restriction_reason == other.restriction_reason \
