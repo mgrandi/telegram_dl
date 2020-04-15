@@ -26,22 +26,39 @@ def upgrade():
     op.create_table('user',
         sa.Column('user_id', sa.Integer(), nullable=False),
 
-        sa.Column('as_of', sqlalchemy_utils.types.arrow.ArrowType(), nullable=False),
+        # Changing this custom column to its base type
+        # sa.Column('as_of', sqlalchemy_utils.types.arrow.ArrowType(), nullable=False),
+        sa.Column("as_of", sa.DateTime, nullable=False),
+
         sa.Column('tg_user_id', sa.Integer(), nullable=False),
         sa.Column('first_name', sa.Unicode(length=100), nullable=True),
         sa.Column('last_name', sa.Unicode(length=100), nullable=True),
         sa.Column('user_name', sa.Unicode(length=100), nullable=True),
-        sa.Column('phone_number', sqlalchemy_utils.types.phone_number.PhoneNumberType(region="US", max_length=20), nullable=True),
+
+        # Changing this custom column to its base type
+        # sa.Column('phone_number', sqlalchemy_utils.types.phone_number.PhoneNumberType(region="US", max_length=20), nullable=True),
+        sa.Column("phone_number", sa.Unicode(length=20)),
+
         sa.Column('profile_photo_id', sa.Unicode(length=100), nullable=True),
-        sa.Column('incoming_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
-        sa.Column('outgoing_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
-        sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
+
+        # Changing this custom column to its base type
+        # sa.Column('incoming_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
+        sa.Column("incoming_link", sa.Integer()),
+
+        # Changing this custom column to its base type
+        # sa.Column('outgoing_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
+        sa.Column("outgoing_link", sa.Integer()),
+
         sa.Column('is_verified', sa.Boolean(), nullable=True),
         sa.Column('is_support', sa.Boolean(), nullable=True),
         sa.Column('restriction_reason', sa.Unicode(length=255), nullable=True),
         sa.Column('is_scam', sa.Boolean(), nullable=True),
         sa.Column('have_access', sa.Boolean(), nullable=True),
-        sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.UserTypeEnum, impl=sa.Integer()), nullable=True),
+
+        # Changing this custom column to its base type
+        # sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.UserTypeEnum, impl=sa.Integer()), nullable=True),
+        sa.Column("user_type", sa.Integer()),
+
         sa.Column('language_code', sa.Unicode(length=20), nullable=True),
         sa.ForeignKeyConstraint(['profile_photo_id'], ['profile_photo.profile_photo_id'], name="FK-user-profile_photo_id-profile_photo-profile_photo_id"),
         sa.PrimaryKeyConstraint('user_id', name='PK-user-user_id')

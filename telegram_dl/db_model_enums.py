@@ -15,32 +15,6 @@ class DatabaseChangeEnum(enum.Enum):
     NEW = 1
     UPDATED = 2
 
-class LinkStateEnum(enum.Enum):
-    '''
-    FIXME: NOT USED ANYMORE
-    but cannot delete until i figure out how i want to handle this
-    becasue the 'add user table' alembic script is still referring to
-    this enum class
-
-    '''
-
-    LINK_STATE_NONE = 0
-    LINK_STATE_IS_CONTACT = 1
-    LINK_STATE_KNOWS_PHONE_NUMBER = 2
-
-
-    @staticmethod
-    def parse_from_tdg_linkstate(tdg_linkstate:tdg.LinkState) -> LinkStateEnum:
-
-        if isinstance(tdg_linkstate, tdg.linkStateNone):
-            return LinkStateEnum.LINK_STATE_NONE
-        elif isinstance(tdg_linkstate, tdg.linkStateKnowsPhoneNumber):
-            return LinkStateEnum.LINK_STATE_KNOWS_PHONE_NUMBER
-        elif isinstance(tdg_linkstate, tdg.linkStateIsContact):
-            return LinkStateEnum.LINK_STATE_IS_CONTACT
-        else:
-            raise Exception("Unknown link state: `%s`", tdg_linkstate)
-
 
 class UserTypeEnum(enum.Enum):
 
