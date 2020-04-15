@@ -41,19 +41,13 @@ def upgrade():
 
         sa.Column('profile_photo_id', sa.Unicode(length=100), nullable=True),
 
-        # Changing this custom column to its base type
-        # sa.Column('incoming_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
-        sa.Column("incoming_link", sa.Integer()),
-
-        # Changing this custom column to its base type
-        # sa.Column('outgoing_link', sqlalchemy_utils.types.choice.ChoiceType(dbme.LinkStateEnum, impl=sa.Integer()), nullable=True),
-        sa.Column("outgoing_link", sa.Integer()),
-
-        sa.Column('is_verified', sa.Boolean(), nullable=True),
-        sa.Column('is_support', sa.Boolean(), nullable=True),
+        sa.Column('is_contact', sa.Boolean(), nullable=False),
+        sa.Column('is_mutual_contact', sa.Boolean(), nullable=False)
+        sa.Column('is_verified', sa.Boolean(), nullable=False),
+        sa.Column('is_support', sa.Boolean(), nullable=False),
         sa.Column('restriction_reason', sa.Unicode(length=255), nullable=True),
-        sa.Column('is_scam', sa.Boolean(), nullable=True),
-        sa.Column('have_access', sa.Boolean(), nullable=True),
+        sa.Column('is_scam', sa.Boolean(), nullable=False),
+        sa.Column('have_access', sa.Boolean(), nullable=False),
 
         # Changing this custom column to its base type
         # sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.UserTypeEnum, impl=sa.Integer()), nullable=True),

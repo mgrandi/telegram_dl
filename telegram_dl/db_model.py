@@ -49,13 +49,13 @@ class User(CustomDeclarativeBase):
         ForeignKey("profile_photo.profile_photo_id",
             name="FK-user-profile_photo_id-profile_photo-profile_photo_id"))
 
-    is_contact = Column(Boolean)
-    is_mutual_contact = Column(Boolean)
-    is_verified = Column(Boolean)
-    is_support = Column(Boolean)
+    is_contact = Column(Boolean, nullable=False)
+    is_mutual_contact = Column(Boolean, nullable=False)
+    is_verified = Column(Boolean, nullable=False)
+    is_support = Column(Boolean, nullable=False)
     restriction_reason = Column(Unicode(length=255))
-    is_scam = Column(Boolean)
-    have_access = Column(Boolean)
+    is_scam = Column(Boolean, nullable=False)
+    have_access = Column(Boolean, nullable=False)
 
     user_type = Column(ChoiceType(dbme.UserTypeEnum, impl=Integer()))
 
