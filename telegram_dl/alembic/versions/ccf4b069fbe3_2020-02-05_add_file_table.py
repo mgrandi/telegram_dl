@@ -25,10 +25,10 @@ def upgrade():
 
     op.create_table('file',
         sa.Column('file_id', sa.Integer(), nullable=False),
-        sa.Column('tg_file_id', sa.Integer(), nullable=True),
-        sa.Column('size', sa.Integer(), nullable=True),
-        sa.Column('expected_size', sa.Integer(), nullable=True),
-        sa.Column('remote_file_id', sa.Unicode(length=100), nullable=True),
+        sa.Column('tg_file_id', sa.Integer(), nullable=False),
+        sa.Column('size', sa.Integer(), nullable=False),
+        sa.Column('expected_size', sa.Integer(), nullable=False),
+        sa.Column('remote_file_id', sa.Unicode(length=100), nullable=False),
         sa.PrimaryKeyConstraint('file_id', name='PK-file-file_id')
     )
 

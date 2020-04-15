@@ -25,8 +25,9 @@ def upgrade():
 
     op.create_table('user',
         sa.Column('user_id', sa.Integer(), nullable=False),
+
         sa.Column('as_of', sqlalchemy_utils.types.arrow.ArrowType(), nullable=True),
-        sa.Column('tg_user_id', sa.Integer(), nullable=True),
+        sa.Column('tg_user_id', sa.Integer(), nullable=False),
         sa.Column('first_name', sa.Unicode(length=100), nullable=True),
         sa.Column('last_name', sa.Unicode(length=100), nullable=True),
         sa.Column('user_name', sa.Unicode(length=100), nullable=True),

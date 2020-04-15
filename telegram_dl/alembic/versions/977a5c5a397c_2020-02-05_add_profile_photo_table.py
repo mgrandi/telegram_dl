@@ -25,9 +25,9 @@ def upgrade():
 
     op.create_table('profile_photo',
         sa.Column('profile_photo_id', sa.Integer(), nullable=False),
-        sa.Column('tg_profile_photo_id', sa.Integer(), nullable=True),
-        sa.Column('big_id', sa.Integer(), nullable=True),
-        sa.Column('small_id', sa.Integer(), nullable=True),
+        sa.Column('tg_profile_photo_id', sa.Integer(), nullable=False),
+        sa.Column('big_id', sa.Integer(), nullable=False),
+        sa.Column('small_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(['big_id'], ['file.file_id'], name="FK-profile_photo-big_id-file-file_id"),
         sa.ForeignKeyConstraint(['small_id'], ['file.file_id'], name="FK-profile_photo-small_id-file-file_id" ),
         sa.PrimaryKeyConstraint('profile_photo_id', name='PK-profile_photo-profile_photo_id')

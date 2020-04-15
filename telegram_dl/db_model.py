@@ -25,10 +25,10 @@ class User(CustomDeclarativeBase):
     # primary key column
     user_id = Column(Integer)
 
-    as_of = Column(ArrowType)
+    as_of = Column(ArrowType, nullable=False)
 
     # telegram fields
-    tg_user_id = Column(Integer)
+    tg_user_id = Column(Integer, nullable=False)
     first_name = Column(Unicode(length=100))
     last_name = Column(Unicode(length=100))
     user_name = Column(Unicode(length=100))
@@ -144,9 +144,9 @@ class File(CustomDeclarativeBase):
     file_id = Column(Integer)
 
     # seems to be local to the user and a very low number, like `27`
-    tg_file_id = Column(Integer)
-    size = Column(Integer)
-    expected_size = Column(Integer)
+    tg_file_id = Column(Integer, nullable=False)
+    size = Column(Integer, nullable=False)
+    expected_size = Column(Integer, nullable=False)
 
     ##########################
     # `localFile` fields
@@ -161,7 +161,7 @@ class File(CustomDeclarativeBase):
     # seems to be the unique identifier across all of telegram for the file. Example:
     # `AQADAQADRbYxG4UzzgIACFG4CjAABAIAA4UzzgIABJJVDmJhXyVcVUQAAhYE`
     # only seems to be 60 characters in practice, but lets be safe
-    remote_file_id = Column(Unicode(100))
+    remote_file_id = Column(Unicode(100), nullable=False)
 
 
     __table_args__ = (
@@ -185,14 +185,14 @@ class ProfilePhoto(CustomDeclarativeBase):
 
     # unlike User.tg_file_id, this isn't a super low number, not sure if it it can change
     # if the tdlib working copy gets regenerated?
-    tg_profile_photo_id = Column(Integer)
+    tg_profile_photo_id = Column(Integer, nullable=False)
 
     big_id = Column(Integer,
         ForeignKey("file.file_id",
-            name="FK-profile_photo-big_id-file-file_id"))
+            name="FK-profile_photo-big_id-file-file_id"), nullable=False)
     small_id = Column(Integer,
         ForeignKey("file.file_id",
-            name="FK-profile_photo-small_id-file-file_id"))
+            name="FK-profile_photo-small_id-file-file_id"), nullable=False)
 
     # see https://docs.sqlalchemy.org/en/14/orm/join_conditions.html#handling-multiple-join-paths
     big = relationship("File", foreign_keys=[big_id])
