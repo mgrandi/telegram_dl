@@ -149,7 +149,16 @@ class Application:
 
         # wait for all the tasks to finish
         logger.info("waiting for tasks to finish")
-        await asyncio.gather(*all_tasks)
+        gather_result_list = await asyncio.gather(*all_tasks, return_exceptions=True)
+
+        error_list = [x for x in gather_result_list if x is not None]
+
+        # TODO: is there a way to get the full stack trace instead of just the 'message' part of the exception?
+        if error_list:
+            logger.error("One or more of the tasks had an exception when shutting down!")
+
+            for idx, iter_error in enumerate(error_list):
+                logger.error("error `%s`: `%r", idx, iter_error)
 
         logger.info("all tasks finished")
 
