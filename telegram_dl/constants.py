@@ -10,6 +10,7 @@ PHONE_NUMBER_MAX_LENGTH = 20
 
 # logger that just only logs the raw messages we get
 # from telegram
+MESSAGE_ARCHIVE_LOGGER_TDLIB = "telegram_dl.message_archive.tdlibpy"
 MESSAGE_ARCHIVE_LOGGER_FROM_TELEGRAM_NAME = "telegram_dl.message_archive.in"
 MESSAGE_ARCHIVE_LOGGER_TO_TELEGRAM_NAME = "telegram_dl.message_archive.out"
 

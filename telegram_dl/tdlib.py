@@ -18,6 +18,7 @@ from telegram_dl import tdlib_generated
 
 
 logger = logging.getLogger(__name__)
+message_archive_tdlib_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_TDLIB)
 receive_logger = logger.getChild("receive")
 send_logger = logger.getChild("send")
 execute_logger = logger.getChild("execute")
@@ -181,6 +182,10 @@ class TdlibHandle:
             raise Exception("TdlibHandle.create_client called when a client already exists")
 
         create_logger.debug("creating tdlib client")
+
+        if message_archive_tdlib_logger.isEnabledFor(logging.DEBUG):
+            message_archive_tdlib_logger.debug("################# tdlib client created #################")
+
         new_client = self.func_client_create()
         create_logger.debug("tdlib client created successfully: `%s`", new_client)
 
@@ -274,6 +279,8 @@ class TdlibHandle:
         '''
 
         destroy_logger.info("destroying tdlib client")
+        if message_archive_tdlib_logger.isEnabledFor(logging.DEBUG):
+            message_archive_tdlib_logger.debug("################# tdlib client destroyed #################")
         self.func_client_destroy(self.tdlib_client)
         destroy_logger.info("tdlib client destroyed successfully")
         return attr.evolve(self, tdlib_client=None)
