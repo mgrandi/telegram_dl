@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class ApplicationConfiguration:
 
+    use_test_dc:bool = attr.ib()
     library_path:str = attr.ib()
     tdlib_log_file_path:pathlib.Path = attr.ib()
     tdlib_log_file_max_size_bytes:int = attr.ib()
@@ -49,6 +50,7 @@ class ApplicationConfiguration:
             tmp_api_id = c.get_int(constants.CONFIG_KEY_API_ID)
             tmp_api_hash = c.get_string(constants.CONFIG_KEY_API_HASH)
 
+            tmp_use_test = c.get_bool(constants.CONFIG_KEY_USE_TEST_DC)
 
             tmp_tdlib_working_path = pathlib.Path(c.get_string(constants.CONFIG_KEY_TDLIB_WORKING_PATH))
             if not tmp_tdlib_working_path.exists() or not tmp_tdlib_working_path.is_dir():
@@ -63,6 +65,7 @@ class ApplicationConfiguration:
             sqla_url = utils.get_sqlalchemy_url_from_hocon_config(db_group)
 
             tdlibcfg =  ApplicationConfiguration(
+                use_test_dc=tmp_use_test,
                 library_path=tmp_library_path,
                 tdlib_log_file_path=tmp_tdlib_log_file_path,
                 tdlib_log_file_max_size_bytes=tmp_log_max_size,

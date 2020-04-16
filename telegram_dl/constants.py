@@ -38,6 +38,7 @@ CONFIG_KEY_API_HASH = "api_hash"
 CONFIG_KEY_TDLIB_WORKING_PATH = "tdlib_working_path"
 CONFIG_KEY_TDLIB_ENABLE_STORAGE_OPTIMIZER = "tdlib_enable_storage_optimizer"
 CONFIG_KEY_TDLIB_IGNORE_FILE_NAMES = "tdlib_ignore_file_names"
+CONFIG_KEY_USE_TEST_DC = "use_test_dc"
 
 CONFIG_DATABASE_GROUP = "database"
 CONFIG_KEY_DATABASE_DRIVER = "driver_name"

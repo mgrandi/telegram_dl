@@ -84,7 +84,7 @@ class TdlibHandle:
             files_dir.mkdir()
 
         tp = tdlib_generated.tdlibParameters(
-            use_test_dc=False,
+            use_test_dc=config.use_test_dc,
             database_directory=str(config.tdlib_working_path),
             files_directory=str(files_dir),
             use_file_database=True,

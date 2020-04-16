@@ -1,8 +1,12 @@
+BASE_PATH_WITH_SLASH = "C:/Users/Bob/some_path_here/"
+
 telegram_dl {
+
+    use_test_dc = false
 
     library_path = "C:/Users/Bob/some_path_here/tdjson.dll"
 
-    tdlib_log_file_path = "C:/Users/Bob/some_path_here/tdjson.dll"
+    tdlib_log_file_path = ${BASE_PATH_WITH_SLASH}"tdlib.log"
 
     # 100 MiB
     # 1024 * 1024 * 100
@@ -21,7 +25,7 @@ telegram_dl {
 
     api_hash = "00000000000000000000000000000000"
 
-    tdlib_working_path = "C:/Users/Bob/some_path_here/tdlib"
+    tdlib_working_path = ${BASE_PATH_WITH_SLASH}"tdlib"
 
     tdlib_enable_storage_optimizer = true
 
@@ -34,7 +38,7 @@ telegram_dl {
         password = null
         host = null
         port = null
-        database = "C:/Users/Someone/database.sqlite"
+        database = ${BASE_PATH_WITH_SLASH}"db/database.sqlite"
         query = null
     }
 
