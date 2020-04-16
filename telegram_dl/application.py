@@ -120,6 +120,12 @@ class Application:
         logger.info("creating TDLib client")
         self.tdlib_handle = self.tdlib_handle.create_client()
 
+        if self.app_config.use_test_dc:
+            logger.info("######################")
+            logger.info("*** Using Test DC ***")
+            logger.info("######################")
+
+
         logger.info("Starting tasks")
 
         recieve_messages_task_notstarted = ReceiveMessagesFromTelegramTask(self.stop_event, self.tdlib_handle, self.from_telegram_queue)
