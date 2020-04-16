@@ -5,6 +5,22 @@
 
 `chat`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1chat.html
 
+`ChatType`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1_chat_type.html
+
+`Object`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1_object.html
+
+
+`chatTypeBasicGroup`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1chat_type_basic_group.html
+
+
+`chatTypePrivate`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1chat_type_private.html
+
+
+`chatTypeSecret`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1chat_type_secret.html
+
+
+`chatTypeSupergroup`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1chat_type_supergroup.html
+
 ## examples
 
 ```json
