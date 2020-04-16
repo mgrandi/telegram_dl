@@ -42,7 +42,7 @@ def upgrade():
         sa.Column('profile_photo_id', sa.Unicode(length=100), nullable=True),
 
         sa.Column('is_contact', sa.Boolean(), nullable=False),
-        sa.Column('is_mutual_contact', sa.Boolean(), nullable=False)
+        sa.Column('is_mutual_contact', sa.Boolean(), nullable=False),
         sa.Column('is_verified', sa.Boolean(), nullable=False),
         sa.Column('is_support', sa.Boolean(), nullable=False),
         sa.Column('restriction_reason', sa.Unicode(length=255), nullable=True),
