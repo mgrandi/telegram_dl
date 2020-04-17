@@ -265,6 +265,12 @@ class TdlibHandle:
 
             json_result = json.loads(res)
 
+            if constants.TDLIB_JSON_EXTRA_STR in json_result.keys():
+                # TODO FIX THIS
+                # replace the @extra and put it as _extra which is what attrs is expecting
+                json_result[constants.TDLIB_ORIGINAL_JSON_EXTRA_STR] = json_result[constants.TDLIB_JSON_EXTRA_STR]
+                del json_result[constants.TDLIB_JSON_EXTRA_STR]
+
             # convert the json back into an object
             # TODO: replace cattrs
             final_result = self.cattr_converter.structure(json_result, tdlib_generated.RootObject)
