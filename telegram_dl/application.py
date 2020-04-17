@@ -200,7 +200,12 @@ class LogicTask:
                 import uuid
 
 
-                x = tdlib_generated.getChats(extra=uuid.uuid4(), offset_order=2 ** 63 - 1, offset_chat_id=0, limit=5)
+                x = tdlib_generated.getChats(
+                    extra=uuid.uuid4(),
+                    chat_list=tdlib_generated.chatListMain(),
+                    offset_order=2 ** 63 - 1,
+                    offset_chat_id=0,
+                    limit=5)
                 logic_task_logger.info("sending get chat message: `%s`", x)
                 self.temp = False
                 self.to_telegram_queue.put_nowait(x)
