@@ -5,21 +5,16 @@ Revises:
 Create Date: 2020-02-05 16:38:34.152505
 
 """
+
 from alembic import op
 import sqlalchemy as sa
-
 import sqlalchemy_utils
-
-from telegram_dl import db_model as dbm
-from telegram_dl import db_model_enums as dbme
-
 
 # revision identifiers, used by Alembic.
 revision = 'ccf4b069fbe3'
 down_revision = None
 branch_labels = None
 depends_on = None
-
 
 def upgrade():
 
