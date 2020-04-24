@@ -23,7 +23,7 @@ class User(CustomDeclarativeBase):
     __tablename__ = "user"
 
     # primary key column
-    user_id = Column(Integer)
+    user_id = Column(Integer, nullable=False)
 
     as_of = Column(ArrowType, nullable=False)
 
@@ -45,9 +45,9 @@ class User(CustomDeclarativeBase):
     # i don't really care about the status so i won't store it, or have a UserStatus type really
     # status = Column()
 
-    profile_photo_id = Column(Unicode(100),
-        ForeignKey("profile_photo.profile_photo_id",
-            name="FK-user-profile_photo_id-profile_photo-profile_photo_id"))
+    profile_photo_set_id= Column(Integer,
+        ForeignKey("photo_set.photo_set_id",
+            name="FK-user-profile_photo_set_id-photo_set-photo_set_id"))
 
     is_contact = Column(Boolean, nullable=False)
     is_mutual_contact = Column(Boolean, nullable=False)
@@ -141,7 +141,7 @@ class File(CustomDeclarativeBase):
 
 
     # our unique identifier, primary key column
-    file_id = Column(Integer)
+    file_id = Column(Integer, nullable=False)
 
     # seems to be local to the user and a very low number, like `27`
     tg_file_id = Column(Integer, nullable=False)
@@ -176,43 +176,81 @@ class File(CustomDeclarativeBase):
             and self.remote_file_id == other.remote.id
 
 
-class ProfilePhoto(CustomDeclarativeBase):
 
-    __tablename__ = "profile_photo"
+class PhotoSet(CustomDeclarativeBase):
+    ''' this table is using joined table inheritance
 
-    # primary key column
-    profile_photo_id = Column(Integer)
+    see https://docs.sqlalchemy.org/en/13/orm/inheritance.html
 
-    # unlike User.tg_file_id, this isn't a super low number, not sure if it it can change
-    # if the tdlib working copy gets regenerated?
-    tg_profile_photo_id = Column(Integer, nullable=False)
+    '''
 
-    big_id = Column(Integer,
-        ForeignKey("file.file_id",
-            name="FK-profile_photo-big_id-file-file_id"), nullable=False)
-    small_id = Column(Integer,
-        ForeignKey("file.file_id",
-            name="FK-profile_photo-small_id-file-file_id"), nullable=False)
+    __tablename__ = 'photo_set'
 
-    # see https://docs.sqlalchemy.org/en/14/orm/join_conditions.html#handling-multiple-join-paths
-    big = relationship("File", foreign_keys=[big_id])
-    small = relationship("File", foreign_keys=[small_id])
+    # our unique identifier, primary key column
+    photo_set_id = Column(Integer, nullable=False)
+
+    # the polymorphic descriminator for the joined table inheritance
+    polytype = Column(Unicode(100), nullable=False)
 
     __table_args__ = (
-        PrimaryKeyConstraint("profile_photo_id", name="PK-profile_photo-profile_photo_id"),
+        PrimaryKeyConstraint("photo_set_id", name="PK-photo_set-photo_set_id"),
+    )
+    __mapper_args__ = {
+        'polymorphic_identity': constants.POLYMORPHIC_IDENTITY_PHOTOSET_BASE,
+        'polymorphic_on': polytype
+    }
+
+    def equals_tdg(self, other:tdg.file):
+        pass
+
+class ProfilePhotoSet(PhotoSet):
+
+    __tablename__ = 'profile_photo_set'
+
+    # our unique identifier, primary key column
+    profile_photo_photo_set_id = Column(Integer,
+        ForeignKey("photo_set.photo_set_id", name="FK-profile_photo_set-profile_photo_set_id-photo_set-photo_set_id"),
+        nullable=False)
+
+    # this is the id of the profile photo within telegram, used to access to the profile photo later
+    tg_id = Column(Integer, nullable=False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint("profile_photo_photo_set_id", name="PK-profile_photo_set-profile_photo_photo_set_id"),
+    )
+    __mapper_args__ = {
+        'polymorphic_identity': constants.POLYMORPHIC_IDENTITY_PHOTOSET_PROFILE_PHOTO,
+    }
+
+    def equals_tdg(self, other:tdg.file):
+        pass
+
+class Photo(CustomDeclarativeBase):
+
+    __tablename__ = 'photo'
+
+    # our unique identifier, primary key column
+    profile_photo_photo_set_id = Column(Integer, nullable=False)
+
+    photo_set_id = Column(Integer,
+        ForeignKey("photo_set.photo_set_id", name="FK-photo-photo_set_id-photo_set-photo_set_id"),
+        nullable=False)
+
+    thumbnail_type = Column(ChoiceType(dbme.PhotoSizeThumbnailType, impl=Unicode()), nullable=False)
+
+    width = Column(Integer, nullable=False)
+
+    height = Column(Integer, nullable=False)
+
+    has_stickers = Column(Boolean, nullable=False)
+
+    file_id = Column(Integer,
+        ForeignKey("file.file_id",
+            name="FK-photo-file_id-file-file_id"), nullable=False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint("profile_photo_photo_set_id", name="PK-profile_photo_set-profile_photo_photo_set_id"),
     )
 
-
-    def equals_tdg(self, other:tdg.profilePhoto):
-
-        return other is not None \
-            and isinstance(other, tdg.profilePhoto) \
-            and self.big.equals_tdg(other.big) \
-            and self.small.equals_tdg(other.small)
-
-
-
-# class TEMPLATE(CustomDeclarativeBase):
-
-#         __tablename__ = "SOMETHING"
-#         __table_args__ = ( )
+    def equals_tdg(self, other:tdg.file):
+        pass

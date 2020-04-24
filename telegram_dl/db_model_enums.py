@@ -15,6 +15,48 @@ class DatabaseChangeEnum(enum.Enum):
     NEW = 1
     UPDATED = 2
 
+class PhotoSizeThumbnailType(enum.Enum):
+
+    def __new__(cls, value, width, height, image_filter):
+        '''
+        NOTE:
+        I want to attach additional data to the enum like it is done in java:
+        https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html
+
+        the python 3 docs have an example:
+        https://docs.python.org/3/library/enum.html?highlight=enum#when-to-use-new-vs-init
+
+        there is also another (better) example here since we aren't subclassing bytes as well as Enum:
+        http://xion.io/post/code/python-enums-are-ok.html#fnref:3
+
+        ##################
+
+        this is a enum class representing the photoSize "thumbnail type"
+
+        see https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1photo_size.html
+        and https://core.telegram.org/constructor/photoSize
+        '''
+
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj.width = width
+        obj.height = height
+        obj.image_filter = image_filter
+
+        return obj
+
+
+    S = ("s", 100, 100, "box")
+    M = ("m", 320, 320, "box")
+    X = ("x", 800, 800, "box")
+    Y = ("y", 1280, 1280, "box")
+    W = ("w", 2560, 2560, "box")
+    A = ("a", 160, 160, "crop")
+    B = ("b", 320, 320, "crop")
+    C = ("c", 640, 640, "crop")
+    D = ("d", 1280, 1280, "crop")
+
+
 
 class UserTypeEnum(enum.Enum):
 
