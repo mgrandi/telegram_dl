@@ -73,6 +73,12 @@
 
     "loggers": {
 
+        "sqlalchemy": {
+
+            "level": "DEBUG"
+
+        },
+
         "telegram_dl.message_archive": {
 
             "level": "INFO"
