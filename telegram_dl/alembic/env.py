@@ -1,12 +1,9 @@
-# NOTE:
-# we set the current working dir (the top level directory,
-# containing the `telegram_dl` folder) to be in the python path, so that
-# it can actually find the `telegram_dl` module, or else we just get
-# `ModuleNotFoundError: No module named 'telegram_dl'` errors
-# see https://stackoverflow.com/questions/32032940/how-to-import-the-own-model-into-myproject-alembic-env-py
-import sys, os;sys.path.insert(0, os.getcwd())
+
+import sys
+import os
 from logging.config import fileConfig
 import logging
+import pathlib
 
 from sqlalchemy import engine_from_config, create_engine
 from sqlalchemy import pool
@@ -22,6 +19,17 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
+
+# NOTE:
+# we set the telegram_dl directory (the package directory)
+# to be in the python path, so that
+# it can actually find the `telegram_dl` module, or else we just get
+# `ModuleNotFoundError: No module named 'telegram_dl'` errors
+# see https://stackoverflow.com/questions/32032940/how-to-import-the-own-model-into-myproject-alembic-env-py
+telegram_dl_import_path = pathlib.Path(config.get_main_option("telegram_dl_import_path"))
+resolved_path = telegram_dl_import_path.resolve()
+if resolved_path not in sys.path:
+    sys.path.insert(0, str(resolved_path))
 
 # add your model's MetaData object here
 # for 'autogenerate' support

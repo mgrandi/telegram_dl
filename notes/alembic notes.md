@@ -27,6 +27,46 @@ Note that you need to provide the `-x` command after `alembic` , but before othe
 arguments such as `revision` or `upgrade`. This is just how it was set up in the
 ArgumentParser that alembic uses
 
+## folder you run alembic in
+
+By default `alembic` will look in the current directory for alembic.ini, but if you want
+to run it anywhere, you can just pass in the `-c <path>` and it will work
+
+examples:
+
+```plaintext
+
+PS C:\Users\USER\Code\Personal\telegram_dl> ls -Filter *.ini
+
+
+    Directory: C:\Users\USER\Code\Personal\telegram_dl
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        4/23/2020   5:34 PM           3826 alembic.ini
+
+PS C:\Users\USER\Code\Personal\telegram_dl> alembic -x "telegram_dl_config=~\Temp\telegram_dl_scratch\Workspaces\test_dc\config.conf" history
+
+cb38ff4e8b0a -> 3326eb4a8333 (head), add user table
+9cfe76bb0156 -> cb38ff4e8b0a, add photo table
+e617bbe46221 -> 9cfe76bb0156, add profile_photo_set table
+ccf4b069fbe3 -> e617bbe46221, add photo_set table
+<base> -> ccf4b069fbe3, add file table
+
+
+PS C:\Users\USER\Code\Personal\telegram_dl> cd ~/
+
+PS C:\Users\USER> alembic -c "~\Code\Personal\telegram_dl\alembic.ini"-x "telegram_dl_config=~\Temp\telegram_dl_scratch\Workspaces\test_dc\config.conf" history
+
+cb38ff4e8b0a -> 3326eb4a8333 (head), add user table
+9cfe76bb0156 -> cb38ff4e8b0a, add photo table
+e617bbe46221 -> 9cfe76bb0156, add profile_photo_set table
+ccf4b069fbe3 -> e617bbe46221, add photo_set table
+<base> -> ccf4b069fbe3, add file table
+
+```
+
 ## generating the first 3 tables, user, file, profile_photo
 
 the ideal situation is to only do one thing in a database revision, like only
@@ -76,3 +116,7 @@ also, you need to do `alembic upgrade head` every time, because it looks at the
 database to see what the differences are between the sqlalchemy declarative
 model Metadata and the actual database, so if you don't do `upgrade head`, you
 will be adding the 'file' table in all 3 revisions rather than just the first
+
+## questions
+
+what is the 'imports' variable in the mako script for?
