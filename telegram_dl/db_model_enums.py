@@ -55,6 +55,8 @@ class PhotoSizeThumbnailType(enum.Enum):
     B = ("b", 320, 320, "crop")
     C = ("c", 640, 640, "crop")
     D = ("d", 1280, 1280, "crop")
+    # a profile photo doesn't have a thumbnail type so we will just make one up
+    PROFILE_PHOTO = ("pp", -1, -1, "profile_photo")
 
 
 

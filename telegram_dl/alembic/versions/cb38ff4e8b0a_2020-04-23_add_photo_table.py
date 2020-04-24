@@ -19,7 +19,7 @@ depends_on = None
 def upgrade():
 
     op.create_table('photo',
-        sa.Column('profile_photo_photo_set_id', sa.Integer(), nullable=False),
+        sa.Column('photo_id', sa.Integer(), nullable=False),
         sa.Column('photo_set_id', sa.Integer(), nullable=False),
 
         # Changing this custom column to its base type
@@ -42,11 +42,21 @@ def upgrade():
             name='FK-photo-photo_set_id-photo_set-photo_set_id'),
 
         sa.PrimaryKeyConstraint(
-            'profile_photo_photo_set_id',
-            name='PK-profile_photo_set-profile_photo_photo_set_id')
+            'photo_id',
+            name='PK-photo-photo_id')
     )
+
+    op.create_index(
+        index_name='IXUQ-photo-file_id',
+        table_name='photo',
+        columns=['file_id'],
+        unique=True)
+
 
 
 def downgrade():
 
+    op.drop_index(
+        index_name='IXUQ-photo-file_id',
+        table_name='user')
     op.drop_table('photo')

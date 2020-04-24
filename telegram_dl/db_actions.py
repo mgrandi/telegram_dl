@@ -79,7 +79,7 @@ class InsertOrUpdateHandler:
     async def handle_insert_or_update(self, obj_to_handle:None, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
 
         # noop
-        return
+        return None
 
     @handle_insert_or_update.register
     async def file(self, object_to_handle:tdlib_generated.file, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
@@ -125,47 +125,59 @@ class InsertOrUpdateHandler:
         # profile photos should be unique
 
         # see if it exists
-        maybe_existing = session.query(db_model.ProfilePhoto).filter(db_model.ProfilePhoto.tg_profile_photo_id == incoming_profile_photo.id).first()
 
-        is_equal = maybe_existing.equals_tdg(incoming_profile_photo) if maybe_existing else False
+        # see if the big and small files exist
+        big_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.big, params)
+        small_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.small, params)
 
-        if not maybe_existing or not is_equal:
+        if big_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE and \
+            small_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE:
 
-            big_photo_file = await self.handle_insert_or_update(incoming_profile_photo.big, params)
-            small_photo_file = await self.handle_insert_or_update(incoming_profile_photo.small, params)
+            # files already exist, return the profile_photo_set that already exists
 
-            new_profile_photo = db_model.ProfilePhoto(
-                tg_profile_photo_id=incoming_profile_photo.id,
-                big=big_photo_file.obj,
-                small=small_photo_file.obj)
+            existing_profile_photo_set = session.query(db_model.ProfilePhotoSet) \
+                .join(db_model.Photo) \
+                .filter(db_model.Photo.file_id == big_photo_file_result.obj.file_id) \
+                .first()
 
-            change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
 
-            insert_or_update_logger.info("profile_photo: adding db_model.ProfilePhoto object `%s` to session with change: `%s`",
-                new_profile_photo, change)
-
-            session.add(new_profile_photo)
-
-            return InsertOrUpdateResult(obj=new_profile_photo, change=change)
+            return InsertOrUpdateResult(obj=existing_profile_photo_set, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
         else:
 
-            insert_or_update_logger.debug("profile_photo: not adding db_model.ProfilePhoto object `%s` because it already exists or hasn't changed",
-                incoming_profile_photo)
+            # files are new, so we need to create a Photo for each and then a ProfilePhotoSet,
+            # then return the ProfilePhotoSet
+            new_photo_set = db_model.ProfilePhotoSet(
+                tg_id=incoming_profile_photo.id)
 
-            return InsertOrUpdateResult(obj=maybe_existing, change=dbe.DatabaseChangeEnum.NO_CHANGE)
+            big_photo = db_model.Photo(
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO,
+                width=-1,
+                height=-1,
+                has_stickers=False,
+                file=big_photo_file_result.obj)
+
+            small_photo = db_model.Photo(
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO,
+                width=-1,
+                height=-1,
+                has_stickers=False,
+                file=small_photo_file_result.obj)
+
+            new_photo_set.photos.append(big_photo)
+            new_photo_set.photos.append(small_photo)
+
+            return InsertOrUpdateResult(obj=new_photo_set, change=dbe.DatabaseChangeEnum.NEW)
 
 
     @handle_insert_or_update.register
     async def user(self, incoming_user:tdlib_generated.user, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
-
 
         session = params.session
 
         # users are versioned
 
         # see if this user version exists
-        # TODO ACTUALLY IMPLEMENT VERSIONING
         maybe_existing = session.query(db_model.User) \
             .filter(db_model.User.tg_user_id == incoming_user.id) \
             .order_by(desc(db_model.User.as_of)) \
@@ -175,10 +187,12 @@ class InsertOrUpdateHandler:
 
         if not maybe_existing or not is_equal:
 
+            # create a new user
+
             # add the + sign so it parses correctly
             fixed_phone_number = utils.fix_phone_number(incoming_user.phone_number) if incoming_user.phone_number else ""
 
-            profile_photo = await self.handle_insert_or_update(incoming_user.profile_photo, params)
+            profile_photo_set_result = await self.handle_insert_or_update(incoming_user.profile_photo, params)
 
             new_user = db_model.User(
                 as_of=arrow.utcnow(),
@@ -189,7 +203,7 @@ class InsertOrUpdateHandler:
                 phone_number=fixed_phone_number,
                 is_contact=True if incoming_user.is_contact == 1 else False,
                 is_mutual_contact=True if incoming_user.is_mutual_contact == 1 else False,
-                profile_photo=profile_photo.obj if profile_photo is not None else None,
+                profile_photo_set=profile_photo_set_result.obj if profile_photo_set_result is not None else None,
                 is_verified=incoming_user.is_verified,
                 is_support=incoming_user.is_support,
                 restriction_reason=incoming_user.restriction_reason,
@@ -208,7 +222,7 @@ class InsertOrUpdateHandler:
 
         else:
 
-            # see if the old version matches the new one
+            # don't create a new user, old and new one match
 
             insert_or_update_logger.debug("user: not adding db_model.User object `%s` because it already exists or hasn't changed",
                 incoming_user)

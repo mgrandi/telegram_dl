@@ -19,17 +19,17 @@ depends_on = None
 def upgrade():
 
     op.create_table('profile_photo_set',
-        sa.Column('profile_photo_photo_set_id', sa.Integer(), nullable=False),
+        sa.Column('profile_photo_set_id', sa.Integer(), nullable=False),
         sa.Column('tg_id', sa.Integer(), nullable=False),
 
         sa.ForeignKeyConstraint(
-            ['profile_photo_photo_set_id'],
+            ['profile_photo_set_id'],
             ['photo_set.photo_set_id'],
             name='FK-profile_photo_set-profile_photo_set_id-photo_set-photo_set_id'),
 
         sa.PrimaryKeyConstraint(
-            'profile_photo_photo_set_id',
-            name='PK-profile_photo_set-profile_photo_photo_set_id')
+            'profile_photo_set_id',
+            name='PK-profile_photo_set-profile_photo_set_id')
     )
 
 

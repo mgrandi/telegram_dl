@@ -49,6 +49,8 @@ class User(CustomDeclarativeBase):
         ForeignKey("photo_set.photo_set_id",
             name="FK-user-profile_photo_set_id-photo_set-photo_set_id"))
 
+    profile_photo_set = relationship("ProfilePhotoSet", back_populates="user")
+
     is_contact = Column(Boolean, nullable=False)
     is_mutual_contact = Column(Boolean, nullable=False)
     is_verified = Column(Boolean, nullable=False)
@@ -60,9 +62,6 @@ class User(CustomDeclarativeBase):
     user_type = Column(ChoiceType(dbme.UserTypeEnum, impl=Integer()))
 
     language_code = Column(Unicode(length=20))
-
-
-    profile_photo = relationship("ProfilePhoto")
 
     __table_args__ = (
         PrimaryKeyConstraint("user_id", name="PK-user-user_id"),
@@ -98,9 +97,9 @@ class User(CustomDeclarativeBase):
 
         # haandle where the user might not have a profile photo
         if self.profile_photo is None:
-            profilephoto_result = self.profile_photo == other.profile_photo
+            profilephoto_result = self.profile_photo_set == other.profile_photo_set
         else:
-            profilephoto_result = self.profile_photo.equals_tdg(other.profile_photo)
+            profilephoto_result = self.profile_photo_set.equals_tdg(other.profile_photo_set)
 
         # handle where we get a str from telegram but a Phonenumber object from the database
         # or the user has no phone number at all
@@ -192,6 +191,8 @@ class PhotoSet(CustomDeclarativeBase):
     # the polymorphic descriminator for the joined table inheritance
     polytype = Column(Unicode(100), nullable=False)
 
+    photos = relationship("Photo", back_populates="photo_set")
+
     __table_args__ = (
         PrimaryKeyConstraint("photo_set_id", name="PK-photo_set-photo_set_id"),
     )
@@ -208,15 +209,17 @@ class ProfilePhotoSet(PhotoSet):
     __tablename__ = 'profile_photo_set'
 
     # our unique identifier, primary key column
-    profile_photo_photo_set_id = Column(Integer,
+    profile_photo_set_id = Column(Integer,
         ForeignKey("photo_set.photo_set_id", name="FK-profile_photo_set-profile_photo_set_id-photo_set-photo_set_id"),
         nullable=False)
 
     # this is the id of the profile photo within telegram, used to access to the profile photo later
     tg_id = Column(Integer, nullable=False)
 
+    user = relationship("User", back_populates="profile_photo_set")
+
     __table_args__ = (
-        PrimaryKeyConstraint("profile_photo_photo_set_id", name="PK-profile_photo_set-profile_photo_photo_set_id"),
+        PrimaryKeyConstraint("profile_photo_set_id", name="PK-profile_photo_set-profile_photo_set_id"),
     )
     __mapper_args__ = {
         'polymorphic_identity': constants.POLYMORPHIC_IDENTITY_PHOTOSET_PROFILE_PHOTO,
@@ -230,7 +233,7 @@ class Photo(CustomDeclarativeBase):
     __tablename__ = 'photo'
 
     # our unique identifier, primary key column
-    profile_photo_photo_set_id = Column(Integer, nullable=False)
+    photo_id = Column(Integer, nullable=False)
 
     photo_set_id = Column(Integer,
         ForeignKey("photo_set.photo_set_id", name="FK-photo-photo_set_id-photo_set-photo_set_id"),
@@ -248,8 +251,12 @@ class Photo(CustomDeclarativeBase):
         ForeignKey("file.file_id",
             name="FK-photo-file_id-file-file_id"), nullable=False)
 
+    photo_set = relationship("PhotoSet", back_populates="photos")
+    file = relationship("File")
+
     __table_args__ = (
-        PrimaryKeyConstraint("profile_photo_photo_set_id", name="PK-profile_photo_set-profile_photo_photo_set_id"),
+        PrimaryKeyConstraint("photo_id", name="PK-photo-photo_id"),
+        Index("IXUQ-photo-file_id", "file_id", unique=True),
     )
 
     def equals_tdg(self, other:tdg.file):
