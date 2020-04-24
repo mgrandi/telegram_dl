@@ -27,6 +27,28 @@ structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
 
 
+def sqlalchemy_pool_on_connect_listener(dbapi_connection, connection_record):
+    ''' a sqlalchemy listener method that listens to the 'connect' event on a Pool
+
+    https://docs.sqlalchemy.org/en/13/core/events.html#sqlalchemy.events.PoolEvents.connect
+
+    @param dbapi_connection – a DBAPI connection.
+
+    @param connection_record – the _ConnectionRecord managing the DBAPI connection.
+    '''
+
+    logger.debug("sqlalchemy_pool_on_connect_listener: enabling foreign keys")
+    dbapi_connection.execute("PRAGMA foreign_keys = ON")
+
+    fk_result = dbapi_connection.execute("PRAGMA foreign_keys")
+    logger.debug("sqlalchemy_pool_on_connect_listener: it is now: `%s`", fk_result.fetchone())
+
+    logger.debug("sqlalchemy_pool_on_connect_listener: setting WAL journaling mode")
+    dbapi_connection.execute("PRAGMA journal_mode = WAL")
+
+    wal_result = dbapi_connection.execute("PRAGMA journal_mode")
+    logger.debug("sqlalchemy_pool_on_connect_listener: it is now: `%s`", wal_result.fetchone())
+
 
 class AllowEverythingButThisLoggerFilter:
     ''' logging filter that allows everything but the string specified

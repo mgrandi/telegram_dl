@@ -6,6 +6,8 @@ import json
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.event import listen
+from sqlalchemy.pool import Pool
 
 from telegram_dl import tdlib
 from telegram_dl import utils
@@ -29,8 +31,6 @@ process_messages_from_tl_logger = task_logger.getChild("ProcessMessagesFromTeleg
 database_task_logger = task_logger.getChild("DatabaseTask")
 
 database_task_action_logger = database_task_logger.getChild("actions")
-
-
 
 class Application:
     '''
@@ -56,6 +56,10 @@ class Application:
 
         self.engine = create_engine(self.app_config.sqlalchemy_url, echo=False)
         self.sessionmaker = sessionmaker(bind=self.engine)
+
+        # attach a listener to the pool
+        # see https://docs.sqlalchemy.org/en/13/core/event.html
+        listen(self.engine, 'connect', utils.sqlalchemy_pool_on_connect_listener)
 
         # NOTE: you NEED to create these inside a running loop or else it will use
         # `asyncio.get_event_loop()` which is not the same loop that `asyncio.run()` uses

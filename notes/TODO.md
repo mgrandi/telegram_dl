@@ -2,6 +2,10 @@
 
 TODO:
 
+for our connection open listener, `sqlalchemy_pool_on_connect_listener`, that only works if we are using sqlite
+as a database, we should probably check to make sure we are using sqlite before attaching that listener, aka in
+application.py
+
 check out poetry instead of pipenv?
 
 get the version of the app dynamically, maybe using something like this:
@@ -11,9 +15,7 @@ https://pypi.org/project/importlib-metadata/ (or just the importlib library incl
 
 handle updateConnectionState
 
-make sqlite use WAL
-
-RootObject doesn't need _extra as an attrib, as that is only on the top most object
+RootObject doesn't need _extra_ as an attrib, as that is only on the top most object
 
 look into cattrs and figure out how to maybe use a converter to add the @type JSON keys for every object recursively? https://cattrs.readthedocs.io/en/latest/converters.html right now i have no way to turn the JSON i get back from tdjson into an object
 
