@@ -333,3 +333,31 @@ class SuperGroupChat(Chat):
         Index("IXUQ-super_group_chat-tg_super_group_id", "tg_super_group_id", unique=True),
     )
 
+class SecretChat(Chat):
+    __tablename__ = 'secret_chat'
+
+    # our unique identifier, primary key column
+    # has to be a FK to `chat`'s primary key' because of the polymorphic table
+    secret_chat_id = Column(Integer,
+         ForeignKey("chat.chat_id",
+            name="FK-secret_chat-secret_chat_id-chat-chat_id"),
+        nullable=False)
+
+    tg_secret_chat_id = Column(Integer, nullable=False)
+
+    # the "other" user this secret chat is with
+    user_id = Column(Integer,
+        ForeignKey("user.user_id",
+            name="FK-secret_chat-user_id-user-user_id"),
+        nullable=False)
+
+    __mapper_args__ = {
+            'polymorphic_identity': dbme.ChatPolymorphicTableEnum.SECRET_CHAT.value,
+    }
+
+    __table_args__ = (
+        PrimaryKeyConstraint("secret_chat_id",
+            name="PK-secret_chat-secret_chat_id"),
+        Index("IXUQ-secret_chat-tg_secret_chat_id", "tg_secret_chat_id", unique=True)
+    )
+
