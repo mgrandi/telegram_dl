@@ -110,7 +110,7 @@ class DbModelEqualityTester:
         see if a db_model.File equals a tdg.file
         '''
 
-        # here we are just going to check the remote file id
+        # here we are just going to check the remote file id and the remote unique id
 
         if file_arg.tdl_file is None or file_arg.tdg_file is None:
             logger_file.debug("one of the args is None, doing fast comparison")
@@ -124,11 +124,16 @@ class DbModelEqualityTester:
 
         logger_file.debug("comparing `%s`", file_arg)
 
-        result = file_arg.tdl_file.remote_file_id == file_arg.tdg_file.remote.id
+        result_remote_file_id = file_arg.tdl_file.remote_file_id == file_arg.tdg_file.remote.id
+        result_remote_unique_id = file_arg.tdl_file.remote_unique_id == file_arg.tdg_file.remote.unique_id
 
-        logger_file.debug("final result: `%s`", result)
+        logger_file.debug("remote id: `%s`, remote unique id", result_remote_file_id, result_remote_unique_id)
 
-        return result
+        final_result = result_remote_unique_id and result_remote_file_id
+
+        logging_file.debug("final result: `%s`", final_result)
+
+        return final_result
 
 
     @is_equal.register

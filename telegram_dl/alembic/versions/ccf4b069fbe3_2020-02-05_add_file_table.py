@@ -23,7 +23,8 @@ def upgrade():
         sa.Column('tg_file_id', sa.Integer(), nullable=False),
         sa.Column('size', sa.Integer(), nullable=False),
         sa.Column('expected_size', sa.Integer(), nullable=False),
-        sa.Column('remote_file_id', sa.Unicode(length=100), nullable=False),
+        sa.Column('remote_file_id', sa.Unicode(), nullable=False),
+        sa.Column('remote_unique_id', sa.Unicode(), nullable=True),
         sa.PrimaryKeyConstraint('file_id', name='PK-file-file_id')
     )
 
@@ -33,4 +34,5 @@ def upgrade():
 def downgrade():
 
     op.drop_index('IXUQ-file-remote_file_id', table_name='file')
+
     op.drop_table('file')

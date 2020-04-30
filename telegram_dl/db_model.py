@@ -82,8 +82,9 @@ class File(CustomDeclarativeBase):
     # our unique identifier, primary key column
     file_id = Column(Integer, nullable=False)
 
-    # seems to be local to the user and a very low number, like `27`
+    # this is corresponding to `file.id`
     tg_file_id = Column(Integer, nullable=False)
+
     size = Column(Integer, nullable=False)
     expected_size = Column(Integer, nullable=False)
 
@@ -100,7 +101,25 @@ class File(CustomDeclarativeBase):
     # seems to be the unique identifier across all of telegram for the file. Example:
     # `AQADAQADRbYxG4UzzgIACFG4CjAABAIAA4UzzgIABJJVDmJhXyVcVUQAAhYE`
     # only seems to be 60 characters in practice, but lets be safe
-    remote_file_id = Column(Unicode(100), nullable=False)
+    #
+    # from the docs:
+    #
+    # Remote file identifier; may be empty. Can be used across application restarts
+    # or even from other devices for the current user. Uniquely identifies a file,
+    # but a file can have a lot of different valid identifiers. If the ID starts with
+    # "http://" or "https://", it represents the HTTP URL of the file. TDLib is
+    # currently unable to download files if only their URL is known. If downloadFile
+    # is called on such a file or if it is sent to a secret chat, TDLib starts a file
+    # generation process by sending updateFileGenerationStart to the client with
+    # the HTTP URL in the original_path and "#url#" as the conversion string.
+    # Clients should generate the file by downloading it to the specified location.
+    remote_file_id = Column(Unicode(), nullable=False)
+
+    # from the docs:
+    #
+    # Unique file identifier; may be empty if unknown. The unique file identifier
+    # which is the same for the same file even for different users and is persistent over time.
+    remote_unique_id = Column(Unicode(), nullable=True)
 
 
     __table_args__ = (
