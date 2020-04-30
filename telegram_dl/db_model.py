@@ -305,3 +305,31 @@ class PrivateChat(Chat):
         Index("IXUQ-private_chat-user_id", "user_id", unique=True)
 
     )
+
+class SuperGroupChat(Chat):
+    __tablename__ = 'super_group_chat'
+
+    # our unique identifier, primary key column
+    # has to be a FK to `chat`'s primary key' because of the polymorphic table
+    super_group_chat_id = Column(Integer,
+         ForeignKey("chat.chat_id",
+            name="FK-super_group_chat-super_group_chat_id-chat-chat_id"),
+        nullable=False)
+
+    # telegram's ID for this 'super group'
+    # this seems to be the same as the `chat.chat_id` except it is
+    # `(tg_super_group_id  * -1 ) - 10000`
+    tg_super_group_id = Column(Integer, nullable=False)
+
+    is_channel = Column(Boolean, nullable=False)
+
+    __mapper_args__ = {
+            'polymorphic_identity': dbme.ChatPolymorphicTableEnum.SUPER_GROUP_CHAT.value,
+    }
+
+    __table_args__ = (
+        PrimaryKeyConstraint("super_group_chat_id",
+            name="PK-super_group_chat-super_group_chat_id"),
+        Index("IXUQ-super_group_chat-tg_super_group_id", "tg_super_group_id", unique=True),
+    )
+
