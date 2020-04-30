@@ -3,6 +3,8 @@ import functools
 
 import attr
 
+from phonenumbers.phonenumber import PhoneNumber
+
 from telegram_dl import utils
 from telegram_dl import db_model
 from telegram_dl import tdlib_generated as tdg
@@ -14,6 +16,7 @@ logger = logging.getLogger(__name__)
 logger_user = logger.getChild("user")
 logger_profile_photo = logger.getChild("profile_photo")
 logger_file = logger.getChild("file")
+logger_phonenumber = logger.getChild("phonenumber")
 
 # These case classes will be the thing that functools.singledispatchmethod
 # calls methods on, and these will basically holders for data that is the same,
@@ -39,6 +42,12 @@ class EqualityArgumentFile:
     tdl_file:db_model.File = attr.ib()
     tdg_file:tdg.file = attr.ib()
 
+
+@attr.s
+class EqualityArgumentPhoneNumber:
+    phonenumbers_lib_obj:PhoneNumber = attr.ib()
+    str_phonenumber:str = attr.ib()
+
 class DbModelEqualityTester:
     '''
 
@@ -62,6 +71,37 @@ class DbModelEqualityTester:
         logger.error(utils.strip_margin('''missing implementation of `DbModelEqualityTester.is_equal_*`,
             |base method was called! Object passed in was `%s` of type `%s`'''),
              equality_argument, type(equality_argument))
+
+
+    @is_equal.register
+    def is_equal_phonenumber(self, phonenumber_arg:EqualityArgumentPhoneNumber) -> bool:
+
+        phoneno_result = None
+
+        logger_phonenumber.debug("comparing `%s`", phonenumber_arg)
+
+        if not phonenumber_arg.phonenumbers_lib_obj:
+
+            if not phonenumber_arg.str_phonenumber:
+                # both phone numbers are empty, just mark as unchanged right
+                phoneno_result = True
+            else:
+                # old phone number doesn't exist but the new one does exist, mark as different
+                phoneno_result = False
+        else:
+            if not phonenumber_arg.str_phonenumber:
+                # old phone exists but new one doesn't, mark as different
+                phoneno_result = False
+            else:
+                # both old and new phone numbers exist, compare
+                fixed_phone_no_str = utils.fix_phone_number(phonenumber_arg.str_phonenumber)
+                parsed_phone = utils.parse_phone_number_from_str(fixed_phone_no_str)
+
+                phoneno_result = phonenumber_arg.phonenumbers_lib_obj == parsed_phone
+
+        logger_phonenumber.debug("final result: `%s`", phoneno_result)
+
+        return phoneno_result
 
 
     @is_equal.register
@@ -172,7 +212,7 @@ class DbModelEqualityTester:
             return fast_result
 
 
-        first_result = user_arg.tdg_user is not None \
+        user_comparison = user_arg.tdg_user is not None \
             and isinstance(user_arg.tdg_user, tdg.user) \
             and user_arg.tdl_user.tg_user_id == user_arg.tdg_user.id \
             and user_arg.tdl_user.first_name == user_arg.tdg_user.first_name \
@@ -196,30 +236,17 @@ class DbModelEqualityTester:
 
         # handle where we get a str from telegram but a Phonenumber object from the database
         # or the user has no phone number at all
-        # TODO: make this a separate method (like is_equal_phonenumber)
-        phoneno_result = False
+        phone_args = EqualityArgumentPhoneNumber(
+            phonenumbers_lib_obj=user_arg.tdl_user.phone_number,
+            str_phonenumber=user_arg.tdg_user.phone_number)
 
-        if not self.phone_number:
-
-            if not other.phone_number:
-                # both phone numbers are empty, just mark as unchanged right
-                phoneno_result = True
-            else:
-                # old phone number doesn't exist but the new one does exist, mark as different
-                phoneno_result = False
-        else:
-            if not other.phone_number:
-                # old phone exists but new one doesn't, mark as different
-                phoneno_result = False
-            else:
-                # both old and new phone numbers exist, compare
-                phoneno_result = self.phone_number == utils.parse_phone_number_from_str(utils.fix_phone_number(other.phone_number))
+        phoneno_result = self.is_equal(phone_args)
 
 
-        final = result and profilephoto_result and phoneno_result
+        final = user_comparison and profilephoto_result and phoneno_result
 
         if not final:
             logger_user.debug("equals_tdg: user result: `%s`, profile photo result: `%s`, phone # result: `%s`",
-                result, profilephoto_result, phoneno_result)
+                user_comparison, profilephoto_result, phoneno_result)
 
         return final

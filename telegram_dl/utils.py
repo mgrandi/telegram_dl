@@ -124,7 +124,7 @@ class AllowEverythingButThisLoggerFilter:
         else:
             return 1
 
-def parse_phone_number_from_str(phone_number_str:str) -> phonenumbers.PhoneNumber:
+def parse_phone_number_from_str(phone_number_str:str) -> phonenumbers.phonenumber.PhoneNumber:
 
     return phonenumbers.parse(phone_number_str, region=constants.PHONE_NUMBER_DEFAULT_REGION)
 
