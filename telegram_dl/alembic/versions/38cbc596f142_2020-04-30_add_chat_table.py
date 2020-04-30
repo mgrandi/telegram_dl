@@ -26,16 +26,26 @@ def upgrade():
         sa.Column('title', sa.Unicode(), nullable=False),
         sa.Column('photo_set_id', sa.Integer(), nullable=True),
         sa.Column('is_sponsored', sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(['photo_set_id'], ['photo_set.photo_set_id'], name='FK-chat-photo_set_id-photo_set-photo_set_id'),
-        sa.PrimaryKeyConstraint('chat_id', name='PK-chat-chat_id')
+        sa.ForeignKeyConstraint(
+            ['photo_set_id'],
+            ['photo_set.photo_set_id'],
+            name='FK-chat-photo_set_id-photo_set-photo_set_id'),
+        sa.PrimaryKeyConstraint('chat_id',
+            name='PK-chat-chat_id')
     )
+
     with op.batch_alter_table('chat', schema=None) as batch_op:
-        batch_op.create_index('IXUQ-chat-tg_chat_id', ['tg_chat_id'], unique=True)
+
+        batch_op.create_index(
+            'IXUQ-chat-tg_chat_id',
+            ['tg_chat_id'],
+            unique=True)
 
 
 def downgrade():
 
     with op.batch_alter_table('chat', schema=None) as batch_op:
+
         batch_op.drop_index('IXUQ-chat-tg_chat_id')
 
     op.drop_table('chat')
