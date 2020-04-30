@@ -27,6 +27,58 @@ structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
 
 
+def strip_margin(string, preserve_newlines=False, strip_characters="|"):
+    ''' given a multi line string, for each line, remove the range from the beginning
+    of the string to the margin character(s), and then return it, optionally separated by
+    newlines or just spaces
+
+    given the string:
+
+    x = """
+        |hey
+        |there"""
+
+    strip_margin(x) returns `hey there`
+    strip_margin(x, True) returns
+
+    `hey
+    there`
+
+    @param string - the string to strip the margins of
+    @param preserve_newlines - if true, we combine the results with a `\n`, if
+        false, we combine them with a space character instead
+    @param strip_characters - the characters to use as a margin character
+
+    '''
+
+    line_list = string.split("\n")
+
+    result_list = []
+
+    for iter_line in line_list:
+
+        if not iter_line:
+            continue
+
+        elif strip_characters in iter_line:
+
+            pos = iter_line.find(strip_characters)
+            strip_chars_len = len(strip_characters)
+
+            stripped = iter_line[pos + strip_chars_len:]
+            result_list.append(stripped)
+
+        else:
+
+            result_list.append(iter_line)
+
+    if preserve_newlines:
+        return "\n".join(result_list)
+    else:
+        return " ".join(result_list)
+
+
+
 def sqlalchemy_pool_on_connect_listener(dbapi_connection, connection_record):
     ''' a sqlalchemy listener method that listens to the 'connect' event on a Pool
 
