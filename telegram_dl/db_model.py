@@ -149,11 +149,16 @@ class ProfilePhotoSet(PhotoSet):
 
     user = relationship("User", back_populates="profile_photo_set")
 
+    # using `uselist` here becuase it is returning a list instead of a single item
+    # i believe this is because technically this is a one to many (one photo set -> many photos) but
+    # here on `big` and `small`, we want a 1 to 1 relationship
     big = relationship("Photo",
-        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG.value}' )")
+        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG.value}' )",
+        uselist=False)
 
     small = relationship("Photo",
-        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL.value}' )")
+        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL.value}' )",
+        uselist=False)
 
 
     __table_args__ = (
