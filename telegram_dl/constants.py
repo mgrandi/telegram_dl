@@ -76,7 +76,3 @@ PHONE_NO_REGEX_PN2 = "phone_num_part_two"
 # multiplicity modifiers (like `{3}` or `{1,3}`) and i would have to double up the braces which looks ugly, so just type
 # the group names manually here
 INPUT_PHONE_NUMBER_REGEX = re.compile(r"^\+(?P<country_code>[0-9]{1,3})-(?P<area_code>[0-9]{3})-(?P<phone_num_part_one>[0-9]{3})-(?P<phone_num_part_two>[0-9]{4})")
-
-
-POLYMORPHIC_IDENTITY_PHOTOSET_BASE = "photoset"
-POLYMORPHIC_IDENTITY_PHOTOSET_PROFILE_PHOTO = "profile_photo_photoset"

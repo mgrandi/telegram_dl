@@ -15,6 +15,15 @@ class DatabaseChangeEnum(enum.Enum):
     NEW = 1
     UPDATED = 2
 
+class PhotoSetPolymorphicTableEnum(enum.Enum):
+    '''
+    enum representing the available types for the polymorphic identity of the
+    `PhotoSet` table
+    '''
+
+    PHOTO_SET = "photoset"
+    PROFILE_PHOTO_SET = "profile_photo_photoset"
+
 class PhotoSizeThumbnailType(enum.Enum):
 
     def __new__(cls, value, width, height, image_filter):

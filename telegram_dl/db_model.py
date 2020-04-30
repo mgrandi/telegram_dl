@@ -149,7 +149,7 @@ class PhotoSet(CustomDeclarativeBase):
         PrimaryKeyConstraint("photo_set_id", name="PK-photo_set-photo_set_id"),
     )
     __mapper_args__ = {
-        'polymorphic_identity': constants.POLYMORPHIC_IDENTITY_PHOTOSET_BASE,
+        'polymorphic_identity':  dbme.PhotoSetPolymorphicTableEnum.PHOTO_SET.value,
         'polymorphic_on': polytype
     }
 
@@ -184,9 +184,8 @@ class ProfilePhotoSet(PhotoSet):
         PrimaryKeyConstraint("profile_photo_set_id", name="PK-profile_photo_set-profile_photo_set_id"),
     )
     __mapper_args__ = {
-        'polymorphic_identity': constants.POLYMORPHIC_IDENTITY_PHOTOSET_PROFILE_PHOTO,
+        'polymorphic_identity': dbme.PhotoSetPolymorphicTableEnum.PROFILE_PHOTO_SET.value,
     }
-
 
 
 class Photo(CustomDeclarativeBase):
@@ -220,4 +219,6 @@ class Photo(CustomDeclarativeBase):
         Index("IXUQ-photo-file_id", "file_id", unique=True),
         Index("IX-photo-photo_set_id", "photo_set_id")
     )
+
+
 
