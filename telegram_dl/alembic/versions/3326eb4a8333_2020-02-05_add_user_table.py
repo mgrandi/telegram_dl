@@ -32,7 +32,7 @@ def upgrade():
 
         # Changing this custom column to its base type
         # sa.Column('phone_number', sqlalchemy_utils.types.phone_number.PhoneNumberType(region="US", max_length=20), nullable=True),
-        sa.Column("phone_number", sa.Unicode(length=20)),
+        sa.Column("phone_number", sa.Unicode(length=20), nullable=True),
 
         sa.Column('profile_photo_set_id', sa.Unicode(length=100), nullable=True),
 
@@ -46,7 +46,7 @@ def upgrade():
 
         # Changing this custom column to its base type
         # sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.UserTypeEnum, impl=sa.Integer()), nullable=True),
-        sa.Column("user_type", sa.Integer()),
+        sa.Column("user_type", sa.Integer(), nullable=False),
 
         sa.Column('language_code', sa.Unicode(length=20), nullable=True),
 

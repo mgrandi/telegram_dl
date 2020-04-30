@@ -29,9 +29,9 @@ class User(CustomDeclarativeBase):
 
     # telegram fields
     tg_user_id = Column(Integer, nullable=False)
-    first_name = Column(Unicode(length=100))
-    last_name = Column(Unicode(length=100))
-    user_name = Column(Unicode(length=100))
+    first_name = Column(Unicode(length=100), nullable=False)
+    last_name = Column(Unicode(length=100), nullable=False)
+    user_name = Column(Unicode(length=100), nullable=False)
 
     # from https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#sqlalchemy_utils.types.phone_number.PhoneNumberType:
     #
@@ -40,14 +40,14 @@ class User(CustomDeclarativeBase):
     # value to PhoneNumber object.
     phone_number = Column(PhoneNumberType(
         region=constants.PHONE_NUMBER_DEFAULT_REGION,
-        max_length=constants.PHONE_NUMBER_MAX_LENGTH))
+        max_length=constants.PHONE_NUMBER_MAX_LENGTH), nullable=True)
 
     # i don't really care about the status so i won't store it, or have a UserStatus type really
     # status = Column()
 
     profile_photo_set_id= Column(Integer,
         ForeignKey("photo_set.photo_set_id",
-            name="FK-user-profile_photo_set_id-photo_set-photo_set_id"))
+            name="FK-user-profile_photo_set_id-photo_set-photo_set_id"), nullable=True)
 
     profile_photo_set = relationship("ProfilePhotoSet", back_populates="user")
 
@@ -59,9 +59,9 @@ class User(CustomDeclarativeBase):
     is_scam = Column(Boolean, nullable=False)
     have_access = Column(Boolean, nullable=False)
 
-    user_type = Column(ChoiceType(dbme.UserTypeEnum, impl=Integer()))
+    user_type = Column(ChoiceType(dbme.UserTypeEnum, impl=Integer()), nullable=False)
 
-    language_code = Column(Unicode(length=20))
+    language_code = Column(Unicode(length=20), nullable=True)
 
     __table_args__ = (
         PrimaryKeyConstraint("user_id", name="PK-user-user_id"),
@@ -159,8 +159,10 @@ class ProfilePhotoSet(PhotoSet):
     __tablename__ = 'profile_photo_set'
 
     # our unique identifier, primary key column
+    # has to be a FK to `photo_set`'s primary key' because of the polymorphic table
     profile_photo_set_id = Column(Integer,
-        ForeignKey("photo_set.photo_set_id", name="FK-profile_photo_set-profile_photo_set_id-photo_set-photo_set_id"),
+        ForeignKey("photo_set.photo_set_id",
+            name="FK-profile_photo_set-profile_photo_set_id-photo_set-photo_set_id"),
         nullable=False)
 
     # this is the id of the profile photo within telegram, used to access to the profile photo later
