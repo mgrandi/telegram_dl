@@ -279,3 +279,29 @@ class BasicGroupChat(Chat):
         Index("IXUQ-basic_group_chat-tg_basic_group_id", "tg_basic_group_id", unique=True),
     )
 
+class PrivateChat(Chat):
+    __tablename__ = 'private_chat'
+
+    # our unique identifier, primary key column
+    # has to be a FK to `chat`'s primary key' because of the polymorphic table
+    private_chat_id = Column(Integer,
+         ForeignKey("chat.chat_id",
+            name="FK-private_chat-private_chat_id-chat-chat_id"),
+        nullable=False)
+
+    # the "other" user this private chat is with
+    user_id = Column(Integer,
+        ForeignKey("user.user_id",
+            name="FK-private_chat-user_id-user-user_id"),
+        nullable=False)
+
+    __mapper_args__ = {
+            'polymorphic_identity': dbme.ChatPolymorphicTableEnum.PRIVATE_CHAT.value,
+    }
+
+    __table_args__ = (
+        PrimaryKeyConstraint("private_chat_id",
+            name="PK-private_chat-private_chat_id"),
+        Index("IXUQ-private_chat-user_id", "user_id", unique=True)
+
+    )
