@@ -224,3 +224,33 @@ class Photo(CustomDeclarativeBase):
 
 
 
+class Chat(CustomDeclarativeBase):
+
+    __tablename__ = 'chat'
+
+    # our unique identifier, primary key column
+    chat_id = Column(Integer, nullable=False)
+
+    # the polymorphic descriminator for the joined table inheritance
+    polytype = Column(Unicode, nullable=False)
+
+    tg_chat_id = Column(Integer, nullable=False)
+
+    title = Column(Unicode, nullable=False)
+
+    photo_set_id = Column(Integer,
+        ForeignKey("photo_set.photo_set_id",
+            name="FK-chat-photo_set_id-photo_set-photo_set_id"),
+        nullable=True)
+
+    is_sponsored = Column(Boolean, nullable=False)
+
+    __table_args__ = (
+
+        PrimaryKeyConstraint("chat_id",name="PK-chat-chat_id"),
+        Index("IXUQ-chat-tg_chat_id", "tg_chat_id", unique=True),
+    )
+    __mapper_args__ = {
+        'polymorphic_identity': dbme.ChatPolymorphicTableEnum.CHAT.value,
+        'polymorphic_on': polytype
+    }
