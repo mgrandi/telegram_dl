@@ -246,7 +246,6 @@ class Chat(CustomDeclarativeBase):
     is_sponsored = Column(Boolean, nullable=False)
 
     __table_args__ = (
-
         PrimaryKeyConstraint("chat_id",name="PK-chat-chat_id"),
         Index("IXUQ-chat-tg_chat_id", "tg_chat_id", unique=True),
     )
@@ -254,3 +253,29 @@ class Chat(CustomDeclarativeBase):
         'polymorphic_identity': dbme.ChatPolymorphicTableEnum.CHAT.value,
         'polymorphic_on': polytype
     }
+
+class BasicGroupChat(Chat):
+    __tablename__ = 'basic_group_chat'
+
+    # our unique identifier, primary key column
+    # has to be a FK to `chat`'s primary key' because of the polymorphic table
+    basic_group_chat_id = Column(Integer,
+        ForeignKey("chat.chat_id",
+            name="FK-basic_group_chat-basic_group_chat_id-chat-chat_id"),
+        nullable=False)
+
+    # telegram's ID for this 'basic group'
+    # this seems to be the same as the `chat.chat_id` except it is
+    # `tg_basic_group_id * -1`
+    tg_basic_group_id = Column(Integer, nullable=False)
+
+    __mapper_args__ = {
+        'polymorphic_identity': dbme.ChatPolymorphicTableEnum.BASIC_GROUP_CHAT.value,
+    }
+
+    __table_args__ = (
+        PrimaryKeyConstraint("basic_group_chat_id",
+            name="PK-basic_group_chat-basic_group_chat_id"),
+        Index("IXUQ-basic_group_chat-tg_basic_group_id", "tg_basic_group_id", unique=True),
+    )
+
