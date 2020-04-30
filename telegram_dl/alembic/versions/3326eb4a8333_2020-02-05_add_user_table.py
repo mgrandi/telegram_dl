@@ -28,7 +28,7 @@ def upgrade():
         sa.Column('tg_user_id', sa.Integer(), nullable=False),
         sa.Column('first_name', sa.Unicode(length=100), nullable=True),
         sa.Column('last_name', sa.Unicode(length=100), nullable=True),
-        sa.Column('user_name', sa.Unicode(length=100), nullable=True),
+        sa.Column('user_name', sa.Unicode(length=100), nullable=False),
 
         # Changing this custom column to its base type
         # sa.Column('phone_number', sqlalchemy_utils.types.phone_number.PhoneNumberType(region="US", max_length=20), nullable=True),

@@ -29,8 +29,8 @@ class User(CustomDeclarativeBase):
 
     # telegram fields
     tg_user_id = Column(Integer, nullable=False)
-    first_name = Column(Unicode(length=100), nullable=False)
-    last_name = Column(Unicode(length=100), nullable=False)
+    first_name = Column(Unicode(length=100), nullable=True)
+    last_name = Column(Unicode(length=100), nullable=True)
     user_name = Column(Unicode(length=100), nullable=False)
 
     # from https://sqlalchemy-utils.readthedocs.io/en/latest/data_types.html#sqlalchemy_utils.types.phone_number.PhoneNumberType:
