@@ -257,6 +257,7 @@ class Photo(CustomDeclarativeBase):
     __table_args__ = (
         PrimaryKeyConstraint("photo_id", name="PK-photo-photo_id"),
         Index("IXUQ-photo-file_id", "file_id", unique=True),
+        Index("IX-photo-photo_set_id", "photo_set_id")
     )
 
     def equals_tdg(self, other:tdg.file):

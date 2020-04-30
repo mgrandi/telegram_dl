@@ -52,11 +52,23 @@ def upgrade():
         columns=['file_id'],
         unique=True)
 
+    op.create_index(
+        index_name='IX-photo-photo_set_id',
+        table_name='photo',
+        columns=['photo_set_id'],
+        unique=False)
+
+
 
 
 def downgrade():
 
     op.drop_index(
+        index_name='IX-photo-photo_set_id',
+        table_name='photo')
+
+    op.drop_index(
         index_name='IXUQ-photo-file_id',
-        table_name='user')
+        table_name='photo')
+
     op.drop_table('photo')
