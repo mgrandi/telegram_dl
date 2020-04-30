@@ -15,6 +15,13 @@ class DatabaseChangeEnum(enum.Enum):
     NEW = 1
     UPDATED = 2
 
+class ChatPolymorphicTableEnum(enum.Enum):
+    CHAT = "chat"
+    BASIC_GROUP_CHAT = "basic_group_chat"
+    PRIVATE_CHAT = "private_chat"
+    SUPER_GROUP_CHAT = "super_group_chat"
+    SECRET_CHAT = "secret_chat"
+
 class PhotoSetPolymorphicTableEnum(enum.Enum):
     '''
     enum representing the available types for the polymorphic identity of the
