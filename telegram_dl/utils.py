@@ -27,7 +27,7 @@ structure_logger = converter_logger.getChild("structure")
 unstructure_logger = converter_logger.getChild("unstructure")
 
 
-def strip_margin(string, preserve_newlines=False, strip_characters="|"):
+def strip_margin(string:str, preserve_newlines:bool=False, strip_characters:str="|") -> str:
     ''' given a multi line string, for each line, remove the range from the beginning
     of the string to the margin character(s), and then return it, optionally separated by
     newlines or just spaces
@@ -48,6 +48,7 @@ def strip_margin(string, preserve_newlines=False, strip_characters="|"):
     @param preserve_newlines - if true, we combine the results with a `\n`, if
         false, we combine them with a space character instead
     @param strip_characters - the characters to use as a margin character
+    @return a string with the margins stripped and optionally the newlines
 
     '''
 
