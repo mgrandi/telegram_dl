@@ -35,6 +35,9 @@ def sqlalchemy_pool_on_connect_listener(dbapi_connection, connection_record):
     @param dbapi_connection – a DBAPI connection.
 
     @param connection_record – the _ConnectionRecord managing the DBAPI connection.
+
+    FIXME: this probably only works if we are sqlite, maybe we should have some code
+    to verify if we are sqlite first before we attach this listener?
     '''
 
     logger.debug("sqlalchemy_pool_on_connect_listener: enabling foreign keys")
