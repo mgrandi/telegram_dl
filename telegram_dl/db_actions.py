@@ -7,6 +7,7 @@ from telegram_dl import tdlib_generated
 from telegram_dl import db_model
 from telegram_dl import db_model_enums as dbe
 from telegram_dl import utils
+from telegram_dl import db_model_equality
 
 import attr
 import arrow
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 insert_or_update_logger = logger.getChild("insert_update")
 dbaction_handler_logger = logger.getChild("handler")
 
+equality_tester = db_model_equality.DbModelEqualityTester()
 
 @attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class InsertOrUpdateResult:
@@ -92,7 +94,11 @@ class InsertOrUpdateHandler:
         # # see if it exists
         maybe_existing = session.query(db_model.File).filter(db_model.File.remote_file_id == object_to_handle.remote.id).first()
 
-        is_equal = maybe_existing.equals_tdg(object_to_handle) if maybe_existing else False
+        file_args = db_model_equality.EqualityArgumentFile(
+            tdl_file=maybe_existing,
+            tdg_file=object_to_handle)
+
+        is_equal = equality_tester.is_equal(file_args)
 
         # either doesn't exist or it does exist but has changed
         if not maybe_existing or not is_equal:
@@ -140,6 +146,8 @@ class InsertOrUpdateHandler:
                 .filter(db_model.Photo.file_id == big_photo_file_result.obj.file_id) \
                 .first()
 
+            insert_or_update_logger.debug("profile_photo: not adding db_model.ProfilePhotoSet object `%s` because it already exists or hasn't changed",
+                existing_profile_photo_set)
 
             return InsertOrUpdateResult(obj=existing_profile_photo_set, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
@@ -151,14 +159,14 @@ class InsertOrUpdateHandler:
                 tg_id=incoming_profile_photo.id)
 
             big_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO,
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG,
                 width=-1,
                 height=-1,
                 has_stickers=False,
                 file=big_photo_file_result.obj)
 
             small_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO,
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL,
                 width=-1,
                 height=-1,
                 has_stickers=False,
@@ -166,6 +174,9 @@ class InsertOrUpdateHandler:
 
             new_photo_set.photos.append(big_photo)
             new_photo_set.photos.append(small_photo)
+
+            insert_or_update_logger.info("profile_photo: adding db_model.ProfilePhotoSet object `%s` to session with change: `%s`",
+                new_photo_set, dbe.DatabaseChangeEnum.NEW)
 
             return InsertOrUpdateResult(obj=new_photo_set, change=dbe.DatabaseChangeEnum.NEW)
 
@@ -183,7 +194,11 @@ class InsertOrUpdateHandler:
             .order_by(desc(db_model.User.as_of)) \
             .first()
 
-        is_equal = maybe_existing.equals_tdg(incoming_user) if maybe_existing else False
+        user_args = db_model_equality.EqualityArgumentUser(
+            tdl_user=maybe_existing,
+            tdg_user=incoming_user)
+
+        is_equal = equality_tester.is_equal(user_args)
 
         if not maybe_existing or not is_equal:
 

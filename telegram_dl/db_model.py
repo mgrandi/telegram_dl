@@ -72,66 +72,6 @@ class User(CustomDeclarativeBase):
     )
 
 
-    def equals_tdg(self, other:tdg.user):
-        ''' basically overloading __eq__ because sqlalchemy takes over that to
-        test by identity for its ORM stuff
-        '''
-
-        result = other is not None \
-            and isinstance(other, tdg.user) \
-            and self.tg_user_id == other.id \
-            and self.first_name == other.first_name \
-            and self.last_name == other.last_name \
-            and self.user_name == other.username \
-            and self.is_contact == other.is_contact \
-            and self.is_mutual_contact == other.is_mutual_contact \
-            and self.is_verified == other.is_verified \
-            and self.is_support == other.is_support \
-            and self.restriction_reason == other.restriction_reason \
-            and self.is_scam == other.is_scam \
-            and self.have_access == other.have_access \
-            and self.user_type == dbme.UserTypeEnum.parse_from_tdg_usertype(other.type) \
-            and self.language_code == other.language_code
-
-        profilephoto_result = False
-
-        # haandle where the user might not have a profile photo
-        if self.profile_photo is None:
-            profilephoto_result = self.profile_photo_set == other.profile_photo_set
-        else:
-            profilephoto_result = self.profile_photo_set.equals_tdg(other.profile_photo_set)
-
-        # handle where we get a str from telegram but a Phonenumber object from the database
-        # or the user has no phone number at all
-        phoneno_result = False
-
-        if not self.phone_number:
-
-            if not other.phone_number:
-                # both phone numbers are empty, just mark as unchanged right
-                phoneno_result = True
-            else:
-                # old phone number doesn't exist but the new one does exist, mark as different
-                phoneno_result = False
-        else:
-            if not other.phone_number:
-                # old phone exists but new one doesn't, mark as different
-                phoneno_result = False
-            else:
-                # both old and new phone numbers exist, compare
-                phoneno_result = self.phone_number == utils.parse_phone_number_from_str(utils.fix_phone_number(other.phone_number))
-
-
-        final = result and profilephoto_result and phoneno_result
-
-        if not final:
-            logger.debug("equals_tdg: user result: `%s`, profile photo result: `%s`, phone # result: `%s`",
-                result, profilephoto_result, phoneno_result)
-
-        return final
-
-
-
 class File(CustomDeclarativeBase):
 
     __tablename__ = "file"
@@ -168,13 +108,6 @@ class File(CustomDeclarativeBase):
         Index("IXUQ-file-remote_file_id", "remote_file_id", unique=True),
     )
 
-    def equals_tdg(self, other:tdg.file):
-
-        return other is not None \
-            and isinstance(other, tdg.file) \
-            and self.remote_file_id == other.remote.id
-
-
 
 class PhotoSet(CustomDeclarativeBase):
     ''' this table is using joined table inheritance
@@ -201,8 +134,6 @@ class PhotoSet(CustomDeclarativeBase):
         'polymorphic_on': polytype
     }
 
-    def equals_tdg(self, other:tdg.file):
-        pass
 
 class ProfilePhotoSet(PhotoSet):
 
@@ -218,6 +149,13 @@ class ProfilePhotoSet(PhotoSet):
 
     user = relationship("User", back_populates="profile_photo_set")
 
+    big = relationship("Photo",
+        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG.value}' )")
+
+    small = relationship("Photo",
+        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL.value}' )")
+
+
     __table_args__ = (
         PrimaryKeyConstraint("profile_photo_set_id", name="PK-profile_photo_set-profile_photo_set_id"),
     )
@@ -225,8 +163,7 @@ class ProfilePhotoSet(PhotoSet):
         'polymorphic_identity': constants.POLYMORPHIC_IDENTITY_PHOTOSET_PROFILE_PHOTO,
     }
 
-    def equals_tdg(self, other:tdg.file):
-        pass
+
 
 class Photo(CustomDeclarativeBase):
 
@@ -239,7 +176,7 @@ class Photo(CustomDeclarativeBase):
         ForeignKey("photo_set.photo_set_id", name="FK-photo-photo_set_id-photo_set-photo_set_id"),
         nullable=False)
 
-    thumbnail_type = Column(ChoiceType(dbme.PhotoSizeThumbnailType, impl=Unicode()), nullable=False)
+    thumbnail_type = Column(ChoiceType(dbme.PhotoSizeThumbnailType, impl=Unicode(10)), nullable=False)
 
     width = Column(Integer, nullable=False)
 
@@ -260,5 +197,3 @@ class Photo(CustomDeclarativeBase):
         Index("IX-photo-photo_set_id", "photo_set_id")
     )
 
-    def equals_tdg(self, other:tdg.file):
-        pass
