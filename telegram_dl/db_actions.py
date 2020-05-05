@@ -77,7 +77,7 @@ class InsertOrUpdateHandler:
 
         return None
 
-    @functools.singledispatchmethod
+    @handle_insert_or_update.register
     async def none(self, obj_to_handle:None, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
 
         # noop
