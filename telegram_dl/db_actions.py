@@ -96,28 +96,35 @@ class InsertOrUpdateHandler:
         # it seems that in telegram's ongoing effort to be forward compatable, the IDs for all chats are
         # within the same namespace even though their 'specific' id (for that chat type) is different
         # see `ID notes` in `chat notes.md`
-        maybe_existing = session.query(db_model.Chat) \
+        maybe_existing_chat = session.query(db_model.Chat) \
             .filter(db_model.Chat.tg_chat_id == object_to_handle.id) \
             .first()
 
 
+        # get the latest ChatVersion and see if that matches what we are getting from
+        # the `tdlib_generated.chat` we get passed in
         # TODO: IMPLEMENT
         is_equal = True
 
-        change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
+        change = dbe.DatabaseChangeEnum.NEW if maybe_existing_chat == None else dbe.DatabaseChangeEnum.UPDATED
 
-        if not maybe_existing or not is_equal:
+        if not maybe_existing_chat or not is_equal:
 
             # chat doesn't exist add it
 
             profile_photo_set_result = await self.handle_insert_or_update(object_to_handle.photo, params)
 
             # parameters that fit all `chat` types, since this table is polymorphic
-            instance_parameters_dict = dict(
+            chat_instance_parameters_dict = dict(
                 tg_chat_id=object_to_handle.id,
+            )
+
+            chat_version_instance_parameters_dict = dict(
+                as_of=arrow.utcnow(),
                 title=object_to_handle.title,
+                photo_set=profile_photo_set_result.obj if profile_photo_set_result else None,
                 is_sponsored=object_to_handle.is_sponsored,
-                photo_set=profile_photo_set_result.obj if profile_photo_set_result else None)
+            )
 
 
             chat_type = object_to_handle.type
@@ -126,29 +133,30 @@ class InsertOrUpdateHandler:
 
             if isinstance(chat_type, tdlib_generated.chatTypeBasicGroup):
 
-                instance_parameters_dict["tg_basic_group_id"] = chat_type.basic_group_id
+                chat_instance_parameters_dict["tg_basic_group_id"] = chat_type.basic_group_id
 
-                result_chat = db_model.BasicGroupChat(**instance_parameters_dict)
+                result_chat = db_model.BasicGroupChat(**chat_instance_parameters_dict)
+
 
             elif isinstance(chat_type, tdlib_generated.chatTypePrivate):
 
-                instance_parameters_dict["user_id"] = chat_type.user_id
+                chat_instance_parameters_dict["user_id"] = chat_type.user_id
 
-                result_chat = db_model.PrivateChat(**instance_parameters_dict)
+                result_chat = db_model.PrivateChat(**chat_instance_parameters_dict)
 
             elif isinstance(chat_type, tdlib_generated.chatTypeSecret):
 
-                instance_parameters_dict["user_id"] = chat_type.user_id
-                instance_parameters_dict["tg_secret_chat_id"] = chat_type.secret_chat_id
+                chat_instance_parameters_dict["user_id"] = chat_type.user_id
+                chat_instance_parameters_dict["tg_secret_chat_id"] = chat_type.secret_chat_id
 
-                result_chat = db_model.SecretChat(**instance_parameters_dict)
+                result_chat = db_model.SecretChat(**chat_instance_parameters_dict)
 
             elif isinstance(chat_type, tdlib_generated.chatTypeSupergroup):
 
-                instance_parameters_dict["tg_super_group_id"] = chat_type.supergroup_id
-                instance_parameters_dict["is_channel"] = chat_type.is_channel
+                chat_instance_parameters_dict["tg_super_group_id"] = chat_type.supergroup_id
+                chat_instance_parameters_dict["is_channel"] = chat_type.is_channel
 
-                result_chat = db_model.SuperGroupChat(**instance_parameters_dict)
+                result_chat = db_model.SuperGroupChat(**chat_instance_parameters_dict)
 
             else:
 
@@ -156,6 +164,10 @@ class InsertOrUpdateHandler:
 
                 return InsertOrUpdateResult(obj=None, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
+            # create the chat_version and add it to whatever type of chat we get back from the
+            # if/else statement
+            tmp_chat_ver = db_model.ChatVersion(**chat_version_instance_parameters_dict)
+            result_chat.versions.append(tmp_chat_ver)
 
             insert_or_update_logger.info("chat: adding `%s` object `%s` to session with change: `%s`",
                 type(result_chat), result_chat, change)
@@ -170,7 +182,7 @@ class InsertOrUpdateHandler:
             insert_or_update_logger.debug("chat: not adding db_model.Chat object `%s` because it already exists and hasn't changed",
                  object_to_handle)
 
-            return InsertOrUpdateResult(obj=maybe_existing, change=dbe.DatabaseChangeEnum.NO_CHANGE)
+            return InsertOrUpdateResult(obj=maybe_existing_chat, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
 
 

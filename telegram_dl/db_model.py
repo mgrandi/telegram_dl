@@ -269,6 +269,8 @@ class Chat(CustomDeclarativeBase):
 
     tg_chat_id = Column(Integer, nullable=False)
 
+    versions = relationship("ChatVersion")
+
     __table_args__ = (
         PrimaryKeyConstraint("chat_id",name="PK-chat-chat_id"),
         Index("IXUQ-chat-tg_chat_id", "tg_chat_id", unique=True),
