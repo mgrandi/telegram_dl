@@ -131,7 +131,7 @@ class DbModelEqualityTester:
 
         final_result = result_remote_unique_id and result_remote_file_id
 
-        logging_file.debug("final result: `%s`", final_result)
+        logger_file.debug("final result: `%s`", final_result)
 
         return final_result
 
