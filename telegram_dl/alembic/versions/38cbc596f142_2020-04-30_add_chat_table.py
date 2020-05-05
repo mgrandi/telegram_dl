@@ -12,7 +12,7 @@ import sqlalchemy_utils
 
 # revision identifiers, used by Alembic.
 revision = '38cbc596f142'
-down_revision = '3326eb4a8333'
+down_revision = '6b46e5ae44da'
 branch_labels = None
 depends_on = None
 
@@ -23,13 +23,7 @@ def upgrade():
         sa.Column('chat_id', sa.Integer(), nullable=False),
         sa.Column('polytype', sa.Unicode(), nullable=False),
         sa.Column('tg_chat_id', sa.Integer(), nullable=False),
-        sa.Column('title', sa.Unicode(), nullable=False),
-        sa.Column('photo_set_id', sa.Integer(), nullable=True),
-        sa.Column('is_sponsored', sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ['photo_set_id'],
-            ['photo_set.photo_set_id'],
-            name='FK-chat-photo_set_id-photo_set-photo_set_id'),
+
         sa.PrimaryKeyConstraint('chat_id',
             name='PK-chat-chat_id')
     )

@@ -222,6 +222,39 @@ class Photo(CustomDeclarativeBase):
         Index("IX-photo-photo_set_id", "photo_set_id")
     )
 
+class ChatVersion(CustomDeclarativeBase):
+    '''
+    represents a 'version' of a chat, with all of the stuff that can change about
+    a chat
+    '''
+
+    __tablename__ = 'chat_version'
+
+    chat_version_id = Column(Integer, nullable=False)
+
+    chat_id = Column(Integer,
+        ForeignKey("chat.chat_id",
+            name="FK-chat_version-chat_id-chat_chat_id"),
+        nullable=False)
+
+    as_of = Column(ArrowType, nullable=False)
+
+    title = Column(Unicode, nullable=False)
+
+    photo_set_id = Column(Integer,
+        ForeignKey("photo_set.photo_set_id",
+            name="FK-chat_version-photo_set_id-photo_set-photo_set_id"),
+        nullable=True)
+
+    photo_set = relationship("PhotoSet")
+
+    is_sponsored = Column(Boolean, nullable=False)
+
+
+    __table_args__ = (
+        PrimaryKeyConstraint("chat_version_id",name="PK-chat_version-chat_version_id"),
+        Index("IXUQ-chat_version-chat_id-as_of", "chat_id", "as_of", unique=True),
+    )
 
 
 class Chat(CustomDeclarativeBase):
@@ -235,17 +268,6 @@ class Chat(CustomDeclarativeBase):
     polytype = Column(Unicode, nullable=False)
 
     tg_chat_id = Column(Integer, nullable=False)
-
-    title = Column(Unicode, nullable=False)
-
-    photo_set_id = Column(Integer,
-        ForeignKey("photo_set.photo_set_id",
-            name="FK-chat-photo_set_id-photo_set-photo_set_id"),
-        nullable=True)
-
-    photo_set = relationship("PhotoSet")
-
-    is_sponsored = Column(Boolean, nullable=False)
 
     __table_args__ = (
         PrimaryKeyConstraint("chat_id",name="PK-chat-chat_id"),
