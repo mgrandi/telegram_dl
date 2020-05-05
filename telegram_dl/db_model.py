@@ -243,6 +243,8 @@ class Chat(CustomDeclarativeBase):
             name="FK-chat-photo_set_id-photo_set-photo_set_id"),
         nullable=True)
 
+    photo_set = relationship("PhotoSet")
+
     is_sponsored = Column(Boolean, nullable=False)
 
     __table_args__ = (
