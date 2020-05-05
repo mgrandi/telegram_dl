@@ -78,10 +78,11 @@ class InsertOrUpdateHandler:
         return None
 
     @functools.singledispatchmethod
-    async def handle_insert_or_update(self, obj_to_handle:None, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
+    async def none(self, obj_to_handle:None, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
 
         # noop
         return None
+
 
     @handle_insert_or_update.register
     async def file(self, object_to_handle:tdlib_generated.file, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
