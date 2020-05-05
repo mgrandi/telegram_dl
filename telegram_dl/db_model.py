@@ -18,17 +18,19 @@ CustomDeclarativeBase = declarative_base(cls=RepresentableBase, name="CustomDecl
 
 logger = logging.getLogger(__name__)
 
-class User(CustomDeclarativeBase):
-
-    __tablename__ = "user"
+class UserVersion(CustomDeclarativeBase):
+    __tablename__ = "user_version"
 
     # primary key column
-    user_id = Column(Integer, nullable=False)
+    user_version_id = Column(Integer, nullable=False)
+
+    user_id = Column(Integer,
+        ForeignKey("user.user_id",
+            name="FK-user_version-user_id-user-user_id"),
+        nullable=False)
 
     as_of = Column(ArrowType, nullable=False)
 
-    # telegram fields
-    tg_user_id = Column(Integer, nullable=False)
     first_name = Column(Unicode(length=100), nullable=True)
     last_name = Column(Unicode(length=100), nullable=True)
     user_name = Column(Unicode(length=100), nullable=False)
@@ -42,12 +44,9 @@ class User(CustomDeclarativeBase):
         region=constants.PHONE_NUMBER_DEFAULT_REGION,
         max_length=constants.PHONE_NUMBER_MAX_LENGTH), nullable=True)
 
-    # i don't really care about the status so i won't store it, or have a UserStatus type really
-    # status = Column()
-
     profile_photo_set_id= Column(Integer,
         ForeignKey("photo_set.photo_set_id",
-            name="FK-user-profile_photo_set_id-photo_set-photo_set_id"), nullable=True)
+            name="FK-user_version-profile_photo_set_id-photo_set-photo_set_id"), nullable=True)
 
     profile_photo_set = relationship("ProfilePhotoSet", back_populates="user")
 
@@ -63,12 +62,31 @@ class User(CustomDeclarativeBase):
 
     language_code = Column(Unicode(length=20), nullable=True)
 
+    user = relationship("User", back_populates="versions")
+
+    __table_args__ = (
+        PrimaryKeyConstraint("user_version_id", name="PK-user_version-user_version_id"),
+
+        Index("IXUQ-user_version-user_id-as_of", "user_id", "as_of", unique=True),
+        Index("IX-user_version-phone_number", "phone_number"),
+        Index("IX-user_version-user_type", "user_type"),
+    )
+
+
+class User(CustomDeclarativeBase):
+
+    __tablename__ = "user"
+
+    # primary key column
+    user_id = Column(Integer, nullable=False)
+
+    tg_user_id = Column(Integer, nullable=False)
+
+    versions = relationship("UserVersion", back_populates="user")
+
     __table_args__ = (
         PrimaryKeyConstraint("user_id", name="PK-user-user_id"),
         Index("IX-user-tg_user_id", "tg_user_id"),
-        Index("IXUQ-user-tg_user_id-as_of", "tg_user_id", "as_of", unique=True),
-        Index("IX-user-phone_number", "phone_number"),
-        Index("IX-user-user_type", "user_type"),
     )
 
 
@@ -168,7 +186,7 @@ class ProfilePhotoSet(PhotoSet):
     # this is the id of the profile photo within telegram, used to access to the profile photo later
     tg_id = Column(Integer, nullable=False)
 
-    user = relationship("User", back_populates="profile_photo_set")
+    user_version = relationship("UserVersion", back_populates="profile_photo_set")
 
     # using `uselist` here becuase it is returning a list instead of a single item
     # i believe this is because technically this is a one to many (one photo set -> many photos) but
@@ -230,6 +248,7 @@ class ChatVersion(CustomDeclarativeBase):
 
     __tablename__ = 'chat_version'
 
+    # primary key column
     chat_version_id = Column(Integer, nullable=False)
 
     chat_id = Column(Integer,
@@ -250,6 +269,7 @@ class ChatVersion(CustomDeclarativeBase):
 
     is_sponsored = Column(Boolean, nullable=False)
 
+    chat = relationship("Chat", back_populates="versions")
 
     __table_args__ = (
         PrimaryKeyConstraint("chat_version_id",name="PK-chat_version-chat_version_id"),
@@ -269,7 +289,7 @@ class Chat(CustomDeclarativeBase):
 
     tg_chat_id = Column(Integer, nullable=False)
 
-    versions = relationship("ChatVersion")
+    versions = relationship("ChatVersion", back_populates="chat")
 
     __table_args__ = (
         PrimaryKeyConstraint("chat_id",name="PK-chat-chat_id"),
