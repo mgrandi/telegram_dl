@@ -127,7 +127,7 @@ class DbModelEqualityTester:
         result_remote_file_id = file_arg.tdl_file.remote_file_id == file_arg.tdg_file.remote.id
         result_remote_unique_id = file_arg.tdl_file.remote_unique_id == file_arg.tdg_file.remote.unique_id
 
-        logger_file.debug("remote id: `%s`, remote unique id", result_remote_file_id, result_remote_unique_id)
+        logger_file.debug("remote id: `%s`, remote unique id: `%s`", result_remote_file_id, result_remote_unique_id)
 
         final_result = result_remote_unique_id and result_remote_file_id
 

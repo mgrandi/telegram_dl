@@ -106,7 +106,8 @@ class InsertOrUpdateHandler:
             new_file = db_model.File(tg_file_id=object_to_handle.id,
                 size=object_to_handle.size,
                 expected_size=object_to_handle.expected_size,
-                remote_file_id=object_to_handle.remote.id)
+                remote_file_id=object_to_handle.remote.id,
+                remote_unique_id=object_to_handle.remote.unique_id if object_to_handle.remote.unique_id else None)
 
             change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
 
