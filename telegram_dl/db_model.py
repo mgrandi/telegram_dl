@@ -293,8 +293,6 @@ class PrivateChat(Chat):
 
     # the "other" user this private chat is with
     user_id = Column(Integer,
-        ForeignKey("user.user_id",
-            name="FK-private_chat-user_id-user-user_id"),
         nullable=False)
 
     __mapper_args__ = {

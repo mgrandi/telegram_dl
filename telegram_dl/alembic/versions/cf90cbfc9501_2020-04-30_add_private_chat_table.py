@@ -25,10 +25,6 @@ def upgrade():
             ['private_chat_id'],
             ['chat.chat_id'],
             name='FK-private_chat-private_chat_id-chat-chat_id'),
-        sa.ForeignKeyConstraint(
-            ['user_id'],
-            ['user.user_id'],
-            name='FK-private_chat-user_id-user-user_id'),
         sa.PrimaryKeyConstraint(
             'private_chat_id',
              name='PK-private_chat-private_chat_id')

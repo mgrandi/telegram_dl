@@ -85,6 +85,96 @@ class InsertOrUpdateHandler:
 
 
     @handle_insert_or_update.register
+    async def chat(self, object_to_handle:tdlib_generated.chat, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
+
+
+        # chats are versioned
+
+        session = params.session
+
+        # so here, we are seeing if we have the chat already saved
+        # it seems that in telegram's ongoing effort to be forward compatable, the IDs for all chats are
+        # within the same namespace even though their 'specific' id (for that chat type) is different
+        # see `ID notes` in `chat notes.md`
+        maybe_existing = session.query(db_model.Chat) \
+            .filter(db_model.Chat.tg_chat_id == object_to_handle.id) \
+            .first()
+
+
+        # TODO: IMPLEMENT
+        is_equal = True
+
+        change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
+
+        if not maybe_existing or not is_equal:
+
+            # chat doesn't exist add it
+
+            profile_photo_set_result = await self.handle_insert_or_update(object_to_handle.photo, params)
+
+            # parameters that fit all `chat` types, since this table is polymorphic
+            instance_parameters_dict = dict(
+                tg_chat_id=object_to_handle.id,
+                title=object_to_handle.title,
+                is_sponsored=object_to_handle.is_sponsored,
+                photo_set=profile_photo_set_result.obj if profile_photo_set_result else None)
+
+
+            chat_type = object_to_handle.type
+
+            result_chat = None
+
+            if isinstance(chat_type, tdlib_generated.chatTypeBasicGroup):
+
+                instance_parameters_dict["tg_basic_group_id"] = chat_type.basic_group_id
+
+                result_chat = db_model.BasicGroupChat(**instance_parameters_dict)
+
+            elif isinstance(chat_type, tdlib_generated.chatTypePrivate):
+
+                instance_parameters_dict["user_id"] = chat_type.user_id
+
+                result_chat = db_model.PrivateChat(**instance_parameters_dict)
+
+            elif isinstance(chat_type, tdlib_generated.chatTypeSecret):
+
+                instance_parameters_dict["user_id"] = chat_type.user_id
+                instance_parameters_dict["tg_secret_chat_id"] = chat_type.secret_chat_id
+
+                result_chat = db_model.SecretChat(**instance_parameters_dict)
+
+            elif isinstance(chat_type, tdlib_generated.chatTypeSupergroup):
+
+                instance_parameters_dict["tg_super_group_id"] = chat_type.supergroup_id
+                instance_parameters_dict["is_channel"] = chat_type.is_channel
+
+                result_chat = db_model.SuperGroupChat(**instance_parameters_dict)
+
+            else:
+
+                insert_or_update_logger.error("chat: Unrecognized chat type? we got: `%s`", object_to_handle)
+
+                return InsertOrUpdateResult(obj=None, change=dbe.DatabaseChangeEnum.NO_CHANGE)
+
+
+            insert_or_update_logger.info("chat: adding `%s` object `%s` to session with change: `%s`",
+                type(result_chat), result_chat, change)
+
+            session.add(result_chat)
+
+            return InsertOrUpdateResult(obj=result_chat, change=change)
+
+        else:
+
+            # chat already exists
+            insert_or_update_logger.debug("chat: not adding db_model.Chat object `%s` because it already exists and hasn't changed",
+                 object_to_handle)
+
+            return InsertOrUpdateResult(obj=maybe_existing, change=dbe.DatabaseChangeEnum.NO_CHANGE)
+
+
+
+    @handle_insert_or_update.register
     async def file(self, object_to_handle:tdlib_generated.file, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
 
 
@@ -124,6 +214,68 @@ class InsertOrUpdateHandler:
                  object_to_handle)
 
             return InsertOrUpdateResult(obj=maybe_existing, change=dbe.DatabaseChangeEnum.NO_CHANGE)
+
+
+    @handle_insert_or_update.register
+    async def chat_photo(self, incoming_profile_photo:tdlib_generated.chatPhoto, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
+        '''
+        basically copied from `profile_photo`, except chatPhoto does not have an `id`
+
+        chat photos should be unique
+
+        '''
+
+        session = params.session
+
+        # see if it exists
+
+        # see if the big and small files exist
+        big_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.big, params)
+        small_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.small, params)
+
+        if big_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE and \
+            small_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE:
+
+            # files already exist, return the profile_photo_set that already exists
+
+            existing_photo_set = session.query(db_model.PhotoSet) \
+                .join(db_model.Photo) \
+                .filter(db_model.Photo.file_id == big_photo_file_result.obj.file_id) \
+                .first()
+
+            insert_or_update_logger.debug("chat_photo: not adding db_model.PhotoSet object `%s` because it already exists or hasn't changed",
+                existing_photo_set)
+
+            return InsertOrUpdateResult(obj=existing_photo_set, change=dbe.DatabaseChangeEnum.NO_CHANGE)
+
+        else:
+
+            # files are new, so we need to create a Photo for each and then a PhotoSet,
+            # then return the ProfilePhotoSet
+            new_photo_set = db_model.PhotoSet()
+
+            big_photo = db_model.Photo(
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG,
+                width=-1,
+                height=-1,
+                has_stickers=False,
+                file=big_photo_file_result.obj)
+
+            small_photo = db_model.Photo(
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL,
+                width=-1,
+                height=-1,
+                has_stickers=False,
+                file=small_photo_file_result.obj)
+
+            new_photo_set.photos.append(big_photo)
+            new_photo_set.photos.append(small_photo)
+
+            insert_or_update_logger.info("chat_photo: adding db_model.PhotoSet object `%s` to session with change: `%s`",
+                new_photo_set, dbe.DatabaseChangeEnum.NEW)
+
+            return InsertOrUpdateResult(obj=new_photo_set, change=dbe.DatabaseChangeEnum.NEW)
+
 
     @handle_insert_or_update.register
     async def profile_photo(self, incoming_profile_photo:tdlib_generated.profilePhoto, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:

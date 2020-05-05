@@ -144,6 +144,48 @@ bool  is_channel_
 
 ```
 
+## ID notes
+
+### private chat
+`chat` id: `123`
+`private` chat id: `123`
+no change
+
+### supergroup chat
+`chat` id: `-1001048770404`
+`supergroup` chat id: `1048770404`
+
+TODO FIGURE OUT
+
+it might be bitshifting it?
+
+```
+base
+      10597257
+chatid
+-1000010597257
+
+base
+    1048770404
+chatid
+-1001048770404
+
+
+base
+    1266163180
+chatid
+-1001266163180
+
+```
+
+looks like the length of the ID is the same and it just fills in the rest with zeros
+
+### basic group chat
+`chat` id: `-123`
+`private` chat id: `123`
+you multiply the base chat id by -1
+
+
 ## database layout notes
 
 Chat
@@ -201,7 +243,8 @@ SecretChat(Chat)
 
 Notice how the chat's ID is `-356102` but then the `chatTypeBasicGroup.basic_group_id` is `356102`
 
-so i guess to get the 'general chat' id for a basic group, it is  `-1` + `chatTypeSupergroup.supergroup_id` (as strings)
+see `ID notes` for more info
+
 ```json
 {
   "_extra": null,
@@ -409,7 +452,7 @@ std::int32_t  user_id_
 
 Notice how the chat's ID is `-1000010597257` but then the `chatTypeSupergroup.supergroup_id` is `10597257`
 
-so i guess to get the 'general chat' id for a supergroup, it is  `-10000` + `chatTypeSupergroup.supergroup_id` (as strings)
+see `ID notes` for more information
 
 ```json
 {

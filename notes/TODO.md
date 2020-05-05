@@ -2,6 +2,9 @@
 
 TODO:
 
+so stuff like private_chat has a user_id that chat is with, i used to have that foreign key to
+user.user_id but that isn't the same value, user_id is the primary key auto increment and tg_user_id is the actual telegram user id, i CAN foreign key it to the correct column (private_chat.user_id -> user.tg_user_id) but then user has multiple entries PER user since it has as_of, will this evne work? do i make a association table or something to handle this? Like a table that is just `User table, user_id, tg_user_id`, and then that pk will go to go to a new table, `user_versions` or something?? this probably also is a thing for 'all' versioned tables i am going to have
+
 for our connection open listener, `sqlalchemy_pool_on_connect_listener`, that only works if we are using sqlite
 as a database, we should probably check to make sure we are using sqlite before attaching that listener, aka in
 application.py
