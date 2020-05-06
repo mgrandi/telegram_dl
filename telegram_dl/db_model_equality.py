@@ -206,7 +206,6 @@ class DbModelEqualityTester:
 
         '''
 
-
         if user_arg.tdl_user is None or user_arg.tdg_user is None:
             logger_user.debug("one of the args is None, doing fast comparison")
 
@@ -216,42 +215,52 @@ class DbModelEqualityTester:
 
             return fast_result
 
+        if len(user_arg.tdl_user.versions) == 0:
+            logger_user.debug("returning False because User exists but has no versions")
+            return False
 
-        user_comparison = user_arg.tdg_user is not None \
+        # get the latest version
+
+        # should be sorted by ascending so the LAST index is the latest
+
+        latest_version = user_arg.tdl_user.versions[-1]
+
+
+        user_version_comparison = user_arg.tdg_user is not None \
             and isinstance(user_arg.tdg_user, tdg.user) \
             and user_arg.tdl_user.tg_user_id == user_arg.tdg_user.id \
-            and user_arg.tdl_user.first_name == user_arg.tdg_user.first_name \
-            and user_arg.tdl_user.last_name == user_arg.tdg_user.last_name \
-            and user_arg.tdl_user.user_name == user_arg.tdg_user.username \
-            and user_arg.tdl_user.is_contact == user_arg.tdg_user.is_contact \
-            and user_arg.tdl_user.is_mutual_contact == user_arg.tdg_user.is_mutual_contact \
-            and user_arg.tdl_user.is_verified == user_arg.tdg_user.is_verified \
-            and user_arg.tdl_user.is_support == user_arg.tdg_user.is_support \
-            and user_arg.tdl_user.restriction_reason == user_arg.tdg_user.restriction_reason \
-            and user_arg.tdl_user.is_scam == user_arg.tdg_user.is_scam \
-            and user_arg.tdl_user.have_access == user_arg.tdg_user.have_access \
-            and user_arg.tdl_user.user_type == dbme.UserTypeEnum.parse_from_tdg_usertype(user_arg.tdg_user.type) \
-            and user_arg.tdl_user.language_code == user_arg.tdg_user.language_code
+            and latest_version.first_name == user_arg.tdg_user.first_name \
+            and latest_version.last_name == user_arg.tdg_user.last_name \
+            and latest_version.user_name == user_arg.tdg_user.username \
+            and latest_version.is_contact == user_arg.tdg_user.is_contact \
+            and latest_version.is_mutual_contact == user_arg.tdg_user.is_mutual_contact \
+            and latest_version.is_verified == user_arg.tdg_user.is_verified \
+            and latest_version.is_support == user_arg.tdg_user.is_support \
+            and latest_version.restriction_reason == user_arg.tdg_user.restriction_reason \
+            and latest_version.is_scam == user_arg.tdg_user.is_scam \
+            and latest_version.have_access == user_arg.tdg_user.have_access \
+            and latest_version.user_type == dbme.UserTypeEnum.parse_from_tdg_usertype(user_arg.tdg_user.type) \
+            and latest_version.language_code == user_arg.tdg_user.language_code
 
         # check to see if there
         profile_photo_arg = EqualityArgumentProfilePhoto(
-            tdl_profile_photo_set=user_arg.tdl_user.profile_photo_set,
+            tdl_profile_photo_set=latest_version.profile_photo_set,
             tdg_profile_photo=user_arg.tdg_user.profile_photo)
         profilephoto_result = self.is_equal(profile_photo_arg)
 
         # handle where we get a str from telegram but a Phonenumber object from the database
         # or the user has no phone number at all
         phone_args = EqualityArgumentPhoneNumber(
-            phonenumbers_lib_obj=user_arg.tdl_user.phone_number,
+            phonenumbers_lib_obj=latest_version.phone_number,
             str_phonenumber=user_arg.tdg_user.phone_number)
 
         phoneno_result = self.is_equal(phone_args)
 
 
-        final = user_comparison and profilephoto_result and phoneno_result
+        final = user_version_comparison and profilephoto_result and phoneno_result
 
         if not final:
-            logger_user.debug("equals_tdg: user result: `%s`, profile photo result: `%s`, phone # result: `%s`",
-                user_comparison, profilephoto_result, phoneno_result)
+            logger_user.debug("user result: `%s`, profile photo result: `%s`, phone # result: `%s`",
+                user_version_comparison, profilephoto_result, phoneno_result)
 
         return final

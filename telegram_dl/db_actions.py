@@ -362,57 +362,93 @@ class InsertOrUpdateHandler:
 
         # users are versioned
 
+        async def _new_version_from_tdlib_user(tdlib_user:tdlib_generated.user) -> db_model.UserVersion:
+            ''' helper function to create a UserVersion
+
+            @param tdlib_user the tdlib user to copy info from
+            @return the UserVersion model object
+            '''
+
+            # add the + sign so it parses correctly
+            fixed_phone_number = utils.fix_phone_number(tdlib_user.phone_number) if tdlib_user.phone_number else ""
+
+            profile_photo_set_result = await self.handle_insert_or_update(tdlib_user.profile_photo, params)
+
+            new_version = db_model.UserVersion(
+                as_of=arrow.utcnow(),
+                first_name=tdlib_user.first_name,
+                last_name=tdlib_user.last_name,
+                user_name=tdlib_user.username,
+                phone_number=fixed_phone_number,
+                is_contact=True if tdlib_user.is_contact == 1 else False,
+                is_mutual_contact=True if tdlib_user.is_mutual_contact == 1 else False,
+                profile_photo_set=profile_photo_set_result.obj if profile_photo_set_result is not None else None,
+                is_verified=tdlib_user.is_verified,
+                is_support=tdlib_user.is_support,
+                restriction_reason=tdlib_user.restriction_reason,
+                is_scam=tdlib_user.is_scam,
+                have_access=tdlib_user.have_access,
+                user_type=dbe.UserTypeEnum.parse_from_tdg_usertype(tdlib_user.type),
+                language_code=tdlib_user.language_code)
+
+            return new_version
+
         # see if this user version exists
-        maybe_existing = session.query(db_model.User) \
+        maybe_existing_user = session.query(db_model.User) \
             .filter(db_model.User.tg_user_id == incoming_user.id) \
-            .order_by(desc(db_model.User.as_of)) \
             .first()
 
+        change = None
+
+        if not maybe_existing_user:
+
+            # create a new user
+            new_user = db_model.User(tg_user_id=incoming_user.id)
+
+            new_version = await _new_version_from_tdlib_user(incoming_user)
+
+            new_user.versions.append(new_version)
+
+            change = dbe.DatabaseChangeEnum.NEW if maybe_existing_user == None else dbe.DatabaseChangeEnum.UPDATED
+
+            insert_or_update_logger.info("user:adding new db_model.User object `%s` and new db_model.UserVersion `%s` to session with change: `%s`",
+                new_user, new_version, change)
+            session.add(new_user)
+
+            return InsertOrUpdateResult(obj=new_user, change=change)
+
+
+        # see if we need a new version?
+
         user_args = db_model_equality.EqualityArgumentUser(
-            tdl_user=maybe_existing,
+            tdl_user=maybe_existing_user,
             tdg_user=incoming_user)
 
         is_equal = equality_tester.is_equal(user_args)
 
-        if not maybe_existing or not is_equal:
+        if not is_equal:
 
-            # create a new user
+            # user exists but we need a new version
+            new_version = await _new_version_from_tdlib_user(incoming_user)
 
-            # add the + sign so it parses correctly
-            fixed_phone_number = utils.fix_phone_number(incoming_user.phone_number) if incoming_user.phone_number else ""
+            maybe_existing_user.versions.append(new_version)
 
-            profile_photo_set_result = await self.handle_insert_or_update(incoming_user.profile_photo, params)
+            change =  dbe.DatabaseChangeEnum.UPDATED
 
-            new_user = db_model.User(
-                as_of=arrow.utcnow(),
-                tg_user_id=incoming_user.id,
-                first_name=incoming_user.first_name,
-                last_name=incoming_user.last_name,
-                user_name=incoming_user.username,
-                phone_number=fixed_phone_number,
-                is_contact=True if incoming_user.is_contact == 1 else False,
-                is_mutual_contact=True if incoming_user.is_mutual_contact == 1 else False,
-                profile_photo_set=profile_photo_set_result.obj if profile_photo_set_result is not None else None,
-                is_verified=incoming_user.is_verified,
-                is_support=incoming_user.is_support,
-                restriction_reason=incoming_user.restriction_reason,
-                is_scam=incoming_user.is_scam,
-                have_access=incoming_user.have_access,
-                user_type=dbe.UserTypeEnum.parse_from_tdg_usertype(incoming_user.type),
-                language_code=incoming_user.language_code)
+            insert_or_update_logger.info("user: adding new db_model.UserVersion object `%s`  to existing db_model.User `%s`, to session with change: `%s`",
+                new_version, maybe_existing_user, change)
 
+            session.add(maybe_existing_user)
 
-            change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
-
-            insert_or_update_logger.info("user: adding db_model.User object `%s` to session with change: `%s`", new_user, change)
-            session.add(new_user)
-
-            return InsertOrUpdateResult(obj=new_user, change=change)
+            return InsertOrUpdateResult(obj=maybe_existing_user, change=change)
 
         else:
 
             # don't create a new user, old and new one match
 
-            insert_or_update_logger.debug("user: not adding db_model.User object `%s` because it already exists or hasn't changed",
-                incoming_user)
-            return InsertOrUpdateResult(obj=maybe_existing, change=dbe.DatabaseChangeEnum.NO_CHANGE)
+            insert_or_update_logger.debug("user: not adding new db_model.UserVersion object for db_model.User `%s` because the latest version hasn't changed",
+                maybe_existing_user)
+
+            change = dbe.DatabaseChangeEnum.NO_CHANGE
+
+            return InsertOrUpdateResult(obj=maybe_existing_user, change=change)

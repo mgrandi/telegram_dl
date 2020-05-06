@@ -48,7 +48,7 @@ class UserVersion(CustomDeclarativeBase):
         ForeignKey("photo_set.photo_set_id",
             name="FK-user_version-profile_photo_set_id-photo_set-photo_set_id"), nullable=True)
 
-    profile_photo_set = relationship("ProfilePhotoSet", back_populates="user")
+    profile_photo_set = relationship("ProfilePhotoSet", back_populates="user_version")
 
     is_contact = Column(Boolean, nullable=False)
     is_mutual_contact = Column(Boolean, nullable=False)
@@ -82,7 +82,9 @@ class User(CustomDeclarativeBase):
 
     tg_user_id = Column(Integer, nullable=False)
 
-    versions = relationship("UserVersion", back_populates="user")
+    # has an ascending orderby on 'UserVersion.as_of', so the earliest versions are first,
+    # latest are last
+    versions = relationship("UserVersion", order_by="asc(UserVersion.as_of)", back_populates="user")
 
     __table_args__ = (
         PrimaryKeyConstraint("user_id", name="PK-user-user_id"),
