@@ -146,45 +146,77 @@ bool  is_channel_
 
 ## ID notes
 
-### private chat
-`chat` id: `123`
-`private` chat id: `123`
-no change
+So, it seems that for the sake of forward compatbility, when telegram first started
+there probably weren't groups, just users, so `chat` only had `chat.id` to distinguish
+chats
 
-### supergroup chat
-`chat` id: `-1001048770404`
-`supergroup` chat id: `1048770404`
+but then basic groups, super groups and secret chats got added, and those have their
+own identifiers, but if stuff is still only looking at `chat.id` , how will they distinguish
+the chat/groups?
 
-TODO FIGURE OUT
+so it seems that they change the `chat.id` in predictable ways for groups and super groups:
 
-it might be bitshifting it?
+### chatTypeBasicGroup
 
-```
-base
-      10597257
-chatid
+chat.id: `-356102`
+chat.type.basic_group_id: `356102`
+
+#### discussion
+
+seems to be just multiplying it by -1
+
+### chatTypePrivate
+
+chat.id: `678406`
+chat.type.user_id: `678406`
+
+### chatTypeSecret
+
+don't have a secret chat yet to test
+
+### chatTypeSupergroup
+
+chat.id: `-1000010597257`
+chat.type.supergroup_id: `10597257`
+
+#### discussion
+
+the `chat.id` identifier is always 14 characters long, with `-1` taking up the leading two,
+and the rest is padded (on the left) with zeroes
+
+so it is just adding `1000000000000` to the ID then multiplying by -1?
+
+```python3
+
+# chat.id = 10597257
+# chat.type.supergroup_id = -1000010597257
+>>> orig = 10597257
+>>> (orig + 1000000000000) * -1
 -1000010597257
 
-base
-    1048770404
-chatid
+
+# chat.id = 1048770404
+# chat.type.supergroup_id = -1001048770404
+>>> orig = 1048770404
+>>> (orig + 1000000000000) * -1
 -1001048770404
 
-
-base
-    1266163180
-chatid
+# chat.id = 1266163180
+# chat.type.supergroup_id = -1001266163180
+>>> orig = 1266163180
+>>> (orig + 1000000000000) * -1
 -1001266163180
 
 ```
-
-looks like the length of the ID is the same and it just fills in the rest with zeros
 
 ### basic group chat
 `chat` id: `-123`
 `private` chat id: `123`
 you multiply the base chat id by -1
 
+### secret chat
+
+haven't gotten a secret chat yet on `telegram_dl` so i can't tell
 
 ## database layout notes
 
