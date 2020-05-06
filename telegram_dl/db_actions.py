@@ -90,6 +90,25 @@ class InsertOrUpdateHandler:
 
         # chats are versioned
 
+
+        async def _new_version_from_tdlib_chat(tdlib_chat:tdlib_generated.chat) -> db_model.ChatVersion:
+            ''' helper function to create a new ChatVersion from a `chat`
+
+            @param tdlib_chat - the chat to copy the information from
+            @return the new ChatVersion object
+            '''
+
+            profile_photo_set_result = await self.handle_insert_or_update(object_to_handle.photo, params)
+
+            new_ver = db_model.ChatVersion(
+                as_of=arrow.utcnow(),
+                title=tdlib_chat.title,
+                photo_set=profile_photo_set_result.obj if profile_photo_set_result else None,
+                is_sponsored=tdlib_chat.is_sponsored)
+
+            return new_ver
+
+
         session = params.session
 
         # so here, we are seeing if we have the chat already saved
@@ -100,32 +119,23 @@ class InsertOrUpdateHandler:
             .filter(db_model.Chat.tg_chat_id == object_to_handle.id) \
             .first()
 
+        change = None
 
         # get the latest ChatVersion and see if that matches what we are getting from
         # the `tdlib_generated.chat` we get passed in
         # TODO: IMPLEMENT
         is_equal = True
 
-        change = dbe.DatabaseChangeEnum.NEW if maybe_existing_chat == None else dbe.DatabaseChangeEnum.UPDATED
+        if not maybe_existing_chat:
 
-        if not maybe_existing_chat or not is_equal:
+            change = dbe.DatabaseChangeEnum.NEW
 
-            # chat doesn't exist add it
-
-            profile_photo_set_result = await self.handle_insert_or_update(object_to_handle.photo, params)
+            # chat doesn't exist, add a new Chat and one ChatVersion
 
             # parameters that fit all `chat` types, since this table is polymorphic
             chat_instance_parameters_dict = dict(
                 tg_chat_id=object_to_handle.id,
             )
-
-            chat_version_instance_parameters_dict = dict(
-                as_of=arrow.utcnow(),
-                title=object_to_handle.title,
-                photo_set=profile_photo_set_result.obj if profile_photo_set_result else None,
-                is_sponsored=object_to_handle.is_sponsored,
-            )
-
 
             chat_type = object_to_handle.type
 
@@ -174,21 +184,38 @@ class InsertOrUpdateHandler:
 
             # create the chat_version and add it to whatever type of chat we get back from the
             # if/else statement
-            tmp_chat_ver = db_model.ChatVersion(**chat_version_instance_parameters_dict)
+            tmp_chat_ver = await _new_version_from_tdlib_chat(object_to_handle)
             result_chat.versions.append(tmp_chat_ver)
 
-            insert_or_update_logger.info("chat: adding `%s` object `%s` to session with change: `%s`",
-                type(result_chat), result_chat, change)
+            insert_or_update_logger.info("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
+                tmp_chat_ver, type(result_chat), result_chat, change)
 
             session.add(result_chat)
 
             return InsertOrUpdateResult(obj=result_chat, change=change)
 
+        if not is_equal:
+
+            # chat already exists, but we need to add a new version
+
+            new_version = await _new_version_from_tdlib_chat(object_to_handle)
+
+            change = dbe.DatabaseChangeEnum.UPDATED
+
+            maybe_existing_chat.versions.append(new_version)
+
+            insert_or_update_logger.info("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
+                new_version, type(maybe_existing_chat), maybe_existing_chat, change)
+
+            session.add(maybe_existing_chat)
+
+            return InsertOrUpdateResult(obj=maybe_existing_chat, change=change)
+
         else:
 
             # chat already exists
-            insert_or_update_logger.debug("chat: not adding db_model.Chat object `%s` because it already exists and hasn't changed",
-                 object_to_handle)
+            insert_or_update_logger.debug("chat: not adding db_model.ChatVersion object to db_model.Chat `%s` because it already exists and hasn't changed",
+                 maybe_existing_chat)
 
             return InsertOrUpdateResult(obj=maybe_existing_chat, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
@@ -409,7 +436,7 @@ class InsertOrUpdateHandler:
 
             new_user.versions.append(new_version)
 
-            change = dbe.DatabaseChangeEnum.NEW if maybe_existing_user == None else dbe.DatabaseChangeEnum.UPDATED
+            change = dbe.DatabaseChangeEnum.NEW
 
             insert_or_update_logger.info("user:adding new db_model.User object `%s` and new db_model.UserVersion `%s` to session with change: `%s`",
                 new_user, new_version, change)
