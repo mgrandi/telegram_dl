@@ -337,7 +337,11 @@ class PrivateChat(Chat):
 
     # the "other" user this private chat is with
     user_id = Column(Integer,
+        ForeignKey("user.user_id",
+            name="FK-private_chat-user_id-user-user_id"),
         nullable=False)
+
+    user = relationship("User")
 
     __mapper_args__ = {
             'polymorphic_identity': dbme.ChatPolymorphicTableEnum.PRIVATE_CHAT.value,
@@ -394,6 +398,9 @@ class SecretChat(Chat):
         ForeignKey("user.user_id",
             name="FK-secret_chat-user_id-user-user_id"),
         nullable=False)
+
+    user = relationship("User")
+
 
     __mapper_args__ = {
             'polymorphic_identity': dbme.ChatPolymorphicTableEnum.SECRET_CHAT.value,

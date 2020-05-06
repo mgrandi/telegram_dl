@@ -140,13 +140,21 @@ class InsertOrUpdateHandler:
 
             elif isinstance(chat_type, tdlib_generated.chatTypePrivate):
 
-                chat_instance_parameters_dict["user_id"] = chat_type.user_id
+                other_user = session.query(db_model.User) \
+                    .filter(db_model.User.tg_user_id == chat_type.user_id) \
+                    .one()
+
+                chat_instance_parameters_dict["user"] = other_user
 
                 result_chat = db_model.PrivateChat(**chat_instance_parameters_dict)
 
             elif isinstance(chat_type, tdlib_generated.chatTypeSecret):
 
-                chat_instance_parameters_dict["user_id"] = chat_type.user_id
+                other_secret_user = session.query(db_model.User) \
+                    .filter(db_model.User.tg_user_id == chat_type.secret_user_id) \
+                    .one()
+
+                chat_instance_parameters_dict["user"] = other_secret_user
                 chat_instance_parameters_dict["tg_secret_chat_id"] = chat_type.secret_chat_id
 
                 result_chat = db_model.SecretChat(**chat_instance_parameters_dict)

@@ -21,10 +21,17 @@ def upgrade():
     op.create_table('private_chat',
         sa.Column('private_chat_id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
+
         sa.ForeignKeyConstraint(
             ['private_chat_id'],
             ['chat.chat_id'],
             name='FK-private_chat-private_chat_id-chat-chat_id'),
+
+        sa.ForeignKeyConstraint(
+            ['user_id'],
+            ['user.user_id'],
+            name='FK-private_chat-user_id-user-user_id'),
+
         sa.PrimaryKeyConstraint(
             'private_chat_id',
              name='PK-private_chat-private_chat_id')
