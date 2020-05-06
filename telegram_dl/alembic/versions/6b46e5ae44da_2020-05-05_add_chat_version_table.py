@@ -50,7 +50,6 @@ def upgrade():
             unique=True)
 
 
-
 def downgrade():
 
     with op.batch_alter_table('chat_version', schema=None) as batch_op:
