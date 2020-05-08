@@ -54,6 +54,87 @@ is a `content` member that is of type `MessageContent`
 `messageVoiceNote`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_voice_note.html
 
 
+## message docs copy and paste
+
+```plaintext
+std::int64_t  id_
+  Message identifier, unique for the chat to which the message belongs.
+
+std::int32_t  sender_user_id_
+  Identifier of the user who sent the message; 0 if unknown. Currently, it is unknown for channel posts and for channel posts automatically forwarded to discussion group.
+
+std::int64_t  chat_id_
+  Chat identifier.
+
+object_ptr< MessageSendingState >   sending_state_
+  Information about the sending state of the message; may be null.
+
+object_ptr< MessageSchedulingState >  scheduling_state_
+  Information about the scheduling state of the message; may be null.
+
+bool  is_outgoing_
+  True, if the message is outgoing.
+
+bool  can_be_edited_
+  True, if the message can be edited. For live location and poll messages this fields shows whether editMessageLiveLocation or stopPoll can be used with this message by the client.
+
+bool  can_be_forwarded_
+  True, if the message can be forwarded.
+
+bool  can_be_deleted_only_for_self_
+  True, if the message can be deleted only for the current user while other users will continue to see it.
+
+bool  can_be_deleted_for_all_users_
+  True, if the message can be deleted for all users.
+
+bool  is_channel_post_
+  True, if the message is a channel post. All messages to channels are channel posts, all other messages are not channel posts.
+
+bool  contains_unread_mention_
+  True, if the message contains an unread mention for the current user.
+
+std::int32_t  date_
+  Point in time (Unix timestamp) when the message was sent.
+
+std::int32_t  edit_date_
+  Point in time (Unix timestamp) when the message was last edited.
+
+object_ptr< messageForwardInfo >  forward_info_
+  Information about the initial message sender; may be null.
+
+std::int64_t  reply_to_message_id_
+  If non-zero, the identifier of the message this message is replying to; can be the identifier of a deleted message.
+
+std::int32_t  ttl_
+  For self-destructing messages, the message's TTL (Time To Live), in seconds; 0 if none. TDLib will send updateDeleteMessages or updateMessageContent once the TTL expires.
+
+double  ttl_expires_in_
+  Time left before the message expires, in seconds.
+
+std::int32_t  via_bot_user_id_
+  If non-zero, the user identifier of the bot through which this message was sent.
+
+std::string   author_signature_
+  For channel posts, optional author signature.
+
+std::int32_t  views_
+  Number of times this message was viewed.
+
+std::int64_t  media_album_id_
+  Unique identifier of an album this message belongs to. Only photos and videos can be grouped together in albums.
+
+std::string   restriction_reason_
+  If non-empty, contains a human-readable description of the reason why access to this message must be restricted.
+
+object_ptr< MessageContent >  content_
+  Content of the message.
+
+object_ptr< ReplyMarkup >   reply_markup_
+  Reply markup for the message; may be null.
+
+```
+
+
 ## stuff messages contain
 
 `photo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1photo.html
@@ -61,8 +142,6 @@ is a `content` member that is of type `MessageContent`
 `messageForwardInfo`: https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1message_forward_info.html
 
 ## message content
-
-
 
 ### `messageAnimation`
 
@@ -1473,3 +1552,195 @@ these are GIFS, if you right click a gif and click "save to gifs" it calls `upda
 
 
 
+
+## database layout
+
+```plaintext
+message_version
+
+  as_of -> ArrowType
+
+  date
+  edit date
+
+  sending_state
+  scheduling_state
+
+  views (PROBABLY DON'T NEED)
+
+  author_signature
+
+  ttl
+
+
+
+message
+
+  VERSIONED
+
+  message_id -> integer, pk
+
+
+  sender_user_id -> integer, FK to user
+  chat_id -> integer, FK to chat
+
+  reply_to_message_id -> integer, should this be a FK? might not have the message yet?
+    can this change when the message is edited??
+
+
+  via_bot_user_id -> integer, FK to user maybe?
+
+  is_outgoing (PROBABLY DON'T NEED)
+
+  is_channel_post (PROBABLY DON'T NEED)
+
+  can_edit
+  can_forward
+
+  can_be_deleted_only_for_self
+
+  can_be_deleted_for_all_users
+
+
+  restriction_reason
+```
+
+  # STUFF THAT IS MORE COMPLEX THAN JUST A SINGLE FIELD
+
+  content
+
+  foward_info
+
+  reply_markup
+
+  media_album_id
+
+
+## editing messages
+
+### original message
+so if you send a message, you get this:
+
+```json
+{
+  "_extra": null,
+  "message": {
+    "_extra": null,
+    "id": 12582912,
+    "sender_user_id": 0,
+    "chat_id": -1001446368458,
+    "sending_state": null,
+    "scheduling_state": null,
+    "is_outgoing": true,
+    "can_be_edited": true,
+    "can_be_forwarded": true,
+    "can_be_deleted_only_for_self": false,
+    "can_be_deleted_for_all_users": true,
+    "is_channel_post": true,
+    "contains_unread_mention": false,
+    "date": 1588897698,
+    "edit_date": 0,
+    "forward_info": null,
+    "reply_to_message_id": 0,
+    "ttl": 0,
+    "ttl_expires_in": "0",
+    "via_bot_user_id": 0,
+    "author_signature": "",
+    "views": 1,
+    "media_album_id": 0,
+    "restriction_reason": "",
+    "content": {
+      "_extra": null,
+      "text": {
+        "_extra": null,
+        "text": "testing edit 1 2 3",
+        "entities": [],
+        "@type": "formattedText"
+      },
+      "web_page": null,
+      "@type": "messageText"
+    },
+    "reply_markup": null,
+    "@type": "message"
+  },
+  "@type": "updateNewMessage"
+}
+```
+
+then if you edit it, you will get probably two separate messages
+
+one will be `updateMessageContent` which seems to just contain the edit,
+the other will be just the `updateChatLastMessage` which seems like the full message
+again
+
+### edited message `updateMessageContent`
+
+```json
+{
+  "_extra": null,
+  "chat_id": -1001446368458,
+  "message_id": 12582912,
+  "new_content": {
+    "_extra": null,
+    "text": {
+      "_extra": null,
+      "text": "testing edit 1 2 3 this is an edit",
+      "entities": [],
+      "@type": "formattedText"
+    },
+    "web_page": null,
+    "@type": "messageText"
+  },
+  "@type": "updateMessageContent"
+}
+```
+
+### edited message `updateChatLastMessage`
+
+```json
+{
+  "_extra": null,
+  "chat_id": -1001446368458,
+  "last_message": {
+    "_extra": null,
+    "id": 12582912,
+    "sender_user_id": 0,
+    "chat_id": -1001446368458,
+    "sending_state": null,
+    "scheduling_state": null,
+    "is_outgoing": true,
+    "can_be_edited": true,
+    "can_be_forwarded": true,
+    "can_be_deleted_only_for_self": false,
+    "can_be_deleted_for_all_users": true,
+    "is_channel_post": true,
+    "contains_unread_mention": false,
+    "date": 1588897698,
+    "edit_date": 1588897703,
+    "forward_info": null,
+    "reply_to_message_id": 0,
+    "ttl": 0,
+    "ttl_expires_in": "0",
+    "via_bot_user_id": 0,
+    "author_signature": "",
+    "views": 1,
+    "media_album_id": 0,
+    "restriction_reason": "",
+    "content": {
+      "_extra": null,
+      "text": {
+        "_extra": null,
+        "text": "testing edit 1 2 3 this is an edit",
+        "entities": [],
+        "@type": "formattedText"
+      },
+      "web_page": null,
+      "@type": "messageText"
+    },
+    "reply_markup": null,
+    "@type": "message"
+  },
+  "order": 9221294784512000000,
+  "@type": "updateChatLastMessage"
+}
+```
