@@ -1,0 +1,28 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+*.py text eol=lf
+
+*.md text eol=lf
+
+*.json text eol=lf
+
+*.txt text eol=lf
+
+README text eol=lf
+
+*.mako text eol=lf
+
+*.ini text eol=lf
+
+*.lock text eol=lf
+
+*.sublime-project text eol=lf
+
+*.gitignore text eol=lf
+
+*.gitattributes text eol=lf
+
+*.TEMPLATE text eol=lf
+
+Pipfile text eol=lf
