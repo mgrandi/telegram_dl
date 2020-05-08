@@ -3,6 +3,13 @@
 TODO:
 
 
+Handle FullUserInfo / FullBasicGroupInfo / FullSuperGroupInfo
+
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1update_user_full_info.html
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1get_user_full_info.html
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1user_full_info.html
+
+
 make all the alembic revisions use the batch migration stuff
 
 so stuff like private_chat has a user_id that chat is with, i used to have that foreign key to
