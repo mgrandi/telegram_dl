@@ -17,6 +17,8 @@ logger_user = logger.getChild("user")
 logger_profile_photo = logger.getChild("profile_photo")
 logger_file = logger.getChild("file")
 logger_phonenumber = logger.getChild("phonenumber")
+logger_chat = logger.getChild("chat")
+logger_chat_photo = logger.getChild("chat_photo")
 
 # These case classes will be the thing that functools.singledispatchmethod
 # calls methods on, and these will basically holders for data that is the same,
@@ -26,6 +28,15 @@ logger_phonenumber = logger.getChild("phonenumber")
 class EqualityArgumentUser:
     tdl_user:db_model.User = attr.ib()
     tdg_user:tdg.user = attr.ib()
+
+@attr.s
+class EqualityArgumentChatPhoto:
+    # again, this is kinda weird as a chat photo is basically the same
+    # as a profile photo but without one field
+    # so we just use a PhotoSet here with 2 images, big and small
+
+    tdl_photo_set:db_model.PhotoSet = attr.ib()
+    tdg_chat_photo:tdg.chatPhoto = attr.ib()
 
 @attr.s
 class EqualityArgumentProfilePhoto:
@@ -47,6 +58,11 @@ class EqualityArgumentFile:
 class EqualityArgumentPhoneNumber:
     phonenumbers_lib_obj:PhoneNumber = attr.ib()
     str_phonenumber:str = attr.ib()
+
+@attr.s
+class EqualityArgumentChat:
+    tdl_chat:db_model.Chat = attr.ib()
+    tdg_chat:tdg.chat = attr.ib()
 
 class DbModelEqualityTester:
     '''
@@ -103,7 +119,6 @@ class DbModelEqualityTester:
 
         return phoneno_result
 
-
     @is_equal.register
     def is_equal_file(self, file_arg:EqualityArgumentFile) -> bool:
         '''
@@ -132,6 +147,64 @@ class DbModelEqualityTester:
         final_result = result_remote_unique_id and result_remote_file_id
 
         logger_file.debug("final result: `%s`", final_result)
+
+        return final_result
+
+
+    @is_equal.register
+    def is_equal_chat_photo(self, chat_photo_arg:EqualityArgumentChatPhoto) -> bool:
+        '''
+        Testing to see if a `db_model.Chat`s `db_model.PhotoSet` 'matches'
+        tdlib's 'chatPhoto' class
+
+        since we are abstracting a `tdg.chatPhoto` as a `db_model.PhotoSet ,
+        its slightly more complicated
+        '''
+
+        # a `tdg.chatPhoto` has 2 fields, 'big` (file), `small` (file),
+        #
+        # a db_model.PhotoSet has a collection of db_model.Photo objects,
+        # each with a reference to a db_model.File
+
+        # do fast check for None, some users don't have a profile photo or have removed it
+        # since we last checked
+        logger_chat_photo.debug("comparing `%s`", chat_photo_arg)
+
+        if chat_photo_arg.tdl_photo_set is None or \
+            chat_photo_arg.tdg_chat_photo is None:
+
+            logger_chat_photo.debug("one of the args is None, doing fast comparison")
+
+            fast_result = chat_photo_arg.tdl_photo_set == chat_photo_arg.tdg_chat_photo
+
+            logger_chat_photo.debug("fast result: `%s`", fast_result)
+
+            return fast_result
+
+        # check files
+        logger_chat_photo.debug("comparing big file")
+
+        big_photo_file_args = EqualityArgumentFile(
+            tdl_file=chat_photo_arg.tdl_photo_set.get_photos_by_thumnail_type(dbme.PhotoSizeThumbnailType.PHOTO_BIG)[0].file,
+            tdg_file=chat_photo_arg.tdg_chat_photo.big)
+
+        big_photo_comparison = self.is_equal(big_photo_file_args)
+
+        logger_chat_photo.debug("comparing small file")
+
+        small_photo_file_args = EqualityArgumentFile(
+            tdl_file=chat_photo_arg.tdl_photo_set.get_photos_by_thumnail_type(dbme.PhotoSizeThumbnailType.PHOTO_SMALL)[0].file,
+            tdg_file=chat_photo_arg.tdg_chat_photo.small)
+
+        small_photo_comparison = self.is_equal(small_photo_file_args)
+
+        logger_chat_photo.debug("big photo comparison: `%s`, small photo comparison: `%s`",
+            big_photo_comparison, small_photo_comparison)
+
+        # get final result
+        final_result = big_photo_comparison and small_photo_comparison
+
+        logger_chat_photo.debug("final result: `%s`", final_result)
 
         return final_result
 
@@ -199,6 +272,49 @@ class DbModelEqualityTester:
 
         return final_result
 
+    @is_equal.register
+    def is_equal_chat(self, chat_arg:EqualityArgumentChat) -> bool:
+
+        logger_chat.debug("comparing `%s`", chat_arg)
+
+        if chat_arg.tdl_chat is None or chat_arg.tdg_chat is None:
+            logger_chat.debug("one of the args is None, doing fast comparison")
+
+            fast_result = chat_arg.tdl_chat == chat_arg.tdg_chat
+
+            logger_chat.debug("fast result: `%s`", fast_result)
+
+            return fast_result
+
+        if len(chat_arg.tdl_chat.versions) == 0:
+            logger_chat.debug("returning False because Chat exists but has no versions")
+            return False
+
+        # get the latest version
+
+        # should be sorted by ascending so the LAST index is the latest
+
+        latest_version = chat_arg.tdl_chat.versions[-1]
+
+        chat_version_comparison = chat_arg.tdg_chat is not None \
+            and isinstance(chat_arg.tdg_chat, tdg.chat) \
+            and latest_version.chat_id == chat_arg.tdg_chat.id \
+            and latest_version.title == chat_arg.tdg_chat.title \
+            and latest_version.is_sponsored == chat_arg.tdg_chat.is_sponsored
+
+
+        chat_photo_arg = EqualityArgumentChatPhoto(
+            tdl_photo_set=latest_version.photo_set,
+            tdg_chat_photo=chat_arg.tdg_chat.photo)
+
+        chat_photo_result = self.is_equal(chat_photo_arg)
+
+        # get final result
+        final_result =  chat_version_comparison and chat_photo_result
+
+        logger_chat.debug("final result: `%s`", final_result)
+
+        return final_result
 
     @is_equal.register
     def is_equal_user(self, user_arg:EqualityArgumentUser) -> bool:

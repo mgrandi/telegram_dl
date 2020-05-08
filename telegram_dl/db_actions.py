@@ -121,11 +121,6 @@ class InsertOrUpdateHandler:
 
         change = None
 
-        # get the latest ChatVersion and see if that matches what we are getting from
-        # the `tdlib_generated.chat` we get passed in
-        # TODO: IMPLEMENT
-        is_equal = True
-
         if not maybe_existing_chat:
 
             change = dbe.DatabaseChangeEnum.NEW
@@ -193,6 +188,13 @@ class InsertOrUpdateHandler:
             session.add(result_chat)
 
             return InsertOrUpdateResult(obj=result_chat, change=change)
+
+
+        # see if the latest version matches the chat we got from telegram
+        chat_equality_args = db_model_equality.EqualityArgumentChat(
+            tdl_chat=maybe_existing_chat, tdg_chat=object_to_handle)
+
+        is_equal = equality_tester.is_equal(chat_equality_args)
 
         if not is_equal:
 
@@ -302,14 +304,14 @@ class InsertOrUpdateHandler:
             new_photo_set = db_model.PhotoSet()
 
             big_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG,
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_BIG,
                 width=-1,
                 height=-1,
                 has_stickers=False,
                 file=big_photo_file_result.obj)
 
             small_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL,
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_SMALL,
                 width=-1,
                 height=-1,
                 has_stickers=False,
@@ -360,14 +362,14 @@ class InsertOrUpdateHandler:
                 tg_id=incoming_profile_photo.id)
 
             big_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG,
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_BIG,
                 width=-1,
                 height=-1,
                 has_stickers=False,
                 file=big_photo_file_result.obj)
 
             small_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL,
+                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_SMALL,
                 width=-1,
                 height=-1,
                 has_stickers=False,

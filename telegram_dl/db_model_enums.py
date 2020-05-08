@@ -71,9 +71,13 @@ class PhotoSizeThumbnailType(enum.Enum):
     B = ("b", 320, 320, "crop")
     C = ("c", 640, 640, "crop")
     D = ("d", 1280, 1280, "crop")
-    # a profile photo doesn't have a thumbnail type so we will just make one up
-    PROFILE_PHOTO_BIG = ("ppbig", -1, -1, "profile_photo_big")
-    PROFILE_PHOTO_SMALL = ("ppsmall", -1, -1, "profile_photo_big")
+
+    # so both 'profile photo' and 'chat photo' both have big/small fields,
+    # so since they don't have any other size info, we will just have a generic
+    # big / small thumbnail type to mark them
+    PHOTO_BIG = ("pbig", -1, -1, "hoto_big")
+    PHOTO_SMALL = ("psmall", -1, -1, "photo_big")
+
 
 
 

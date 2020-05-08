@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import logging
+import typing
 
 from sqlalchemy import Column, Index, Integer, Unicode, Boolean, ForeignKey, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
@@ -174,6 +177,25 @@ class PhotoSet(CustomDeclarativeBase):
     }
 
 
+    def get_photos_by_thumnail_type(self, thumbnail_type:dbme.PhotoSizeThumbnailType) -> typing.Sequence[Photo]:
+        ''' helper method for getting the Photo object that has the
+        specifiedthumbnail_type of
+
+        @param thumbnail_type a dbme.PhotoSizeThumbnailType to match the photos against
+
+        @return a list of Photo objects, or an empty list if nothing matched
+
+        '''
+
+        result_list = []
+
+        for iter_photo in self.photos:
+            if iter_photo.thumbnail_type == thumbnail_type:
+                result_list.append(iter_photo)
+
+        return result_list
+
+
 class ProfilePhotoSet(PhotoSet):
 
     __tablename__ = 'profile_photo_set'
@@ -194,11 +216,11 @@ class ProfilePhotoSet(PhotoSet):
     # i believe this is because technically this is a one to many (one photo set -> many photos) but
     # here on `big` and `small`, we want a 1 to 1 relationship
     big = relationship("Photo",
-        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_BIG.value}' )",
+        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PHOTO_BIG.value}' )",
         uselist=False)
 
     small = relationship("Photo",
-        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PROFILE_PHOTO_SMALL.value}' )",
+        primaryjoin=f"and_(ProfilePhotoSet.photo_set_id == Photo.photo_set_id, Photo.thumbnail_type == '{dbme.PhotoSizeThumbnailType.PHOTO_SMALL.value}' )",
         uselist=False)
 
 
@@ -234,6 +256,7 @@ class Photo(CustomDeclarativeBase):
             name="FK-photo-file_id-file-file_id"), nullable=False)
 
     photo_set = relationship("PhotoSet", back_populates="photos")
+
     file = relationship("File")
 
     __table_args__ = (
@@ -291,7 +314,7 @@ class Chat(CustomDeclarativeBase):
 
     tg_chat_id = Column(Integer, nullable=False)
 
-    versions = relationship("ChatVersion", back_populates="chat")
+    versions = relationship("ChatVersion", order_by="asc(ChatVersion.as_of)", back_populates="chat")
 
     __table_args__ = (
         PrimaryKeyConstraint("chat_id",name="PK-chat-chat_id"),
