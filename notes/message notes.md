@@ -1351,12 +1351,11 @@ these are GIFS, if you right click a gif and click "save to gifs" it calls `upda
 ```json
 {
   "_extra": null,
-  "chat_id": 678406,
-  "last_message": {
+  "message": {
     "_extra": null,
-    "id": 23068672,
-    "sender_user_id": 678406,
-    "chat_id": 678406,
+    "id": 599515987968,
+    "sender_user_id": 80661419,
+    "chat_id": 80661419,
     "sending_state": null,
     "scheduling_state": null,
     "is_outgoing": true,
@@ -1366,7 +1365,7 @@ these are GIFS, if you right click a gif and click "save to gifs" it calls `upda
     "can_be_deleted_for_all_users": false,
     "is_channel_post": false,
     "contains_unread_mention": false,
-    "date": 1588226866,
+    "date": 1589260319,
     "edit_date": 0,
     "forward_info": null,
     "reply_to_message_id": 0,
@@ -1381,18 +1380,57 @@ these are GIFS, if you right click a gif and click "save to gifs" it calls `upda
       "_extra": null,
       "text": {
         "_extra": null,
-        "text": "testing 1 2 3",
-        "entities": [],
+        "text": "https://twitter.com/dril/status/107911000199671808",
+        "entities": [
+          {
+            "_extra": null,
+            "offset": 0,
+            "length": 50,
+            "type": {
+              "_extra": null,
+              "@type": "textEntityTypeUrl"
+            },
+            "@type": "textEntity"
+          }
+        ],
         "@type": "formattedText"
       },
-      "web_page": null,
+      "web_page": {
+        "_extra": null,
+        "url": "https://twitter.com/dril/status/107911000199671808",
+        "display_url": "twitter.com/dril/status/107911000199671808",
+        "type": "article",
+        "site_name": "Twitter",
+        "title": "wint",
+        "description": {
+          "_extra": null,
+          "text": "\"Is Wario A Libertarian\" - the greatest thread in the history of forums, locked by a moderator after 12,239 pages of heated debate,",
+          "entities": [],
+          "@type": "formattedText"
+        },
+        "photo": null,
+        "embed_url": "",
+        "embed_type": "",
+        "embed_width": 0,
+        "embed_height": 0,
+        "duration": 0,
+        "author": "@dril",
+        "animation": null,
+        "audio": null,
+        "document": null,
+        "sticker": null,
+        "video": null,
+        "video_note": null,
+        "voice_note": null,
+        "instant_view_version": 0,
+        "@type": "webPage"
+      },
       "@type": "messageText"
     },
     "reply_markup": null,
     "@type": "message"
   },
-  "order": 6821382448098574000,
-  "@type": "updateChatLastMessage"
+  "@type": "updateNewMessage"
 }
 ```
 
