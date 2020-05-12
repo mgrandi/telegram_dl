@@ -75,7 +75,7 @@ class PhotoSizeThumbnailType(enum.Enum):
     # so both 'profile photo' and 'chat photo' both have big/small fields,
     # so since they don't have any other size info, we will just have a generic
     # big / small thumbnail type to mark them
-    PHOTO_BIG = ("pbig", -1, -1, "hoto_big")
+    PHOTO_BIG = ("pbig", -1, -1, "photo_big")
     PHOTO_SMALL = ("psmall", -1, -1, "photo_big")
 
 
