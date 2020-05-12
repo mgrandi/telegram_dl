@@ -96,10 +96,10 @@ class UserTypeEnum(enum.Enum):
     #     inline_query_placeholder:str = attr.ib()
     #     need_location:bool = attr.ib()
 
-    USER_TYPE_UNKNOWN = 0
-    USER_TYPE_REGULAR = 1
-    USER_TYPE_DELETED = 2
-    USER_TYPE_BOT = 3
+    USER_TYPE_UNKNOWN = "UT_unknown"
+    USER_TYPE_REGULAR = "UT_regular"
+    USER_TYPE_DELETED = "UT_deleted"
+    USER_TYPE_BOT = "UT_bot"
 
 
     @staticmethod

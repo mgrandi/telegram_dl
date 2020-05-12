@@ -61,7 +61,7 @@ class UserVersion(CustomDeclarativeBase):
     is_scam = Column(Boolean, nullable=False)
     have_access = Column(Boolean, nullable=False)
 
-    user_type = Column(ChoiceType(dbme.UserTypeEnum, impl=Integer()), nullable=False)
+    user_type = Column(ChoiceType(dbme.UserTypeEnum, impl=Unicode(length=50)), nullable=False)
 
     language_code = Column(Unicode(length=20), nullable=True)
 

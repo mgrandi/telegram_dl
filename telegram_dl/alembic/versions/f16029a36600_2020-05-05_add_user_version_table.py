@@ -46,8 +46,8 @@ def upgrade():
         sa.Column('have_access', sa.Boolean(), nullable=False),
 
         # Changing this custom column to its base type
-        # sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.UserTypeEnum, impl=sa.Integer()), nullable=True),
-        sa.Column("user_type", sa.Integer(), nullable=False),
+        # sa.Column('user_type', sqlalchemy_utils.types.choice.ChoiceType(dbme.UserTypeEnum, impl=sa.Unicode()), nullable=True),
+        sa.Column("user_type", sa.Unicode(length=50), nullable=False),
 
         sa.Column('language_code', sa.Unicode(length=20), nullable=True),
 
