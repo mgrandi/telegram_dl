@@ -119,3 +119,23 @@ class UserTypeEnum(enum.Enum):
 
         else:
             raise Exception("Unknown link state: `%s`", tdg_linkstate)
+
+
+class TextEntityTypeEnum(enum.Enum):
+
+    TEXT_ENTITY_TYPE_BOLD = "TET_bold"
+    TEXT_ENTITY_TYPE_BOT_COMMAND = "TET_bot_command"
+    TEXT_ENTITY_TYPE_CASHTAG = "TET_cashtag"
+    TEXT_ENTITY_TYPE_CODE = "TET_code"
+    TEXT_ENTITY_TYPE_EMAIL_ADDRESS = "TET_email_address"
+    TEXT_ENTITY_TYPE_HASHTAG = "TET_hashtag"
+    TEXT_ENTITY_TYPE_ITALIC = "TET_italic"
+    TEXT_ENTITY_TYPE_MENTION = "TET_mention"
+    TEXT_ENTITY_TYPE_MENTION_NAME = "TET_mention_name"
+    TEXT_ENTITY_TYPE_PHONE_NUMBER = "TET_phone_number"
+    TEXT_ENTITY_TYPE_PRE = "TET_pre"
+    TEXT_ENTITY_TYPE_PRE_CODE = "TET_pre_code"
+    TEXT_ENTITY_TYPE_STRIKETHROUGH = "TET_strikethrough"
+    TEXT_ENTITY_TYPE_TEXT_URL = "TET_text_url"
+    TEXT_ENTITY_TYPE_UNDERLINE = "TET_underline"
+    TEXT_ENTITY_TYPE_URL = "TET_url"
