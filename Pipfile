@@ -16,6 +16,7 @@ phonenumberslite = "*"
 furl = "*"
 alembic = "*"
 sqlalchemy-repr = "*"
+cattrs = "*"
 
 [requires]
 python_version = "3.8"
