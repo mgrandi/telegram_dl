@@ -21,6 +21,7 @@ def upgrade():
 
     op.create_table('message',
         sa.Column('message_id', sa.Integer(), nullable=False),
+        sa.Column('tg_message_id', sa.Integer(), nullable=False),
         sa.Column('sender_user_id', sa.Integer(), nullable=False),
         sa.Column('chat_id', sa.Integer(), nullable=False),
         sa.Column('reply_to_message_id', sa.Integer(), nullable=True),

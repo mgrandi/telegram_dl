@@ -588,6 +588,9 @@ class Message(CustomDeclarativeBase):
     # our unique identifier, primary key column
     message_id = Column(Integer, nullable=False)
 
+    # the message ID according to telegram
+    tg_message_id = Column(Integer, nullable=False)
+
     sender_user_id = Column(Integer,
         ForeignKey("user.user_id",
             name="FK-message-sender_user_id-user-user_id"),
