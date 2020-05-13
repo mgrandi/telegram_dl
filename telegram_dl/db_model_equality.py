@@ -298,7 +298,7 @@ class DbModelEqualityTester:
 
         chat_version_comparison = chat_arg.tdg_chat is not None \
             and isinstance(chat_arg.tdg_chat, tdg.chat) \
-            and latest_version.chat_id == chat_arg.tdg_chat.id \
+            and latest_version.chat.tg_chat_id == chat_arg.tdg_chat.id \
             and latest_version.title == chat_arg.tdg_chat.title \
             and latest_version.is_sponsored == chat_arg.tdg_chat.is_sponsored
 
