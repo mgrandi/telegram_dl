@@ -540,6 +540,47 @@ class MessageVersion(CustomDeclarativeBase):
             name="PK-message_version-message_version_id"),
         Index("IX-message_version-as_of", "as_of", unique=False)
     )
+
+class MessageVersionText(MessageVersion):
+
+    __tablename__ = 'message_version_text'
+
+    # our unique identifier, primary key column
+    # has to be a FK to `message_version`'s primary key' because of the polymorphic table
+    message_version_text_id = Column(
+        Integer,
+        ForeignKey("message_version.message_version_id",
+            name="FK-message_version_text.message_version_text_id-message_version-message_version_id"),
+        nullable=True)
+
+    # pretty sure this can't ever be null
+    text = Column(Unicode, nullable=False)
+
+    # will be null for now, until i implement
+    # storing this in the database
+    web_page_id = Column(Integer, nullable=True)
+
+    #############################
+    # SQLAlchemy Relationships
+    #############################
+
+    # the text entities that go to this message
+    text_entities = relationship("TextEntity", back_populates="message")
+
+    #############################
+    # Table and Mapper Arguments
+    #############################
+
+    __mapper_args__ = {
+        'polymorphic_identity': dbme.MessageVersionPolymorphicTableEnum.MESSAGE_TEXT.value,
+    }
+
+    __table_args__ = (
+        PrimaryKeyConstraint("message_version_text_id",
+            name="PK-message_version_text-message_version_text_id"),
+    )
+
+
 class Message(CustomDeclarativeBase):
 
     __tablename__ = 'message'
