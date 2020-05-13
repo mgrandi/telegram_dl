@@ -443,6 +443,9 @@ class MessageVersion(CustomDeclarativeBase):
     # our unique identifier, primary key column
     message_version_id = Column(Integer, nullable=False)
 
+    # the polymorphic descriminator for the joined table inheritance
+    polytype = Column(Unicode, nullable=False)
+
     message_id = Column(
         Integer,
         ForeignKey("message.message_id",
@@ -473,7 +476,8 @@ class MessageVersion(CustomDeclarativeBase):
     #############################
 
     __mapper_args__ = {
-
+        'polymorphic_identity': dbme.MessageVersionPolymorphicTableEnum.BASE.value,
+        'polymorphic_on': polytype
     }
 
     __table_args__ = (

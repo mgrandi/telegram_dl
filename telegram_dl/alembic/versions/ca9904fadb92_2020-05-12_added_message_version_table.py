@@ -22,6 +22,7 @@ def upgrade():
     op.create_table('message_version',
 
         sa.Column('message_version_id', sa.Integer(), nullable=False),
+        sa.Column('polytype', sa.Unicode(), nullable=False),
         sa.Column('message_id', sa.Integer(), nullable=False),
 
         # Changing this custom column to its base type

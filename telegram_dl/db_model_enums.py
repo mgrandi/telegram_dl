@@ -25,11 +25,24 @@ class ChatPolymorphicTableEnum(enum.Enum):
 class PhotoSetPolymorphicTableEnum(enum.Enum):
     '''
     enum representing the available types for the polymorphic identity of the
-    `PhotoSet` table
+    `photo_set` table
     '''
 
     PHOTO_SET = "photoset"
     PROFILE_PHOTO_SET = "profile_photo_photoset"
+
+
+class MessageVersionPolymorphicTableEnum(enum.Enum):
+    '''
+    enum representing the available types for the polymorphic identity of the
+    `message_version` table
+    '''
+
+    # the base shouldn't ever be used, but I need to have it to
+    # provide a value for the base `MessageVersion` class
+    BASE = "message_version_base"
+    MESSAGE_TEXT = "message_text"
+
 
 class PhotoSizeThumbnailType(enum.Enum):
 
