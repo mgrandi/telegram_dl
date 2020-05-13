@@ -22,8 +22,12 @@ def upgrade():
     op.create_table('chat_version',
         sa.Column('chat_version_id', sa.Integer(), nullable=False),
         sa.Column('chat_id', sa.Integer(), nullable=False),
-        sa.Column('as_of', sqlalchemy_utils.types.arrow.ArrowType(), nullable=False),
-        sa.Column('title', sa.Unicode(), nullable=False),
+
+        # Changing this custom column to its base type
+        # sa.Column('as_of', sqlalchemy_utils.types.arrow.ArrowType(), nullable=False),
+        sa.Column('as_of', sa.DateTime, nullable=False),
+
+       sa.Column('title', sa.Unicode(), nullable=False),
         sa.Column('photo_set_id', sa.Integer(), nullable=True),
         sa.Column('is_sponsored', sa.Boolean(), nullable=False),
 
