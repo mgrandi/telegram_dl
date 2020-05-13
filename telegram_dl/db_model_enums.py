@@ -131,7 +131,7 @@ class UserTypeEnum(enum.Enum):
             return UserTypeEnum.USER_TYPE_BOT
 
         else:
-            raise Exception("Unknown link state: `%s`", tdg_linkstate)
+            raise Exception("Unknown user type: `%s`", tdg_usertype)
 
 
 class TextEntityTypeEnum(enum.Enum):
@@ -152,3 +152,58 @@ class TextEntityTypeEnum(enum.Enum):
     TEXT_ENTITY_TYPE_TEXT_URL = "TET_text_url"
     TEXT_ENTITY_TYPE_UNDERLINE = "TET_underline"
     TEXT_ENTITY_TYPE_URL = "TET_url"
+
+
+    @staticmethod
+    def parse_from_tdg_text_entity_type(tdg_text_entity_type:TextEntityType) -> TextEntityTypeEnum:
+
+        if isinstance(tdg_text_entity_type, tdg.textEntityTypeBold):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_BOLD
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeBotCommand):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_BOT_COMMAND
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeCashtag):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_CASHTAG
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeCode):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_CODE
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeEmailAddress):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_EMAIL_ADDRESS
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeHashtag):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_HASHTAG
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeItalic):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_ITALIC
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeMention):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_MENTION
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeMentionName):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_MENTION_NAME
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypePhoneNumber):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_PHONE_NUMBER
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypePre):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_PRE
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypePreCode):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_PRE_CODE
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeStrikethrough):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_STRIKETHROUGH
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeTextUrl):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_TEXT_URL
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeUnderline):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_UNDERLINE
+
+        elif isinstance(tdg_text_entity_type, tdg.textEntityTypeUrl):
+            return TextEntityTypeEnum.TEXT_ENTITY_TYPE_URL
+
+        else:
+            raise Exception("Unknown text entity type: `%s`", tdg_text_entity_type)
