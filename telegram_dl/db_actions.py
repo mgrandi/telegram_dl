@@ -85,14 +85,183 @@ class InsertOrUpdateHandler:
 
 
     @handle_insert_or_update.register
+    async def message(self, obj_to_handle:tdlib_generated.message, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
+
+        # messages are versioned
+
+        session = params.session
+
+
+        maybe_existing_message = session.query(db_model.Message) \
+            .filter(db_model.Message.tg_message_id == obj_to_handle.id) \
+            .first()
+
+        change = None
+
+        def _create_text_entities_for_text_message(tdl_message_ver:db_model.MessageVersion, tdlib_message:tdlib_generated.message) -> typing.Sequence[db_model.TextEntity]:
+
+            if not isinstance(tdlib_message.content, tdlib_generated.messageText):
+                raise Exception(utils.strip_margin('''_create_text_entities_for_text_message called with a message that
+                    |doesn't have a messageText as its `content`! message: `%s`'''), tdlib_message)
+
+            result_list = []
+
+            for iter_te in tdlib_message.content.text.entities:
+
+                new_entity = db_model.TextEntity(
+                    message=tdl_message_ver,
+                    offset=iter_te.offset,
+                    length=iter_te.length,
+                    text_entity_type=dbe.TextEntityTypeEnum.parse_from_tdg_text_entity_type(iter_te.type))
+
+                result_list.append(new_entity)
+
+            insert_or_update_logger.debug("text entities created: `%s`", result_list)
+
+            return result_list
+
+
+
+        def _new_message_version_from_tdlib_message(tdl_message:db_model.Message, tdlib_message:tdlib_generated.message) -> db_model.Message:
+            ''' helper function to create a new MessageVersion from a `tdlib_generated.message`
+
+            @param tdlib_chat - the chat to copy the information from
+            @return the new ChatVersion object
+            '''
+
+            type_of_message_version = None
+
+            param_dict = {
+                "message": tdl_message,
+                "as_of": arrow.utcnow(),
+                "date": arrow.get(tdlib_message.date),
+                "edit_date": arrow.get(tdlib_message.edit_date) if tdlib_message.edit_date != 0 else None,
+                "author_signature": tdlib_message.author_signature,
+                "ttl": tdlib_message.ttl,
+            }
+
+            # handle the different `MessageContent` subclasses to figure out what type
+            # we are going to actually create
+
+            if isinstance(tdlib_message.content, tdlib_generated.messageText):
+
+                type_of_message_version = db_model.MessageVersionText
+
+                # add extra arguments
+                param_dict["text"] = tdlib_message.content.text.text
+                param_dict["web_page_id"] = None
+
+                new_version = type_of_message_version(**param_dict)
+
+                text_entities =  _create_text_entities_for_text_message(new_version, tdlib_message)
+
+                # can i just assign rather than iterating here?
+                for iter_te in text_entities:
+                    new_version.text_entities.append(iter_te)
+
+                return new_version
+
+            else:
+
+                # unhandled message type
+                insert_or_update_logger.debug("unhandled MessageContent: `%a`", type(tdlib_message.content))
+                return None
+
+
+
+
+        # see if we need to add a Message column or just a MessageVersion
+        if not maybe_existing_message:
+
+            change = dbe.DatabaseChangeEnum.NEW
+
+            # Message column doesn't exist, need to add a Message and a MessageVersion
+
+            sender_user = session.query(db_model.User) \
+                .filter(db_model.User.tg_user_id == obj_to_handle.sender_user_id) \
+                .first()
+
+            message_chat = session.query(db_model.Chat) \
+                .filter(db_model.Chat.tg_chat_id == obj_to_handle.chat_id) \
+                .first()
+
+            # see if this message was a reply to another message
+            # it seems that if `reply_to_message_id` is 0, that means
+            # it was NOT a reply to another message
+            reply_to_message = None
+            if obj_to_handle.reply_to_message_id != 0:
+                reply_to_message = session.query(db_model.Message) \
+                    .filter(db_model.Message.tg_message_id == obj_to_handle.reply_to_message_id) \
+                    .first()
+
+            # see if this was via a bot
+            # it seems that if `via_bot_user_id` is 0, that means a
+            # bot did NOT send this message
+            bot_user = None
+            if obj_to_handle.via_bot_user_id != 0:
+                bot_user = session.query(db_model.User) \
+                    .filter(db_model.User.tg_user_id == obj_to_handle.via_bot_user_id) \
+                    .first()
+
+
+            new_message = db_model.Message(
+                tg_message_id=obj_to_handle.id,
+                sender_user=sender_user,
+                chat=message_chat,
+                reply_to_message=reply_to_message,
+                via_bot_user=bot_user,
+                is_outgoing=obj_to_handle.is_outgoing,
+                is_channel_post=obj_to_handle.is_channel_post,
+                can_edit=obj_to_handle.can_be_edited,
+                can_forward=obj_to_handle.can_be_forwarded,
+                can_be_deleted_only_for_self=obj_to_handle.can_be_deleted_only_for_self,
+                can_be_deleted_for_all_users=obj_to_handle.can_be_deleted_for_all_users,
+                restriction_reason=obj_to_handle.restriction_reason)
+
+            # now get the
+
+
+            # create the chat_version and add it to whatever type of chat we get back from the
+            # if/else statement
+            new_message_version = _new_message_version_from_tdlib_message(new_message, obj_to_handle)
+
+            #### TEMPORARY REMOVE LATER
+
+            if not new_message_version:
+                return None
+            ############################
+
+            new_message.versions.append(new_message_version)
+
+            insert_or_update_logger.info("message: adding db_model.MessageVersion (`%s) `  `%s`  and db_model.Message  `%s` to session with change: `%s`",
+                new_message_version, type(new_message_version), new_message, change)
+
+            session.add(new_message)
+
+            return InsertOrUpdateResult(obj=new_message, change=change)
+
+
+        else:
+
+            # Message column DOES exist, see if it is equal and if we need to
+            # add a new MessageVersion
+
+            # TODO IMPLEMENT
+            return None
+
+
+
+
+
+    @handle_insert_or_update.register
     async def chat(self, object_to_handle:tdlib_generated.chat, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
 
 
         # chats are versioned
 
 
-        async def _new_version_from_tdlib_chat(tdlib_chat:tdlib_generated.chat) -> db_model.ChatVersion:
-            ''' helper function to create a new ChatVersion from a `chat`
+        async def _new_chat_version_from_tdlib_chat(tdlib_chat:tdlib_generated.chat) -> db_model.ChatVersion:
+            ''' helper function to create a new ChatVersion from a `tdlib_generated.chat`
 
             @param tdlib_chat - the chat to copy the information from
             @return the new ChatVersion object
@@ -179,7 +348,7 @@ class InsertOrUpdateHandler:
 
             # create the chat_version and add it to whatever type of chat we get back from the
             # if/else statement
-            tmp_chat_ver = await _new_version_from_tdlib_chat(object_to_handle)
+            tmp_chat_ver = await _new_chat_version_from_tdlib_chat(object_to_handle)
             result_chat.versions.append(tmp_chat_ver)
 
             insert_or_update_logger.info("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
@@ -200,7 +369,7 @@ class InsertOrUpdateHandler:
 
             # chat already exists, but we need to add a new version
 
-            new_version = await _new_version_from_tdlib_chat(object_to_handle)
+            new_version = await _new_chat_version_from_tdlib_chat(object_to_handle)
 
             change = dbe.DatabaseChangeEnum.UPDATED
 

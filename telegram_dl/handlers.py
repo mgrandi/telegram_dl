@@ -85,6 +85,15 @@ class TdlibBaseMessageHandler:
 
         params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.chat))
 
+
+    @handle_message.register
+    async def handle_message_update_new_message(self,  message:tdg.updateNewMessage, params:HandlerParameters) -> tdlib.TdlibResult:
+
+        logger.debug("handle_message_update_new_message.handle_message got `%s`", message)
+
+        params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.message))
+
+
 class AuthorizationHandler:
 
     def __init__(self, input):
