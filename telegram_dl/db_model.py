@@ -437,6 +437,61 @@ class SecretChat(Chat):
         Index("IXUQ-secret_chat-tg_secret_chat_id", "tg_secret_chat_id", unique=True)
     )
 
+
+class TextEntity(CustomDeclarativeBase):
+    '''
+    class that represents the text entities that telegram has parsed out of the
+    message
+
+    see `notes/text entity notes.md` for more information
+
+
+    this is a many to one relationship, where there can be many text entities
+    per 1 'message_version` column
+    '''
+
+    __tablename__ = 'text_entity'
+
+    # our unique identifier, primary key column
+    text_entity_id = Column( Integer, nullable=False)
+
+    message_version_id = Column(
+        Integer,
+        ForeignKey("message_version.message_version_id",
+            name="FK-text_entity-message_version_id-message_version-message_version_id"),
+        nullable=False)
+
+    offset = Column(Integer, nullable=False)
+
+    length = Column(Integer, nullable=False)
+
+    text_entity_type = Column(
+        ChoiceType(dbme.TextEntityTypeEnum,
+            impl=Unicode(length=50)),
+        nullable=False)
+
+    #############################
+    # SQLAlchemy Relationships
+    #############################
+
+    message = relationship("MessageVersionText", back_populates="text_entities")
+
+    #############################
+    # Table and Mapper Arguments
+    #############################
+
+    __mapper_args__ = {
+
+    }
+
+    __table_args__ = (
+       PrimaryKeyConstraint("text_entity_id",
+            name="PK-text_entity-text_entity_id"),
+       Index("IX-text_entity-message_version_id", "message_version_id", unique=False)
+    )
+
+
+
 class MessageVersion(CustomDeclarativeBase):
     __tablename__ = 'message_version'
 
