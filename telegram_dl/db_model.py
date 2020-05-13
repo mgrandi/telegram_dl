@@ -601,7 +601,10 @@ class Message(CustomDeclarativeBase):
             name="FK-message-chat_id-chat-chat_id"),
         nullable=False)
 
-    reply_to_message_id = Column(Integer, nullable=True)
+    reply_to_message_id = Column(Integer,
+        ForeignKey("message.message_id",
+            name="FK-message-reply_to_message_id-message-message_id"),
+        nullable=True)
 
     via_bot_user_id = Column(Integer, nullable=True)
 
