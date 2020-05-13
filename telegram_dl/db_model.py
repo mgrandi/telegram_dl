@@ -525,6 +525,8 @@ class MessageVersion(CustomDeclarativeBase):
     # SQLAlchemy Relationships
     #############################
 
+    message = relationship("Message", back_populates="versions")
+
 
     #############################
     # Table and Mapper Arguments
@@ -628,6 +630,18 @@ class Message(CustomDeclarativeBase):
     #############################
     # SQLAlchemy Relationships
     #############################
+
+    versions = relationship("MessageVersion", back_populates="message")
+
+    sender_user = relationship("User",
+        primaryjoin="Message.sender_user_id == User.user_id")
+
+    chat = relationship("Chat")
+
+    via_bot_user = relationship("User",
+        primaryjoin="Message.via_bot_user_id == User.user_id")
+
+    reply_to_message = relationship("Message", remote_side=[message_id])
 
     #############################
     # Table and Mapper Arguments
