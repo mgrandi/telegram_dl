@@ -437,3 +437,56 @@ class SecretChat(Chat):
         Index("IXUQ-secret_chat-tg_secret_chat_id", "tg_secret_chat_id", unique=True)
     )
 
+class Message(CustomDeclarativeBase):
+
+    __tablename__ = 'message'
+
+    # our unique identifier, primary key column
+    message_id = Column(Integer, nullable=False)
+
+    sender_user_id = Column(Integer,
+        ForeignKey("user.user_id",
+            name="FK-message-sender_user_id-user-user_id"),
+        nullable=False)
+
+    chat_id = Column(Integer,
+        ForeignKey("chat.chat_id",
+            name="FK-message-chat_id-chat-chat_id"),
+        nullable=False)
+
+    reply_to_message_id = Column(Integer, nullable=True)
+
+    via_bot_user_id = Column(Integer, nullable=True)
+
+    is_outgoing = Column(Boolean, nullable=False)
+
+    is_channel_post = Column(Boolean, nullable=False)
+
+    can_edit = Column(Boolean, nullable=False)
+
+    can_forward = Column(Boolean, nullable=False)
+
+    can_be_deleted_only_for_self = Column(Boolean, nullable=False)
+
+    can_be_deleted_for_all_users = Column(Boolean, nullable=False)
+
+    restriction_reason = Column(Unicode, nullable=True)
+
+    #############################
+    # SQLAlchemy Relationships
+    #############################
+
+    #############################
+    # Table and Mapper Arguments
+    #############################
+
+    __mapper_args__ = {
+    }
+
+    __table_args__ = (
+        PrimaryKeyConstraint("message_id",
+            name="PK-message-message_id"),
+        Index("IX-message-sender_user_id", "sender_user_id", unique=False),
+        Index("IX-message-chat_id", "chat_id", unique=False),
+
+    )
