@@ -45,6 +45,11 @@ def upgrade():
             name='FK-message-sender_user_id-user-user_id'),
 
         sa.ForeignKeyConstraint(
+            ['via_bot_user_id'],
+            ['user.user_id'],
+            name='FK-message-via_bot_user_id-user-user_id'),
+
+        sa.ForeignKeyConstraint(
             ['reply_to_message_id'],
             ['message.message_id'],
             name='FK-message-reply_to_message_id-message-message_id'),
