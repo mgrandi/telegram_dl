@@ -437,6 +437,50 @@ class SecretChat(Chat):
         Index("IXUQ-secret_chat-tg_secret_chat_id", "tg_secret_chat_id", unique=True)
     )
 
+class MessageVersion(CustomDeclarativeBase):
+    __tablename__ = 'message_version'
+
+    # our unique identifier, primary key column
+    message_version_id = Column(Integer, nullable=False)
+
+    message_id = Column(
+        Integer,
+        ForeignKey("message.message_id",
+            name="FK-message_version-message_id-message-message_id"),
+        nullable=False)
+
+    as_of = Column(ArrowType, nullable=False)
+
+    date = Column(ArrowType, nullable=False)
+
+    edit_date = Column(ArrowType, nullable=True)
+
+    # sending_state = False
+
+    # scheduling_state = False
+
+    author_signature = Column(Unicode, nullable=True)
+
+    ttl = Column(Integer, nullable=True)
+
+    #############################
+    # SQLAlchemy Relationships
+    #############################
+
+
+    #############################
+    # Table and Mapper Arguments
+    #############################
+
+    __mapper_args__ = {
+
+    }
+
+    __table_args__ = (
+        PrimaryKeyConstraint("message_version_id",
+            name="PK-message_version-message_version_id"),
+        Index("IX-message_version-as_of", "as_of", unique=False)
+    )
 class Message(CustomDeclarativeBase):
 
     __tablename__ = 'message'
