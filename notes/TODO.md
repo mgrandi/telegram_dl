@@ -3,6 +3,11 @@
 TODO:
 
 
+make it so in handlers, all the stuff that subclasses tdlib_generated.Update is in its own handler
+so like updateNewChat, updateNewMessage, etc
+probably needs a custom 'functools.methoddispatch' to handle class heirarchies instead of just
+raw class identity
+
 Handle FullUserInfo / FullBasicGroupInfo / FullSuperGroupInfo
 
 https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1update_user_full_info.html
