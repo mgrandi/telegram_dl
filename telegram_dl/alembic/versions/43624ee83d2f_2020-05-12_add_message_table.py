@@ -1,4 +1,4 @@
-"""added message table
+"""add message table
 
 Revision ID: 43624ee83d2f
 Revises: 817cc7f1f793

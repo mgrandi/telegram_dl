@@ -1,4 +1,4 @@
-"""added message_version table
+"""add message_version table
 
 Revision ID: ca9904fadb92
 Revises: 43624ee83d2f
