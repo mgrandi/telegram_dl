@@ -638,5 +638,6 @@ class Message(CustomDeclarativeBase):
             name="PK-message-message_id"),
         Index("IX-message-sender_user_id", "sender_user_id", unique=False),
         Index("IX-message-chat_id", "chat_id", unique=False),
+        Index("IX-message-tg_message_id", "tg_message_id", unique=True)
 
     )

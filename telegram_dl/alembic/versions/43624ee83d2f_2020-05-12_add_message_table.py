@@ -66,6 +66,10 @@ def upgrade():
             columns=['sender_user_id'],
             unique=False)
 
+        batch_op.create_index(
+            index_name='"IX-message-tg_message_id',
+            columns=['tg_message_id'],
+            unique=True)
 
 
 def downgrade():
