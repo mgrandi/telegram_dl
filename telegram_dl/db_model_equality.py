@@ -24,12 +24,12 @@ logger_chat_photo = logger.getChild("chat_photo")
 # calls methods on, and these will basically holders for data that is the same,
 # but represented in two different classes, ours and telegrams, such as
 #`telegram_dl.db_model.User` and  `tdlib_generated.user`
-@attr.s
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class EqualityArgumentUser:
     tdl_user:db_model.User = attr.ib()
     tdg_user:tdg.user = attr.ib()
 
-@attr.s
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class EqualityArgumentChatPhoto:
     # again, this is kinda weird as a chat photo is basically the same
     # as a profile photo but without one field
@@ -38,7 +38,7 @@ class EqualityArgumentChatPhoto:
     tdl_photo_set:db_model.PhotoSet = attr.ib()
     tdg_chat_photo:tdg.chatPhoto = attr.ib()
 
-@attr.s
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class EqualityArgumentProfilePhoto:
 
     # this is slightly strange because we abstract the profile photo as a
@@ -48,18 +48,18 @@ class EqualityArgumentProfilePhoto:
     tdg_profile_photo:tdg.profilePhoto = attr.ib()
 
 
-@attr.s
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class EqualityArgumentFile:
     tdl_file:db_model.File = attr.ib()
     tdg_file:tdg.file = attr.ib()
 
 
-@attr.s
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class EqualityArgumentPhoneNumber:
     phonenumbers_lib_obj:PhoneNumber = attr.ib()
     str_phonenumber:str = attr.ib()
 
-@attr.s
+@attr.s(auto_attribs=True, frozen=True, kw_only=True)
 class EqualityArgumentChat:
     tdl_chat:db_model.Chat = attr.ib()
     tdg_chat:tdg.chat = attr.ib()
