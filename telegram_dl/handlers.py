@@ -68,12 +68,12 @@ class TdlibBaseMessageHandler:
     @handle_message.register
     async def handle_message_update_option(self, message:tdg.updateOption, params:HandlerParameters) -> tdlib.TdlibResult:
 
-        logger.debug("handle_message_update_option.handle_message got `%s`", message)
+        logger.debug("handle_message_update_option got `%s`", message)
 
     @handle_message.register
     async def handle_message_update_user(self,  message:tdg.updateUser, params:HandlerParameters) -> tdlib.TdlibResult:
 
-        logger.debug("handle_message_update_user.handle_message got `%s`", message)
+        logger.debug("handle_message_update_user got `%s`", message)
 
         params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.user))
 
@@ -81,7 +81,7 @@ class TdlibBaseMessageHandler:
     @handle_message.register
     async def handle_message_update_new_chat(self,  message:tdg.updateNewChat, params:HandlerParameters) -> tdlib.TdlibResult:
 
-        logger.debug("handle_message_update_new_chat.handle_message got `%s`", message)
+        logger.debug("handle_message_update_new_chat got `%s`", message)
 
         params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.chat))
 
@@ -89,7 +89,7 @@ class TdlibBaseMessageHandler:
     @handle_message.register
     async def handle_message_update_new_message(self,  message:tdg.updateNewMessage, params:HandlerParameters) -> tdlib.TdlibResult:
 
-        logger.debug("handle_message_update_new_message.handle_message got `%s`", message)
+        logger.debug("handle_message_update_new_message got `%s`", message)
 
         params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.message))
 
