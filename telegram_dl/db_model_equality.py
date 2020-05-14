@@ -290,6 +290,11 @@ class DbModelEqualityTester:
             logger_chat.debug("returning False because Chat exists but has no versions")
             return False
 
+        # check the base chat
+        base_chat_comparison == isinstance(chat_arg.tdl_chat, db_model.Chat) \
+            and isinstance(chat_arg.tdg_chat, tdg.chat) \
+            and chat_arg.tdg_chat_id == chat_arg.tdg_chat.id
+
         # get the latest version
 
         # should be sorted by ascending so the LAST index is the latest
@@ -310,7 +315,7 @@ class DbModelEqualityTester:
         chat_photo_result = self.is_equal(chat_photo_arg)
 
         # get final result
-        final_result =  chat_version_comparison and chat_photo_result
+        final_result =  base_chat_comparison and chat_version_comparison and chat_photo_result
 
         logger_chat.debug("final result: `%s`", final_result)
 
