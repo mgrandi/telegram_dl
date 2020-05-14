@@ -24,3 +24,24 @@ select * from chat
 join chat_version on (chat.chat_id == chat_version.chat_id)
 where chat.chat_id = 1234
 ```
+
+## show all text snippets for a given text message
+
+```sql
+select text_entity.*
+from message
+         inner join message_version on (message.message_id == message_version.message_id)
+         inner join text_entity on (text_entity.message_version_id == message_version.message_version_id)
+where message.message_id = 16
+```
+
+## show everything about a message, both static and versioned (minus text entities)
+
+```sql
+select *
+from message
+         inner join message_version on (message.message_id == message_version.message_id)
+         inner join message_version_text
+                    on (message_version_text.message_version_text_id == message_version.message_version_id)
+where message.message_id = 16
+```
