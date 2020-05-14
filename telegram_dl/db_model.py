@@ -634,7 +634,7 @@ class Message(CustomDeclarativeBase):
     # SQLAlchemy Relationships
     #############################
 
-    versions = relationship("MessageVersion", back_populates="message")
+    versions = relationship("MessageVersion", order_by="asc(MessageVersion.as_of)", back_populates="message")
 
     sender_user = relationship("User",
         primaryjoin="Message.sender_user_id == User.user_id")
