@@ -237,7 +237,7 @@ class InsertOrUpdateHandler:
 
             new_message.versions.append(new_message_version)
 
-            insert_or_update_logger.info("message: adding db_model.MessageVersion (`%s) `  `%s`  and db_model.Message  `%s` to session with change: `%s`",
+            insert_or_update_logger.debug("message: adding db_model.MessageVersion (`%s) `  `%s`  and db_model.Message  `%s` to session with change: `%s`",
                 new_message_version, type(new_message_version), new_message, change)
 
             session.add(new_message)
@@ -355,7 +355,7 @@ class InsertOrUpdateHandler:
             tmp_chat_ver = await _new_chat_version_from_tdlib_chat(object_to_handle)
             result_chat.versions.append(tmp_chat_ver)
 
-            insert_or_update_logger.info("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
+            insert_or_update_logger.debug("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
                 tmp_chat_ver, type(result_chat), result_chat, change)
 
             session.add(result_chat)
@@ -379,7 +379,7 @@ class InsertOrUpdateHandler:
 
             maybe_existing_chat.versions.append(new_version)
 
-            insert_or_update_logger.info("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
+            insert_or_update_logger.debug("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
                 new_version, type(maybe_existing_chat), maybe_existing_chat, change)
 
             session.add(maybe_existing_chat)
@@ -424,7 +424,7 @@ class InsertOrUpdateHandler:
 
             change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
 
-            insert_or_update_logger.info("file: adding db_model.File object `%s` to session with change: `%s`", new_file, change)
+            insert_or_update_logger.debug("file: adding db_model.File object `%s` to session with change: `%s`", new_file, change)
 
             session.add(new_file)
 
@@ -493,7 +493,7 @@ class InsertOrUpdateHandler:
             new_photo_set.photos.append(big_photo)
             new_photo_set.photos.append(small_photo)
 
-            insert_or_update_logger.info("chat_photo: adding db_model.PhotoSet object `%s` to session with change: `%s`",
+            insert_or_update_logger.debug("chat_photo: adding db_model.PhotoSet object `%s` to session with change: `%s`",
                 new_photo_set, dbe.DatabaseChangeEnum.NEW)
 
             return InsertOrUpdateResult(obj=new_photo_set, change=dbe.DatabaseChangeEnum.NEW)
@@ -551,7 +551,7 @@ class InsertOrUpdateHandler:
             new_photo_set.photos.append(big_photo)
             new_photo_set.photos.append(small_photo)
 
-            insert_or_update_logger.info("profile_photo: adding db_model.ProfilePhotoSet object `%s` to session with change: `%s`",
+            insert_or_update_logger.debug("profile_photo: adding db_model.ProfilePhotoSet object `%s` to session with change: `%s`",
                 new_photo_set, dbe.DatabaseChangeEnum.NEW)
 
             return InsertOrUpdateResult(obj=new_photo_set, change=dbe.DatabaseChangeEnum.NEW)
@@ -613,7 +613,7 @@ class InsertOrUpdateHandler:
 
             change = dbe.DatabaseChangeEnum.NEW
 
-            insert_or_update_logger.info("user:adding new db_model.User object `%s` and new db_model.UserVersion `%s` to session with change: `%s`",
+            insert_or_update_logger.debug("user:adding new db_model.User object `%s` and new db_model.UserVersion `%s` to session with change: `%s`",
                 new_user, new_version, change)
             session.add(new_user)
 
@@ -637,7 +637,7 @@ class InsertOrUpdateHandler:
 
             change =  dbe.DatabaseChangeEnum.UPDATED
 
-            insert_or_update_logger.info("user: adding new db_model.UserVersion object `%s`  to existing db_model.User `%s`, to session with change: `%s`",
+            insert_or_update_logger.debug("user: adding new db_model.UserVersion object `%s`  to existing db_model.User `%s`, to session with change: `%s`",
                 new_version, maybe_existing_user, change)
 
             session.add(maybe_existing_user)
