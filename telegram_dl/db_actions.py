@@ -109,7 +109,7 @@ class InsertOrUpdateHandler:
             for iter_te in tdlib_message.content.text.entities:
 
                 new_entity = db_model.TextEntity(
-                    message=tdl_message_ver,
+                    message_version_text=tdl_message_ver,
                     offset=iter_te.offset,
                     length=iter_te.length,
                     text_entity_type=dbe.TextEntityTypeEnum.parse_from_tdg_text_entity_type(iter_te.type))
@@ -229,7 +229,7 @@ class InsertOrUpdateHandler:
             # if/else statement
             new_message_version = _new_message_version_from_tdlib_message(new_message, obj_to_handle)
 
-            #### TEMPORARY REMOVE LATER
+            #### TEMPORARY REMOVE LATER, if we don't have a supported message version just bail entirely
 
             if not new_message_version:
                 return None
@@ -237,8 +237,10 @@ class InsertOrUpdateHandler:
 
             new_message.versions.append(new_message_version)
 
-            insert_or_update_logger.debug("message: adding db_model.MessageVersion (`%s) `  `%s`  and db_model.Message  `%s` to session with change: `%s`",
-                new_message_version, type(new_message_version), new_message, change)
+            insert_or_update_logger.debug(
+                utils.strip_margin('''message: adding db_model.MessageVersion (`%s) `  `%s`
+                |and db_model.Message  `%s` to session with change: `%s`'''),
+                    new_message_version, type(new_message_version), new_message, change)
 
             session.add(new_message)
 
@@ -250,10 +252,45 @@ class InsertOrUpdateHandler:
             # Message column DOES exist, see if it is equal and if we need to
             # add a new MessageVersion
 
-            # TODO IMPLEMENT
-            return None
+            msg_equality_args = db_model_equality.EqualityArgumentMessage(
+                tdl_message=maybe_existing_message, tdg_message=obj_to_handle)
+            is_equal = equality_tester.is_equal(msg_equality_args)
+
+            if not is_equal:
+
+                change = dbe.DatabaseChangeEnum.UPDATED
+
+                new_message_version = _new_message_version_from_tdlib_message(maybe_existing_message, obj_to_handle)
+
+                #### TEMPORARY REMOVE LATER,  if we don't have a supported message version just bail entirely
+
+                if not new_message_version:
+                    return None
+                ############################
+
+                maybe_existing_message.versions.append(new_message_version)
+
+                insert_or_update_logger.debug(
+                    utils.strip_margin('''message: adding db_model.MessageVersion (`%s) `  `%s`
+                    |to existing db_model.Message  `%s` to session with change: `%s`'''),
+                        new_message_version, type(new_message_version), maybe_existing_message, change)
+
+                # TODO: do i need this or does just appending it above add it to the session
+                session.add(maybe_existing_message)
+
+                return InsertOrUpdateResult(obj=maybe_existing_message, change=change)
 
 
+            else:
+
+                # Message / MessageVersion hasn't changed
+
+                insert_or_update_logger.debug(
+                    utils.strip_margin('''not adding new db_model.MessageVersion for
+                    |db_model.Message `%s`, it already exists and hasn't changed'''),
+                        maybe_existing_message)
+
+                return InsertOrUpdateResult(obj=maybe_existing_message, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
 
 
