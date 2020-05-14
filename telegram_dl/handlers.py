@@ -94,6 +94,14 @@ class TdlibBaseMessageHandler:
         params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.message))
 
 
+    @handle_message.register
+    async def handle_message_update_chat_last_message(self,  message:tdg.updateChatLastMessage, params:HandlerParameters) -> tdlib.TdlibResult:
+
+        logger.debug("handle_message_update_chat_last_message got `%s`", message)
+
+        params.database_queue.put_nowait(db_actions.InsertDatabaseAction(object_to_insert=message.last_message))
+
+
 class AuthorizationHandler:
 
     def __init__(self, input):
