@@ -474,7 +474,7 @@ class TextEntity(CustomDeclarativeBase):
     # SQLAlchemy Relationships
     #############################
 
-    message = relationship("MessageVersionText", back_populates="text_entities")
+    message_version_text = relationship("MessageVersionText", back_populates="text_entities")
 
     #############################
     # Table and Mapper Arguments
@@ -567,7 +567,7 @@ class MessageVersionText(MessageVersion):
     #############################
 
     # the text entities that go to this message
-    text_entities = relationship("TextEntity", back_populates="message")
+    text_entities = relationship("TextEntity", back_populates="message_version_text")
 
     #############################
     # Table and Mapper Arguments
