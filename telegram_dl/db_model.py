@@ -593,21 +593,24 @@ class Message(CustomDeclarativeBase):
     # the message ID according to telegram
     tg_message_id = Column(Integer, nullable=False)
 
+    # can be null (aka `0`) with 'channel' posts
     sender_user_id = Column(Integer,
         ForeignKey("user.user_id",
             name="FK-message-sender_user_id-user-user_id"),
-        nullable=False)
+        nullable=True)
 
     chat_id = Column(Integer,
         ForeignKey("chat.chat_id",
             name="FK-message-chat_id-chat-chat_id"),
         nullable=False)
 
+    # can be null (aka `0`) if the message isn't a reply to anything
     reply_to_message_id = Column(Integer,
         ForeignKey("message.message_id",
             name="FK-message-reply_to_message_id-message-message_id"),
         nullable=True)
 
+    # can be null (aka `0`) if the message was not sent by a bot
     via_bot_user_id = Column(Integer,
         ForeignKey("user.user_id",
             name="FK-message-via_bot_user_id-user-user_id"),

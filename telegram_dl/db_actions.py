@@ -177,9 +177,13 @@ class InsertOrUpdateHandler:
 
             # Message column doesn't exist, need to add a Message and a MessageVersion
 
-            sender_user = session.query(db_model.User) \
-                .filter(db_model.User.tg_user_id == obj_to_handle.sender_user_id) \
-                .first()
+            # this should always exist, except it seems that channel posts have
+            # `sender_user_id` set to 0 (aka nothing)
+            sender_user = None
+            if obj_to_handle.sender_user_id != 0:
+                sender_user = session.query(db_model.User) \
+                    .filter(db_model.User.tg_user_id == obj_to_handle.sender_user_id) \
+                    .first()
 
             message_chat = session.query(db_model.Chat) \
                 .filter(db_model.Chat.tg_chat_id == obj_to_handle.chat_id) \
