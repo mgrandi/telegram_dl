@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "telegram_dl"
+version = "0.0.1"
+description = "An archiving solution for your telegram chats and groups"
+authors = ["Mark Grandi <markgrandi@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+sqlalchemy = "^1.3.17"
+arrow = "^0.15.6"
+logging-tree = "^1.8.1"
+
+attrs = "^19.3.0"
+pyhocon = "^0.3.54"
+sqlalchemy-utils = "^0.36.5"
+phonenumberslite = "^8.12.3"
+furl = "^2.1.0"
+alembic = "^1.4.2"
+sqlalchemy-repr = "^0.0.2"
+cattrs = "^1.0.0"
+
+[tool.poetry.dev-dependencies]
+wheel = "^0.34.2"
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
