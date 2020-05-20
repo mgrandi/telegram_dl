@@ -248,7 +248,7 @@ class TdlibHandle:
 
         return final_result
 
-    def receive(self) -> utils.RootObject:
+    def receive(self) -> tdlib_generated.RootObject:
 
         if self.tdlib_client is None:
             raise Exception("TdlibHandle.receive called when no client has been created")
