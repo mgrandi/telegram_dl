@@ -2,6 +2,10 @@
 
 TODO:
 
+apparently messages can be edited to be one content type to another, see message with tg_message_id of `2295332864`
+
+make it so cattrs / whatever i use is solely responsible for type conversions , instead of between cattrs and a custom
+JSON serializer object, aka put it in `utils.register_custom_types_with_cattr_converter`
 
 make it so in handlers, all the stuff that subclasses tdlib_generated.Update is in its own handler
 so like updateNewChat, updateNewMessage, etc

@@ -206,7 +206,11 @@ def register_custom_types_with_cattr_converter(cattr_converter):
     def _unstructure_bytes(bytes_to_structure):
 
         # base64 encode it for tdjson
-        return base64.b64encode(bytes_to_structure)
+
+        # `base64.b64encode` returns bytes, so make sure to convert it to a UTF-8 string
+        # or else we will just get...base64 bytes back and we will still have the same
+        # problems of JSON can't store binary data, heh
+        return base64.b64encode(bytes_to_structure).decode("utf-8")
 
     # bytes
     cattr_converter.register_unstructure_hook(bytes, _unstructure_bytes)
