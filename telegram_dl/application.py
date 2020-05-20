@@ -4,6 +4,7 @@ import concurrent.futures
 import functools
 import json
 
+import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.event import listen
@@ -18,7 +19,6 @@ from telegram_dl import config, constants
 from telegram_dl import db_actions
 
 logger = logging.getLogger(__name__)
-
 
 message_archive_from_tl_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_FROM_TELEGRAM_NAME)
 message_archive_to_tl_logger = logging.getLogger(constants.MESSAGE_ARCHIVE_LOGGER_TO_TELEGRAM_NAME)
@@ -49,17 +49,11 @@ class Application:
         self.dbaction_handler = db_actions.DbActionHandler()
 
         # load config stuff
-        logger.info("creating ApplicationConfiguration")
-        self.app_config = config.ApplicationConfiguration.init_from_config(self.args.config)
+        self.app_config = self.setup_application_config()
 
-        logger.info("creating engine")
-
-        self.engine = create_engine(self.app_config.sqlalchemy_url, echo=False)
+        # setup sqlalchemy engine stuff
+        self.engine = self.setup_sqlalchemy_engine()
         self.sessionmaker = sessionmaker(bind=self.engine)
-
-        # attach a listener to the pool
-        # see https://docs.sqlalchemy.org/en/13/core/event.html
-        listen(self.engine, 'connect', utils.sqlalchemy_pool_on_connect_listener)
 
         # NOTE: you NEED to create these inside a running loop or else it will use
         # `asyncio.get_event_loop()` which is not the same loop that `asyncio.run()` uses
@@ -67,6 +61,36 @@ class Application:
         self.from_telegram_queue = None
         self.database_queue = None
         self.stop_event = None
+
+    def setup_application_config(self) -> config.ApplicationConfiguration:
+        '''
+        method to set up the application config
+
+        this can be overridden in a subclass to configure the config further
+        '''
+
+        logger.info("creating ApplicationConfiguration")
+        return config.ApplicationConfiguration.init_from_config(self.args.config)
+
+
+    def setup_sqlalchemy_engine(self) -> sqlalchemy.engine.Engine:
+        '''
+        method to set up the sqlalchemy engine
+
+        this can be overridden in a subclass to configure the engine further
+
+        @return a sqlalchemy.engine.Engine instance
+        '''
+
+        logger.info("creating engine")
+
+        result_engine = create_engine(self.app_config.sqlalchemy_url, echo=False)
+
+        # attach a listener to the pool
+        # see https://docs.sqlalchemy.org/en/13/core/event.html
+        listen(result_engine, 'connect', utils.sqlalchemy_pool_on_connect_listener)
+
+        return result_engine
 
     def should_stop_loop(self):
         return self.stop_event.is_set()
@@ -100,6 +124,18 @@ class Application:
         self.tdlib_handle.execute(set_log_stream_obj, without_client_ok=True)
 
 
+    async def setup_tdlib_handle(self) -> tdlib.TdlibHandle:
+        '''
+        method to set up the tdlib handle objecet
+
+        this can be overridden in a subclass to configure further
+        '''
+
+        logger.info("creating TdlibHandle")
+        result = await tdlib.TdlibHandle.init_from_config(self.app_config)
+
+        return result
+
     async def run(self):
 
         self.to_telegram_queue = asyncio.Queue()
@@ -113,9 +149,7 @@ class Application:
 
         utils.register_ctrl_c_signal_handler(_please_stop_loop_func)
 
-
-        logger.info("creating TdlibHandle")
-        self.tdlib_handle = await tdlib.TdlibHandle.init_from_config(self.app_config)
+        self.tdlib_handle = await self.setup_tdlib_handle()
 
         # change log settings
         self.setup_tdlib_logging()
