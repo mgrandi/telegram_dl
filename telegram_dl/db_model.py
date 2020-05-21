@@ -590,7 +590,14 @@ class Message(CustomDeclarativeBase):
     # our unique identifier, primary key column
     message_id = Column(Integer, nullable=False)
 
-    # the message ID according to telegram
+    # the id of the chat
+    chat_id = Column(Integer,
+        ForeignKey("chat.chat_id",
+            name="FK-message-chat_id-chat-chat_id"),
+        nullable=False)
+
+    # the messaee ID according to telegram
+    # message IDs are unique to each chat but NOT unique globally
     tg_message_id = Column(Integer, nullable=False)
 
     # can be null (aka `0`) with 'channel' posts
@@ -598,11 +605,6 @@ class Message(CustomDeclarativeBase):
         ForeignKey("user.user_id",
             name="FK-message-sender_user_id-user-user_id"),
         nullable=True)
-
-    chat_id = Column(Integer,
-        ForeignKey("chat.chat_id",
-            name="FK-message-chat_id-chat-chat_id"),
-        nullable=False)
 
     # can be null (aka `0`) if the message isn't a reply to anything
     reply_to_message_id = Column(Integer,
@@ -658,6 +660,7 @@ class Message(CustomDeclarativeBase):
             name="PK-message-message_id"),
         Index("IX-message-sender_user_id", "sender_user_id", unique=False),
         Index("IX-message-chat_id", "chat_id", unique=False),
-        Index("IX-message-tg_message_id", "tg_message_id", unique=True)
+        Index("IX-message-chat_id-tg_message_id", "chat_id", "tg_message_id", unique=True)
+
 
     )

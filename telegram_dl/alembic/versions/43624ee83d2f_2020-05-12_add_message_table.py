@@ -21,9 +21,9 @@ def upgrade():
 
     op.create_table('message',
         sa.Column('message_id', sa.Integer(), nullable=False),
+        sa.Column('chat_id', sa.Integer(), nullable=False),
         sa.Column('tg_message_id', sa.Integer(), nullable=False),
         sa.Column('sender_user_id', sa.Integer(), nullable=True),
-        sa.Column('chat_id', sa.Integer(), nullable=False),
         sa.Column('reply_to_message_id', sa.Integer(), nullable=True),
         sa.Column('via_bot_user_id', sa.Integer(), nullable=True),
         sa.Column('is_outgoing', sa.Boolean(), nullable=False),
@@ -72,8 +72,8 @@ def upgrade():
             unique=False)
 
         batch_op.create_index(
-            index_name='"IX-message-tg_message_id',
-            columns=['tg_message_id'],
+            index_name='IX-message-chat_id-tg_message_id',
+            columns=['chat_id', 'tg_message_id'],
             unique=True)
 
 
@@ -81,6 +81,7 @@ def downgrade():
 
     with op.batch_alter_table('message', schema=None) as batch_op:
 
+        batch_op.drop_index('IX-message-chat_id-tg_message_id')
         batch_op.drop_index('IX-message-sender_user_id')
         batch_op.drop_index('IX-message-chat_id')
 

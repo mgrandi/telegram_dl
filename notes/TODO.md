@@ -3,6 +3,7 @@
 TODO:
 
 apparently messages can be edited to be one content type to another, see message with tg_message_id of `2295332864`
+* SOLVED, turns out message ids are only unique to the chat they belong to
 
 make it so cattrs / whatever i use is solely responsible for type conversions , instead of between cattrs and a custom
 JSON serializer object, aka put it in `utils.register_custom_types_with_cattr_converter`
