@@ -2,6 +2,15 @@
 
 TODO:
 
+edit db_model classes to make it so we can specify `primary_key=True` on the PK columns and have an empty
+PrimaryConstraint for naming it
+see:
+```plaintext
+New in version 0.9.2: an empty PrimaryKeyConstraint may now be specified for the purposes of establishing keyword arguments with the constraint, independently of the specification of “primary key” columns within the Table itself; columns marked as primary_key=True will be gathered into the empty constraint’s column collection.
+
+https://docs.sqlalchemy.org/en/13/core/constraints.html?highlight=primarykeyconstraint#sqlalchemy.schema.PrimaryKeyConstraint
+```
+
 apparently messages can be edited to be one content type to another, see message with tg_message_id of `2295332864`
 * SOLVED, turns out message ids are only unique to the chat they belong to
 
