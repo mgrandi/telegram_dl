@@ -23,6 +23,9 @@ class TestCattrConverter(unittest.TestCase):
 
 
     def test_cattr_converter_round_trip(self):
+        '''
+        `utils.CustomCattrConverter` round trip test
+        '''
 
         binary_data = "this_is_binary_data 1234567890 🐧".encode("utf-8")
         integer_data = 1234
