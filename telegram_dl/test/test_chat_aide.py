@@ -21,7 +21,6 @@ class TestChatAide(unittest.TestCase):
         utils.register_custom_types_with_cattr_converter(converter)
 
         p = u.get_fake_tdlib_messages_path("updateNewChat_supergroup_id_1446368458_channel_no_photo.json")
-        import pdb;pdb.set_trace()
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, converter)
 
         asof_time = arrow.utcnow()
