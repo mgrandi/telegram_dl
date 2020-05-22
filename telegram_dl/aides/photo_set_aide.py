@@ -3,6 +3,7 @@ import typing
 
 from telegram_dl import db_model
 from telegram_dl import tdlib_generated as tdg
+import telegram_dl.db_model_enums as dbme
 from telegram_dl.aides import file_aide
 
 logger = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ class PhotoSetAide:
         big_photo_dbmodel_photo:typing.Optional[db_model.Photo] = big_photo_dbmodel_photo_list[0] if len(big_photo_dbmodel_photo_list) >= 1 else None
         big_photo_tdlib_file:tdg.file = tdlib_chatphoto.big
 
-        big_photo_comparison = file_aide.compare_dbmodel_file_and_tdlib_file(
+        big_photo_comparison = file_aide.FileAide.compare_dbmodel_file_and_tdlib_file(
             dbmodel_file=big_photo_dbmodel_photo.file,
             tdlib_file=big_photo_tdlib_file)
 
@@ -72,10 +73,10 @@ class PhotoSetAide:
         small_photo_dbmodel_photo_list:typing.Sequence[Photo] = \
             dbmodel_photoset.get_photos_by_thumnail_type(dbme.PhotoSizeThumbnailType.PHOTO_SMALL)
 
-        small_photo_dbmodel_photo:typing.Optional[db_model.Photo] = small_photo_dbmodel_photo[0] if len(small_photo_dbmodel_photo) >= 1 else None
+        small_photo_dbmodel_photo:typing.Optional[db_model.Photo] = small_photo_dbmodel_photo_list[0] if len(small_photo_dbmodel_photo_list) >= 1 else None
         small_photo_tdlib_file:tdg.file = tdlib_chatphoto.small
 
-        small_photo_comparison = file_aide.compare_dbmodel_file_and_tdlib_file(
+        small_photo_comparison = file_aide.FileAide.compare_dbmodel_file_and_tdlib_file(
             dbmodel_file=small_photo_dbmodel_photo.file,
             tdlib_file=small_photo_tdlib_file)
 

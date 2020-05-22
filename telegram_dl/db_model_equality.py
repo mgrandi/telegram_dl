@@ -448,7 +448,7 @@ class DbModelEqualityTester:
     def is_equal_chat(self, chat_arg:EqualityArgumentChat) -> bool:
 
         # FIXME REMOVE THIS METHOD
-        return chat_aide.compare_tdlib_and_dbmodel_chat(
+        return chat_aide.ChatAide.compare_tdlib_and_dbmodel_chat(
             dbmodel_chat=chat_arg.tdl_chat,
             tdlib_chat=chat_arg.tdg_chat)
 
