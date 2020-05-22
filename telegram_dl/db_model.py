@@ -87,6 +87,8 @@ class User(CustomDeclarativeBase):
 
     # has an ascending orderby on 'UserVersion.as_of', so the earliest versions are first,
     # latest are last
+    # NOTE: this only works if you load from the database, if you manually call `User.versions.insert(0, obj)`,
+    # it will NOT be sorted by the `UserVersion.as_of` field!
     versions = relationship("UserVersion", order_by="asc(UserVersion.as_of)", back_populates="user")
 
     __table_args__ = (
@@ -314,6 +316,10 @@ class Chat(CustomDeclarativeBase):
 
     tg_chat_id = Column(Integer, nullable=False)
 
+    # has an ascending orderby on 'ChatVersion.as_of', so the earliest versions are first,
+    # latest are last
+    # NOTE: this only works if you load from the database, if you manually call `Chat.versions.insert(0, obj)`,
+    # it will NOT be sorted by the `ChatVersion.as_of` field!
     versions = relationship("ChatVersion", order_by="asc(ChatVersion.as_of)", back_populates="chat")
 
     __table_args__ = (
@@ -636,6 +642,10 @@ class Message(CustomDeclarativeBase):
     # SQLAlchemy Relationships
     #############################
 
+    # has an ascending orderby on 'MessageVersion.as_of', so the earliest versions are first,
+    # latest are last
+    # NOTE: this only works if you load from the database, if you manually call `Message.versions.insert(0, obj)`,
+    # it will NOT be sorted by the `MessageVersion.as_of` field!
     versions = relationship("MessageVersion", order_by="asc(MessageVersion.as_of)", back_populates="message")
 
     sender_user = relationship("User",
