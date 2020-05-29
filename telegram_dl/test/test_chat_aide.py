@@ -192,7 +192,7 @@ class TestChatAide(unittest.TestCase):
         loading a `db_model.SuperGroupChat`, has photo
         '''
 
-        p = u.get_fake_tdlib_messages_path("chat_supergroup_id_1446368458_channel_has_photo.json")
+        p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_has_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
         #######################################
@@ -228,7 +228,7 @@ class TestChatAide(unittest.TestCase):
         loading a `db_model.SuperGroupChat`, no photo
         '''
 
-        p = u.get_fake_tdlib_messages_path("chat_supergroup_id_1446368458_channel_no_photo.json")
+        p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_no_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
         #######################################
@@ -264,7 +264,7 @@ class TestChatAide(unittest.TestCase):
         `ChatAide.test_compare_tdlib_and_dbmodel_chat` with a supergroup, no photo, should be equal
         '''
 
-        p = u.get_fake_tdlib_messages_path("chat_supergroup_id_1446368458_channel_no_photo.json")
+        p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_no_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
         #######################################
@@ -289,7 +289,7 @@ class TestChatAide(unittest.TestCase):
         '''
         `ChatAide.test_compare_tdlib_and_dbmodel_chat` with a supergroup, photo, should be equal
         '''
-        p = u.get_fake_tdlib_messages_path("chat_supergroup_id_1446368458_channel_has_photo.json")
+        p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_has_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
         #######################################
@@ -310,7 +310,7 @@ class TestChatAide(unittest.TestCase):
         self.assertTrue(compare_result)
 
 
-    def test_multiple_chat_versions(self):
+    def test_compare_multiple_chat_versions(self):
         '''
         chat with multiple versions, checking against the most recent version
 
@@ -330,7 +330,7 @@ class TestChatAide(unittest.TestCase):
         chat_dbmodel_obj = self._get_supergroup_channel_chat_photo(asof_time)
 
 
-        p = u.get_fake_tdlib_messages_path("chat_supergroup_id_1446368458_channel_has_photo.json")
+        p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_has_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
         # so we have a Chat (Supergroup) with a photo, it should equal the message that we loaded
