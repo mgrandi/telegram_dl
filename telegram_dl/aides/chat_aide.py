@@ -236,17 +236,5 @@ class ChatAide:
 
 
     @staticmethod
-    def get_dbmodel_chat_by_telegram_chat_id(
-        sqla_session:sqlalchemy.orm.session.Session,
-        tg_chat_id:int) -> typing.Optional[db_model.Chat]:
-
-        maybe_existing_chat = session.query(db_model.Chat) \
-            .filter(db_model.Chat.tg_chat_id == object_to_handle.id) \
-            .first()
-
-        return maybe_existing_chat
-
-
-    @staticmethod
     def get_latest_dbmodel_chat_version_by_telegram_chat_id():
         pass

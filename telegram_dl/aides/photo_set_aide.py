@@ -55,13 +55,13 @@ class PhotoSetAide:
         if tdlib_chat_photo is None:
             return None
 
-        big_photo_file_result = FileAide.get_file_by_tdlib_file(tdlib_chat_photo.big)
-        small_photo_file_result = FileAide.get_file_by_tdlib_file(tdlib_chat_photo.small)
+        big_photo_file_result = FileAide.get_file_by_tdlib_file(sqla_session, tdlib_chat_photo.big)
+        small_photo_file_result = FileAide.get_file_by_tdlib_file(sqla_session, tdlib_chat_photo.small)
 
         if big_photo_file_result is not None and \
             small_photo_file_result is not None:
 
-            return PhotoSetAide.get_photo_set_from_file(big_photo_file_result)
+            return PhotoSetAide.get_photo_set_from_file(sqla_session, big_photo_file_result)
 
         else:
 
@@ -81,7 +81,7 @@ class PhotoSetAide:
 
         '''
 
-        existing_photo_set = session.query(db_model.PhotoSet) \
+        existing_photo_set = sqla_session.query(db_model.PhotoSet) \
                 .join(db_model.Photo) \
                 .filter(db_model.Photo.file_id == file_in_photoset.file_id) \
                 .first()

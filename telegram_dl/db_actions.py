@@ -309,7 +309,7 @@ class InsertOrUpdateHandler:
         # it seems that in telegram's ongoing effort to be forward compatable, the IDs for all chats are
         # within the same namespace even though their 'specific' id (for that chat type) is different
         # see `ID notes` in `chat notes.md`
-        maybe_existing_chat = ChatAide.get_dbmodel_chat_by_telegram_chat_id(session, object_to_handle.id)
+        maybe_existing_chat = ChatAide.get_chat_by_tg_chat_id(session, object_to_handle.id)
 
 
         change = None
@@ -319,10 +319,10 @@ class InsertOrUpdateHandler:
             change = dbe.DatabaseChangeEnum.NEW
 
             # chat doesn't exist, add a new Chat and one ChatVersion
-            result_chat = ChatAide.new_chat_from_tdlib_chat(object_to_handle)
+            result_chat = ChatAide.new_chat_from_tdlib_chat(session, object_to_handle)
 
-            insert_or_update_logger.debug("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
-                tmp_chat_ver, type(result_chat), result_chat, change)
+            insert_or_update_logger.debug("chat: adding db_model.Chat `%s` to session with change: `%s`",
+                result_chat, change)
 
             session.add(result_chat)
 
@@ -374,7 +374,7 @@ class InsertOrUpdateHandler:
         session = params.session
 
         # # see if it exists
-        maybe_existing = FileAide.get_file_by_remote_file_id(object_to_handle.remote.id)
+        maybe_existing = FileAide.get_file_by_remote_file_id(session, object_to_handle.remote.id)
 
         file_args = db_model_equality.EqualityArgumentFile(
             tdl_file=maybe_existing,
@@ -385,7 +385,7 @@ class InsertOrUpdateHandler:
         # either doesn't exist or it does exist but has changed
         if not maybe_existing or not is_equal:
 
-            new_file = FileAide.new_file_from_tdlib_file(object_to_handle)
+            new_file = FileAide.new_file_from_tdlib_file(session, object_to_handle)
 
             change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
 
