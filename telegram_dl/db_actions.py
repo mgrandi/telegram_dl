@@ -8,6 +8,9 @@ from telegram_dl import db_model
 from telegram_dl import db_model_enums as dbe
 from telegram_dl import utils
 from telegram_dl import db_model_equality
+from telegram_dl.aides.chat_aide import ChatAide
+from telegram_dl.aides.file_aide import FileAide
+from telegram_dl.aides.photo_set_aide import PhotoSetAide
 
 import attr
 import arrow
@@ -300,34 +303,14 @@ class InsertOrUpdateHandler:
 
         # chats are versioned
 
-
-        async def _new_chat_version_from_tdlib_chat(tdlib_chat:tdlib_generated.chat) -> db_model.ChatVersion:
-            ''' helper function to create a new ChatVersion from a `tdlib_generated.chat`
-
-            @param tdlib_chat - the chat to copy the information from
-            @return the new ChatVersion object
-            '''
-
-            profile_photo_set_result = await self.handle_insert_or_update(object_to_handle.photo, params)
-
-            new_ver = db_model.ChatVersion(
-                as_of=arrow.utcnow(),
-                title=tdlib_chat.title,
-                photo_set=profile_photo_set_result.obj if profile_photo_set_result else None,
-                is_sponsored=tdlib_chat.is_sponsored)
-
-            return new_ver
-
-
         session = params.session
 
         # so here, we are seeing if we have the chat already saved
         # it seems that in telegram's ongoing effort to be forward compatable, the IDs for all chats are
         # within the same namespace even though their 'specific' id (for that chat type) is different
         # see `ID notes` in `chat notes.md`
-        maybe_existing_chat = session.query(db_model.Chat) \
-            .filter(db_model.Chat.tg_chat_id == object_to_handle.id) \
-            .first()
+        maybe_existing_chat = ChatAide.get_dbmodel_chat_by_telegram_chat_id(session, object_to_handle.id)
+
 
         change = None
 
@@ -336,61 +319,7 @@ class InsertOrUpdateHandler:
             change = dbe.DatabaseChangeEnum.NEW
 
             # chat doesn't exist, add a new Chat and one ChatVersion
-
-            # parameters that fit all `chat` types, since this table is polymorphic
-            chat_instance_parameters_dict = dict(
-                tg_chat_id=object_to_handle.id,
-            )
-
-            chat_type = object_to_handle.type
-
-            result_chat = None
-
-            if isinstance(chat_type, tdlib_generated.chatTypeBasicGroup):
-
-                chat_instance_parameters_dict["tg_basic_group_id"] = chat_type.basic_group_id
-
-                result_chat = db_model.BasicGroupChat(**chat_instance_parameters_dict)
-
-
-            elif isinstance(chat_type, tdlib_generated.chatTypePrivate):
-
-                other_user = session.query(db_model.User) \
-                    .filter(db_model.User.tg_user_id == chat_type.user_id) \
-                    .one()
-
-                chat_instance_parameters_dict["user"] = other_user
-
-                result_chat = db_model.PrivateChat(**chat_instance_parameters_dict)
-
-            elif isinstance(chat_type, tdlib_generated.chatTypeSecret):
-
-                other_secret_user = session.query(db_model.User) \
-                    .filter(db_model.User.tg_user_id == chat_type.secret_user_id) \
-                    .one()
-
-                chat_instance_parameters_dict["user"] = other_secret_user
-                chat_instance_parameters_dict["tg_secret_chat_id"] = chat_type.secret_chat_id
-
-                result_chat = db_model.SecretChat(**chat_instance_parameters_dict)
-
-            elif isinstance(chat_type, tdlib_generated.chatTypeSupergroup):
-
-                chat_instance_parameters_dict["tg_super_group_id"] = chat_type.supergroup_id
-                chat_instance_parameters_dict["is_channel"] = chat_type.is_channel
-
-                result_chat = db_model.SuperGroupChat(**chat_instance_parameters_dict)
-
-            else:
-
-                insert_or_update_logger.error("chat: Unrecognized chat type? we got: `%s`", object_to_handle)
-
-                return InsertOrUpdateResult(obj=None, change=dbe.DatabaseChangeEnum.NO_CHANGE)
-
-            # create the chat_version and add it to whatever type of chat we get back from the
-            # if/else statement
-            tmp_chat_ver = await _new_chat_version_from_tdlib_chat(object_to_handle)
-            result_chat.versions.append(tmp_chat_ver)
+            result_chat = ChatAide.new_chat_from_tdlib_chat(object_to_handle)
 
             insert_or_update_logger.debug("chat: adding db_model.ChatVersion `%s` object to `%s` db_model.Chat `%s` to session with change: `%s`",
                 tmp_chat_ver, type(result_chat), result_chat, change)
@@ -401,16 +330,19 @@ class InsertOrUpdateHandler:
 
 
         # see if the latest version matches the chat we got from telegram
-        chat_equality_args = db_model_equality.EqualityArgumentChat(
-            tdl_chat=maybe_existing_chat, tdg_chat=object_to_handle)
+        # chat_equality_args = db_model_equality.EqualityArgumentChat(
+        #     tdl_chat=maybe_existing_chat, tdg_chat=object_to_handle)
 
-        is_equal = equality_tester.is_equal(chat_equality_args)
+        # is_equal = equality_tester.is_equal(chat_equality_args)
+
+        is_equal = ChatAide.compare_tdlib_and_dbmodel_chat(maybe_existing_chat, object_to_handle)
 
         if not is_equal:
 
             # chat already exists, but we need to add a new version
 
-            new_version = await _new_chat_version_from_tdlib_chat(object_to_handle)
+            # new_version = await _new_chat_version_from_tdlib_chat(object_to_handle)
+            new_version = ChatAide.new_chat_version_from_tdlib_chat(session, object_to_handle)
 
             change = dbe.DatabaseChangeEnum.UPDATED
 
@@ -425,7 +357,7 @@ class InsertOrUpdateHandler:
 
         else:
 
-            # chat already exists
+            # chat already exists and hasn't changed
             insert_or_update_logger.debug("chat: not adding db_model.ChatVersion object to db_model.Chat `%s` because it already exists and hasn't changed",
                  maybe_existing_chat)
 
@@ -442,7 +374,7 @@ class InsertOrUpdateHandler:
         session = params.session
 
         # # see if it exists
-        maybe_existing = session.query(db_model.File).filter(db_model.File.remote_file_id == object_to_handle.remote.id).first()
+        maybe_existing = FileAide.get_file_by_remote_file_id(object_to_handle.remote.id)
 
         file_args = db_model_equality.EqualityArgumentFile(
             tdl_file=maybe_existing,
@@ -453,11 +385,7 @@ class InsertOrUpdateHandler:
         # either doesn't exist or it does exist but has changed
         if not maybe_existing or not is_equal:
 
-            new_file = db_model.File(tg_file_id=object_to_handle.id,
-                size=object_to_handle.size,
-                expected_size=object_to_handle.expected_size,
-                remote_file_id=object_to_handle.remote.id,
-                remote_unique_id=object_to_handle.remote.unique_id if object_to_handle.remote.unique_id else None)
+            new_file = FileAide.new_file_from_tdlib_file(object_to_handle)
 
             change = dbe.DatabaseChangeEnum.NEW if maybe_existing == None else dbe.DatabaseChangeEnum.UPDATED
 
@@ -476,7 +404,7 @@ class InsertOrUpdateHandler:
 
 
     @handle_insert_or_update.register
-    async def chat_photo(self, incoming_profile_photo:tdlib_generated.chatPhoto, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
+    async def chat_photo(self, incoming_chat_photo:tdlib_generated.chatPhoto, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
         '''
         basically copied from `profile_photo`, except chatPhoto does not have an `id`
 
@@ -486,54 +414,22 @@ class InsertOrUpdateHandler:
 
         session = params.session
 
-        # see if it exists
+        chat_photo_set_result = PhotoSetAide.get_photo_set_from_tdlib_chat_photo(incoming_chat_photo)
 
-        # see if the big and small files exist
-        big_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.big, params)
-        small_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.small, params)
-
-        if big_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE and \
-            small_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE:
-
-            # files already exist, return the profile_photo_set that already exists
-
-            existing_photo_set = session.query(db_model.PhotoSet) \
-                .join(db_model.Photo) \
-                .filter(db_model.Photo.file_id == big_photo_file_result.obj.file_id) \
-                .first()
-
-            insert_or_update_logger.debug("chat_photo: not adding db_model.PhotoSet object `%s` because it already exists or hasn't changed",
-                existing_photo_set)
-
-            return InsertOrUpdateResult(obj=existing_photo_set, change=dbe.DatabaseChangeEnum.NO_CHANGE)
-
-        else:
+        if chat_photo_set_result is None:
 
             # files are new, so we need to create a Photo for each and then a PhotoSet,
             # then return the ProfilePhotoSet
-            new_photo_set = db_model.PhotoSet()
-
-            big_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_BIG,
-                width=-1,
-                height=-1,
-                has_stickers=False,
-                file=big_photo_file_result.obj)
-
-            small_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_SMALL,
-                width=-1,
-                height=-1,
-                has_stickers=False,
-                file=small_photo_file_result.obj)
-
-            new_photo_set.photos.append(big_photo)
-            new_photo_set.photos.append(small_photo)
+            new_photo_set = FileAide.new_photo_set_from_tdlib_chatphoto(incoming_profile_photo)
 
             insert_or_update_logger.debug("chat_photo: adding db_model.PhotoSet object `%s` to session with change: `%s`",
                 new_photo_set, dbe.DatabaseChangeEnum.NEW)
 
             return InsertOrUpdateResult(obj=new_photo_set, change=dbe.DatabaseChangeEnum.NEW)
+
+        else:
+
+            return InsertOrUpdateResult(obj=chat_photo_set_result, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
 
     @handle_insert_or_update.register
