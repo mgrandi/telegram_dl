@@ -186,6 +186,11 @@ class TestChatAide(unittest.TestCase):
             self.assertEquals(tdlib_chat.photo.big.remote.id, "AQADAQATfeJuBgAEAwADNhsl1Rb___999EMQGh7tDwQ9AgABGAQ")
             self.assertEquals(tdlib_chat.photo.big.remote.unique_id, "AQADfeJuBgAEBD0CAAE")
 
+#########################################################################################
+#########################################################################################
+#########################################################################################
+#########################################################################################
+
 
     def test_load_supergroup_channel_from_file_photo(self):
         '''
@@ -195,16 +200,12 @@ class TestChatAide(unittest.TestCase):
         p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_has_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
-        #######################################
         # create the db_model objects from JSON
-        #######################################
 
         asof_time = arrow.utcnow()
         chat_dbmodel_obj = self._get_supergroup_channel_chat_photo(asof_time)
 
-        #######################################
         # test our custom created db_model object
-        #######################################
 
         # supergroup / channel specific stuff
         self.assertEquals(chat_dbmodel_obj.tg_super_group_id, 1446368458)
@@ -213,9 +214,7 @@ class TestChatAide(unittest.TestCase):
         # assert common fields
         self._assert_common_dbmodel_chat_fields(asof_time, chat_dbmodel_obj, tdlib_obj, True)
 
-        #######################################
         # make sure the object we loaded from JSON is what we expect
-        #######################################
 
         # the `chat.type` fields
         self.assertEquals(type(tdlib_obj.type), tdg.chatTypeSupergroup)
@@ -231,16 +230,12 @@ class TestChatAide(unittest.TestCase):
         p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_no_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
-        #######################################
         # create the db_model objects from JSON
-        #######################################
 
         asof_time = arrow.utcnow()
         chat_dbmodel_obj = self._get_supergroup_channel_chat_nophoto(asof_time)
 
-        #######################################
         # test our custom created db_model object
-        #######################################
 
         # supergroup / channel specific stuff
         self.assertEquals(chat_dbmodel_obj.tg_super_group_id, 1446368458)
@@ -249,14 +244,46 @@ class TestChatAide(unittest.TestCase):
         # assert common fields
         self._assert_common_dbmodel_chat_fields(asof_time, chat_dbmodel_obj, tdlib_obj, False)
 
-        #######################################
         # make sure the object we loaded from JSON is what we expect
-        #######################################
 
         # the `chat.type` fields
         self.assertEquals(type(tdlib_obj.type), tdg.chatTypeSupergroup)
         self.assertEquals(tdlib_obj.type.supergroup_id, 1446368458)
         self.assertTrue(tdlib_obj.type.is_channel)
+
+
+
+    # TODO FIXME: do i even need any of these `test load` unit tests?
+    # does it really make sense to test the fake tdlib messags files?
+    # maybe i should just get rid of them...
+
+    @unittest.skip("not finished yet")
+    def test_load_basic_group_from_file_no_photo(self):
+        '''
+        loading a `db_model.BasicGroupChat`, no photo
+        '''
+        pass
+
+    @unittest.skip("not finished yet")
+    def test_load_basic_group_from_file_has_photo(self):
+        '''
+        loading a `db_model.BasicGroupChat`, has photo
+        '''
+        pass
+
+    @unittest.skip("not finished yet")
+    def test_load_secret_chat_from_file(self):
+        pass
+
+    @unittest.skip("not finished yet")
+    def test_load_secret_chat_from_file(self):
+        pass
+
+
+#########################################################################################
+#########################################################################################
+#########################################################################################
+#########################################################################################
 
 
     def test_compare_chat_supergroup_channel_nophoto_equal(self):
@@ -267,16 +294,12 @@ class TestChatAide(unittest.TestCase):
         p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_no_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
-        #######################################
         # create the db_model objects from JSON
-        #######################################
 
         asof_time = arrow.utcnow()
         chat_dbmodel_obj = self._get_supergroup_channel_chat_nophoto(asof_time)
 
-        #######################################
         # assert that we correctly compare these as true
-        #######################################
 
         compare_result = chat_aide.ChatAide.compare_tdlib_and_dbmodel_chat(
             dbmodel_chat=chat_dbmodel_obj,
@@ -292,16 +315,12 @@ class TestChatAide(unittest.TestCase):
         p = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_has_photo.json")
         tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
 
-        #######################################
         # create the db_model objects from JSON
-        #######################################
 
         asof_time = arrow.utcnow()
         chat_dbmodel_obj = self._get_supergroup_channel_chat_photo(asof_time)
 
-        #######################################
         # assert that we correctly compare these as true
-        #######################################
 
         compare_result = chat_aide.ChatAide.compare_tdlib_and_dbmodel_chat(
             dbmodel_chat=chat_dbmodel_obj,
@@ -310,7 +329,7 @@ class TestChatAide(unittest.TestCase):
         self.assertTrue(compare_result)
 
 
-    def test_compare_multiple_chat_versions(self):
+    def test_compare_multiple_chat_versions_supergroup(self):
         '''
         chat with multiple versions, checking against the most recent version
 
@@ -374,7 +393,13 @@ class TestChatAide(unittest.TestCase):
         self.assertEqual(len(chat_dbmodel_obj.versions), 3)
         # has a photo
         self.assertNotEqual(chat_dbmodel_obj.versions[-1].photo_set, None)
-        self.assertTrue(compare_result_three)    def test_get_chat_by_tg_chat_id_multiple_chats(self):
+        self.assertTrue(compare_result_three)
+
+
+#########################################################################################
+#########################################################################################
+#########################################################################################
+#########################################################################################
 
 
     def test_get_chat_by_tg_chat_id_multiple_chats(self):
