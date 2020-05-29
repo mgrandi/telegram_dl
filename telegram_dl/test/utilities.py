@@ -1,5 +1,6 @@
 import json
 import pathlib
+import contextlib
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -8,6 +9,7 @@ from sqlalchemy.engine.url import URL
 
 from telegram_dl import utils
 from telegram_dl import tdlib_generated as tdg
+from telegram_dl import db_model
 
 
 def get_fake_tdlib_messages_path(partial_path:pathlib.Path) -> pathlib.Path:
@@ -38,6 +40,10 @@ def get_testing_sqla_engine():
         query=None)
     e = create_engine(url, echo=False)
 
+    base = db_model.CustomDeclarativeBase
+
+    base.metadata.create_all(bind=e)
+
     return e
 
 def get_testing_sqla_sessionmaker():
@@ -47,6 +53,23 @@ def get_testing_sqla_sessionmaker():
     sm = sessionmaker(bind=engine)
 
     return sm
+
+
+@contextlib.contextmanager
+def get_testing_sqla_session_contextmanager():
+
+    engine = get_testing_sqla_engine()
+
+    sm = sessionmaker(bind=engine)
+
+    session = sm()
+
+    try:
+        yield session
+    finally:
+        session.close()
+        engine.dispose()
+
 
 def load_tdlib_generated_obj_from_file(
     file_path:pathlib.Path, converter:utils.CustomCattrConverter) -> tdg.RootObject:
