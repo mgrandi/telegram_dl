@@ -233,8 +233,3 @@ class ChatAide:
         logger.debug("final result: `%s`", final_result)
 
         return final_result
-
-
-    @staticmethod
-    def get_latest_dbmodel_chat_version_by_telegram_chat_id():
-        pass
