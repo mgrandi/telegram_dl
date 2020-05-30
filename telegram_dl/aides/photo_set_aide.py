@@ -22,8 +22,8 @@ class PhotoSetAide:
         method that returns a new db_model.PhotoSet from a `tdlib_generated.chatPhoto`
         '''
 
-        new_small_photo_file = FileAide.new_file_from_tdlib_file(tdlib_chat_photo.small)
-        new_big_photo_file = FileAide.new_file_from_tdlib_file(tdlib_chat_photo.big)
+        new_small_photo_file = FileAide.new_file_from_tdlib_file(sqla_session, tdlib_chat_photo.small)
+        new_big_photo_file = FileAide.new_file_from_tdlib_file(sqla_session, tdlib_chat_photo.big)
 
         new_photo_set = db_model.PhotoSet()
 
