@@ -152,7 +152,7 @@ class TestChatAide(unittest.TestCase):
         self.assertTrue(compare_result)
 
 
-    def test_compare_multiple_chat_versions_supergroup(self):
+    def test_compare_chat_supergroup_channel_multiple_chat_versions(self):
         '''
         chat with multiple versions, checking against the most recent version
 
@@ -219,13 +219,15 @@ class TestChatAide(unittest.TestCase):
         self.assertTrue(compare_result_three)
 
 
+
+
 #########################################################################################
 #########################################################################################
 #########################################################################################
 #########################################################################################
 
 
-    def test_get_chat_by_tg_chat_id_multiple_chats(self):
+    def test_get_chat_by_tg_chat_id(self):
         '''
         insert multiple chats into the database and call `ChatAide.get_chat_by_tg_chat_id` on the IDs
 
@@ -233,41 +235,56 @@ class TestChatAide(unittest.TestCase):
 
         with u.get_testing_sqla_session_contextmanager() as session:
 
-            chat_one = self._get_supergroup_channel_chat_photo(arrow.now())
+            p1 = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_has_photo.json")
+            tdlib_obj1 = u.load_tdlib_generated_obj_from_file(p1, self.converter)
+            self.assertEqual(type(tdlib_obj1), tdg.chat)
+            chat_one = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj1)
             session.add(chat_one)
-
-            p = u.get_fake_tdlib_messages_path("chat/chat_basic_group_id_-423872019_no_photo.json")
-            tdlib_obj = u.load_tdlib_generated_obj_from_file(p, self.converter)
-            self.assertEqual(type(tdlib_obj), tdg.chat)
-            chat_two = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj)
-            session.add(chat_two)
 
             p2 = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001266163180_no_photo.json")
             tdlib_obj2 = u.load_tdlib_generated_obj_from_file(p2, self.converter)
             self.assertEquals(type(tdlib_obj2), tdg.chat)
-            chat_three = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj2)
+            chat_two = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj2)
+            session.add(chat_two)
+
+            p3 = u.get_fake_tdlib_messages_path("chat/chat_basic_group_id_-423872019_no_photo.json")
+            tdlib_obj3 = u.load_tdlib_generated_obj_from_file(p3, self.converter)
+            self.assertEqual(type(tdlib_obj3), tdg.chat)
+            chat_three = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj3)
             session.add(chat_three)
 
+            p4 = u.get_fake_tdlib_messages_path("chat/chat_private_id_80661419_has_photo.json")
+            tdlib_obj4 = u.load_tdlib_generated_obj_from_file(p4, self.converter)
+            self.assertEqual(type(tdlib_obj4), tdg.chat)
+            chat_four = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj4)
+            session.add(chat_four)
 
-            # now make sure we can get all 3 chats
+
+            # now make sure we can get all chats
 
             session.commit()
 
             result_chat_one = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -1001446368458)
             self.assertEquals(result_chat_one.tg_chat_id, -1001446368458)
             self.assertEquals(len(result_chat_one.versions), 1)
+            self.assertEquals(type(result_chat_one), db_model.SuperGroupChat)
             self.assertEquals(result_chat_one.versions[0].title, "TestingChannel")
 
-            result_chat_two = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -423872019)
-            self.assertEquals(result_chat_two.tg_chat_id, -423872019)
+            result_chat_two = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -1001266163180)
+            self.assertEquals(result_chat_two.tg_chat_id, -1001266163180)
             self.assertEquals(len(result_chat_two.versions), 1)
-            self.assertEquals(result_chat_two.versions[0].title, "telegram_dl development")
+            self.assertEquals(type(result_chat_two), db_model.SuperGroupChat)
+            self.assertEquals(result_chat_two.versions[0].title, "TGS stuff")
 
-            result_chat_three = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -1001266163180)
-            self.assertEquals(result_chat_three.tg_chat_id, -1001266163180)
+            result_chat_three = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -423872019)
+            self.assertEquals(result_chat_three.tg_chat_id, -423872019)
             self.assertEquals(len(result_chat_three.versions), 1)
-            self.assertEquals(result_chat_three.versions[0].title, "TGS stuff")
+            self.assertEquals(type(result_chat_two), db_model.BasicGroupChat)
+            self.assertEquals(result_chat_three.versions[0].title, "telegram_dl development")
 
-
-
+            result_chat_four = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, 80661419)
+            self.assertEquals(result_chat_four.tg_chat_id, 80661419)
+            self.assertEquals(len(result_chat_four.versions), 1)
+            self.assertEquals(type(result_chat_two), db_model.PrivateChat)
+            self.assertEquals(result_chat_four.versions[0].title, "John Smith")
 
