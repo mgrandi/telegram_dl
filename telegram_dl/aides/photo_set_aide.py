@@ -50,6 +50,10 @@ class PhotoSetAide:
     def get_photo_set_from_tdlib_chat_photo(
         sqla_session:sqlalchemy.orm.session.Session,
         tdlib_chat_photo:typing.Optional[tdlib_generated.chatPhoto]) -> typing.Optional[db_model.PhotoSet]:
+        '''
+        returns an exisitng db_model.PhotoSet given a `tdlib_generated.chatPhoto` if it exists, else
+        returns None
+        '''
 
         # sometimes chats have no photo, handle this
         if tdlib_chat_photo is None:
@@ -167,3 +171,150 @@ class PhotoSetAide:
         logger.debug("final result: `%s`", final_result)
 
         return final_result
+
+###################################################
+###################################################
+###################################################
+
+    @staticmethod
+    def compare_dbmodel_profile_photoset_and_tdlib_profilephoto(
+        dbmodel_profile_photoset:typing.Optional[db_model.ProfilePhotoSet],
+        tdlib_profilephoto:typing.Optional[tdg.profilePhoto]) -> bool:
+        '''
+        Testing to see if a `db_model.Chat`s `db_model.PhotoSet` 'matches'
+        tdlib's 'chatPhoto' class
+
+        since we are abstracting a `tdg.profilePhoto` as a `db_model.ProfilePhotoSet ,
+        its slightly more complicated
+        '''
+
+        # a `tdg.profilePhoto` has 3 fields, 'big` (file), `small` (file), and
+        # `id` (int)
+        #
+        # a db_model.PhotoSet has a collection of db_model.Photo objects,
+        # each with a reference to a db_model.File
+        # tdg.profilePhoto.id corresponds to the db_model.ProfilePhotoSet.tg_id field
+
+        # do fast check for None, some users don't have a profile photo or have removed it
+        # since we last checked
+        logging.debug("comparing `%s` and `%s`", dbmodel_profile_photoset, tdlib_profilephoto)
+
+        if dbmodel_profile_photoset is None or \
+            tdlib_profilephoto is None:
+
+            logging.debug("one of the args is None, doing fast comparison")
+
+            fast_result = dbmodel_profile_photoset == tdlib_profilephoto
+
+            logging.debug("fast result: `%s`", fast_result)
+
+            return fast_result
+
+
+        # check profile photo 'id'
+        id_comparison = dbmodel_profile_photoset.tg_id == tdlib_profilephoto.id
+
+        # check files
+        logging.debug("comparing big file")
+
+
+        big_photo_comparison = FileAide \
+            .compare_dbmodel_file_and_tdlib_file(dbmodel_profile_photoset.big.file, tdlib_profilephoto.big)
+
+        logging.debug("comparing small file")
+
+        small_photo_comparison = FileAide \
+            .compare_dbmodel_file_and_tdlib_file(dbmodel_profile_photoset.small.file, tdlib_profilephoto.small)
+
+        logging.debug("big photo comparison: `%s`, small photo comparison: `%s`",
+            big_photo_comparison, small_photo_comparison)
+
+        # get final result
+        final_result =  id_comparison and big_photo_comparison and small_photo_comparison
+
+        logging.debug("final result: `%s`", final_result)
+
+        return final_result
+
+
+    @staticmethod
+    def get_profile_photo_set_from_tdlib_profile_photo(
+        sqla_session:sqlalchemy.orm.session.Session,
+        tdlib_profile_photo:typing.Optional[tdlib_generated.profilePhoto]) -> typing.Optional[db_model.ProfilePhotoSet]:
+        '''
+        returns an exisitng db_model.ProfilePhotoSet given a `tdlib_generated.profilePhoto` if it exists, else
+        returns None
+        '''
+
+        # sometimes chats have no photo, handle this
+        if tdlib_profile_photo is None:
+            return None
+
+        big_photo_file_result = FileAide.get_file_by_tdlib_file(sqla_session, tdlib_profile_photo.big)
+        small_photo_file_result = FileAide.get_file_by_tdlib_file(sqla_session, tdlib_profile_photo.small)
+
+        if big_photo_file_result is not None and \
+            small_photo_file_result is not None:
+
+            return PhotoSetAide.get_profile_photo_set_from_file_and_tg_id(
+                sqla_session, big_photo_file_result, tdlib_profile_photo.id)
+
+        else:
+
+            return None
+
+
+    @staticmethod
+    def get_profile_photo_set_from_file_and_tg_id(
+        sqla_session:sqlalchemy.orm.session.Session,
+        file_in_photoset:db_model.File,
+        tg_id:int) -> typing.Optional[db_model.PhotoSet]:
+        '''
+        returns a `db_model.PhotoSet` that has a `db_model.Photo` / `db_model.File`
+        that matches the one passed in as an argument, if it exists, or
+        returns None (see the documentation for `Query.first()` )
+
+        '''
+
+        existing_photo_set = sqla_session.query(db_model.ProfilePhotoSet) \
+                .join(db_model.Photo) \
+                .filter(db_model.Photo.file_id == file_in_photoset.file_id) \
+                .filter(db_model.ProfilePhotoSet.tg_id == tg_id) \
+                .first()
+
+        return existing_photo_set
+
+    @staticmethod
+    def new_profile_photo_set_from_tdlib_profilephoto(
+        sqla_session:sqlalchemy.orm.session.Session,
+        tdlib_profile_photo:typing.Optional[tdg.profilePhoto]) -> db_model.ProfilePhotoSet:
+        '''
+        method that returns a new db_model.ProfilePhotoSet from a `tdlib_generated.profilePhoto`
+        '''
+
+        if tdlib_profile_photo is None:
+            return None
+
+        new_small_photo_file = FileAide.new_file_from_tdlib_file(sqla_session, tdlib_profile_photo.small)
+        new_big_photo_file = FileAide.new_file_from_tdlib_file(sqla_session, tdlib_profile_photo.big)
+
+        new_photo_set = db_model.ProfilePhotoSet(tg_id=tdlib_profile_photo.id)
+
+        small_photo = db_model.Photo(
+            thumbnail_type=dbme.PhotoSizeThumbnailType.PHOTO_SMALL,
+            width=-1,
+            height=-1,
+            has_stickers=False,
+            file=new_small_photo_file)
+
+        big_photo = db_model.Photo(
+            thumbnail_type=dbme.PhotoSizeThumbnailType.PHOTO_BIG,
+            width=-1,
+            height=-1,
+            has_stickers=False,
+            file=new_big_photo_file)
+
+        new_photo_set.photos.append(big_photo)
+        new_photo_set.photos.append(small_photo)
+
+        return new_photo_set

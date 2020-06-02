@@ -11,6 +11,7 @@ from telegram_dl import db_model_equality
 from telegram_dl.aides.chat_aide import ChatAide
 from telegram_dl.aides.file_aide import FileAide
 from telegram_dl.aides.photo_set_aide import PhotoSetAide
+from telegram_dl.aides.user_aide import UserAide
 
 import attr
 import arrow
@@ -497,57 +498,22 @@ class InsertOrUpdateHandler:
 
         # users are versioned
 
-        async def _new_version_from_tdlib_user(tdlib_user:tdlib_generated.user) -> db_model.UserVersion:
-            ''' helper function to create a UserVersion
-
-            @param tdlib_user the tdlib user to copy info from
-            @return the UserVersion model object
-            '''
-
-            # add the + sign so it parses correctly
-            fixed_phone_number = utils.fix_phone_number(tdlib_user.phone_number) if tdlib_user.phone_number else ""
-
-            profile_photo_set_result = await self.handle_insert_or_update(tdlib_user.profile_photo, params)
-
-            new_version = db_model.UserVersion(
-                as_of=arrow.utcnow(),
-                first_name=tdlib_user.first_name,
-                last_name=tdlib_user.last_name,
-                user_name=tdlib_user.username,
-                phone_number=fixed_phone_number,
-                is_contact=True if tdlib_user.is_contact == 1 else False,
-                is_mutual_contact=True if tdlib_user.is_mutual_contact == 1 else False,
-                profile_photo_set=profile_photo_set_result.obj if profile_photo_set_result is not None else None,
-                is_verified=tdlib_user.is_verified,
-                is_support=tdlib_user.is_support,
-                restriction_reason=tdlib_user.restriction_reason,
-                is_scam=tdlib_user.is_scam,
-                have_access=tdlib_user.have_access,
-                user_type=dbe.UserTypeEnum.parse_from_tdg_usertype(tdlib_user.type),
-                language_code=tdlib_user.language_code)
-
-            return new_version
 
         # see if this user version exists
-        maybe_existing_user = session.query(db_model.User) \
-            .filter(db_model.User.tg_user_id == incoming_user.id) \
-            .first()
+        maybe_existing_user = UserAide.get_user_by_tg_user_id(session, incoming_user.id)
 
         change = None
 
         if not maybe_existing_user:
 
             # create a new user
-            new_user = db_model.User(tg_user_id=incoming_user.id)
-
-            new_version = await _new_version_from_tdlib_user(incoming_user)
-
-            new_user.versions.append(new_version)
+            new_user = UserAide.new_user_from_tdlib_user(session, incoming_user)
 
             change = dbe.DatabaseChangeEnum.NEW
 
-            insert_or_update_logger.debug("user:adding new db_model.User object `%s` and new db_model.UserVersion `%s` to session with change: `%s`",
-                new_user, new_version, change)
+            insert_or_update_logger.debug("user:adding new db_model.User object `%s` to session with change: `%s`",
+                new_user, change)
+
             session.add(new_user)
 
             return InsertOrUpdateResult(obj=new_user, change=change)
@@ -555,16 +521,12 @@ class InsertOrUpdateHandler:
 
         # see if we need a new version?
 
-        user_args = db_model_equality.EqualityArgumentUser(
-            tdl_user=maybe_existing_user,
-            tdg_user=incoming_user)
-
-        is_equal = equality_tester.is_equal(user_args)
+        is_equal = UserAide.compare_dbmodel_and_tdlib_user(maybe_existing_user, incoming_user)
 
         if not is_equal:
 
             # user exists but we need a new version
-            new_version = await _new_version_from_tdlib_user(incoming_user)
+            new_version = UserAide.new_user_version_from_tdlib_user(session, incoming_user)
 
             maybe_existing_user.versions.append(new_version)
 
