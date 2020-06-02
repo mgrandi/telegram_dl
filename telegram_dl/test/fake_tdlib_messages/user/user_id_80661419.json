@@ -1,0 +1,87 @@
+{
+  "_extra": null,
+  "id": 80661419,
+  "first_name": "John",
+  "last_name": "Doe",
+  "username": "TestingJohnDoe",
+  "phone_number": "15555555",
+  "status": {
+    "_extra": null,
+    "was_online": 1589933227,
+    "@type": "userStatusOffline"
+  },
+  "profile_photo": {
+    "_extra": null,
+    "id": 346438157110192450,
+    "small": {
+      "_extra": null,
+      "id": 14,
+      "size": 0,
+      "expected_size": 0,
+      "local": {
+        "_extra": null,
+        "path": "",
+        "can_be_downloaded": true,
+        "can_be_deleted": false,
+        "is_downloading_active": false,
+        "is_downloading_completed": false,
+        "download_offset": 0,
+        "downloaded_prefix_size": 0,
+        "downloaded_size": 0,
+        "@type": "localFile"
+      },
+      "remote": {
+        "_extra": null,
+        "id": "AQADAQADXKkxG6vLzgQACLJsEjAABAIAA6vLzgQABHHpJIC1z601EGwAAhgE",
+        "unique_id": "AQADsmwSMAAEEGwAAg",
+        "is_uploading_active": false,
+        "is_uploading_completed": true,
+        "uploaded_size": 0,
+        "@type": "remoteFile"
+      },
+      "@type": "file"
+    },
+    "big": {
+      "_extra": null,
+      "id": 15,
+      "size": 0,
+      "expected_size": 0,
+      "local": {
+        "_extra": null,
+        "path": "",
+        "can_be_downloaded": true,
+        "can_be_deleted": false,
+        "is_downloading_active": false,
+        "is_downloading_completed": false,
+        "download_offset": 0,
+        "downloaded_prefix_size": 0,
+        "downloaded_size": 0,
+        "@type": "localFile"
+      },
+      "remote": {
+        "_extra": null,
+        "id": "AQADAQADXKkxG6vLzgQACLJsEjAABAMAA6vLzgQABHHpJIC1z601EmwAAhgE",
+        "unique_id": "AQADsmwSMAAEEmwAAg",
+        "is_uploading_active": false,
+        "is_uploading_completed": true,
+        "uploaded_size": 0,
+        "@type": "remoteFile"
+      },
+      "@type": "file"
+    },
+    "@type": "profilePhoto"
+  },
+  "is_contact": true,
+  "is_mutual_contact": true,
+  "is_verified": false,
+  "is_support": false,
+  "restriction_reason": "",
+  "is_scam": false,
+  "have_access": true,
+  "type": {
+    "_extra": null,
+    "@type": "userTypeRegular"
+  },
+  "language_code": "",
+  "@type": "user"
+}

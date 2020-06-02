@@ -49,18 +49,30 @@ class TestChatAidePrivateChatPhoto(unittest.TestCase):
 
         with u.get_testing_sqla_session_contextmanager() as session:
 
+            # add the db_model.User that this private chat is with, or else it
+            # will have a integrity error when we add the chat
+            user_json =  u.get_fake_tdlib_messages_path("user/user_id_80661419.json")
+            user_obj = u.load_tdlib_generated_obj_from_file(user_json, self.converter)
+            self.assertEqual(type(user_obj), tdg.user)
+            user_tdlib_obj = UserAide.new_user_from_tdlib_user(session, user_obj)
+            session.add(user_tdlib_obj)
+
+
+            # add the db_model.PrivateChat
             p4 = u.get_fake_tdlib_messages_path("chat/chat_private_id_80661419_has_photo.json")
             tdlib_obj4 = u.load_tdlib_generated_obj_from_file(p4, self.converter)
             self.assertEqual(type(tdlib_obj4), tdg.chat)
             chat_four = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj4)
             session.add(chat_four)
 
+            # commit it
             session.commit()
 
+            # do assertions
             result_chat_four = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, 80661419)
             self.assertEquals(result_chat_four.tg_chat_id, 80661419)
             self.assertEquals(len(result_chat_four.versions), 1)
-            self.assertEquals(type(result_chat_two), db_model.PrivateChat)
+            self.assertEquals(type(result_chat_four), db_model.PrivateChat)
             self.assertEquals(result_chat_four.versions[0].title, "John Smith")
 
     @unittest.skip("TODO")
