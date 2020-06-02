@@ -21,7 +21,10 @@ class PhoneNumberAide:
         parses a phone number string and returns a PhoneNumber object
         '''
 
-        return phonenumbers.parse(phone_number_str, region=constants.PHONE_NUMBER_DEFAULT_REGION)
+        fixed_phone_number_str = PhoneNumberAide.fix_phone_number_from_string(phone_number_str)
+
+        return phonenumbers.parse(fixed_phone_number_str,
+            region=constants.PHONE_NUMBER_DEFAULT_REGION)
 
     @staticmethod
     def fix_phone_number_from_string(phone_number_str:str) -> str:
