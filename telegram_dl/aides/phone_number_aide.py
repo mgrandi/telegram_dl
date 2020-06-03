@@ -29,23 +29,27 @@ class PhoneNumberAide:
     @staticmethod
     def fix_phone_number_from_string(phone_number_str:str) -> str:
         ''' add a plus infront of the phone number if it
-        doesn't have one so `phonenumbers` can parse it
+        doesn't have one so `phonenumbers` can parse it easier
         '''
 
-        # NOTE: it seems that we are NOT supposed to put a plus infront of the number
-        # if it is a short code number
-        # see:
-        # https://support.twilio.com/hc/en-us/articles/223182068-What-is-a-Messaging-Short-Code-
-        # https://support.twilio.com/hc/en-us/articles/360013980754-Formatting-Short-Code-Numbers
         if not phone_number_str.startswith("+"):
 
-            if len(phone_number_str) >= constants.PHONE_NUMBER_SHORT_CODE_MIN_LENGTH \
-                and len(phone_number_str) <= constants.PHONE_NUMBER_SHORT_CODE_MIN_LENGTH:
+            l = len(phone_number_str)
 
-                return phone_number_str
+
+            if l >= constants.PHONE_NUMBER_SHORT_CODE_MIN_LENGTH \
+                and l <= constants.PHONE_NUMBER_SHORT_CODE_MAX_LENGTH:
+
+                # short codes are a US thing, don't add a plus, it will be
+                # added automatically when parsed
+
+                return f"{phone_number_str}"
             else:
+                # not a short code number, add a plus
                 return f"+{phone_number_str}"
         else:
+
+
             return phone_number_str
 
 
