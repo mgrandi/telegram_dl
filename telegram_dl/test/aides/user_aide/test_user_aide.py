@@ -1,6 +1,5 @@
 import unittest
 import pathlib
-import unittest
 
 import arrow
 import phonenumbers
