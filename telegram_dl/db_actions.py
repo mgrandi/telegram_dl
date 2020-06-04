@@ -433,63 +433,6 @@ class InsertOrUpdateHandler:
             return InsertOrUpdateResult(obj=chat_photo_set_result, change=dbe.DatabaseChangeEnum.NO_CHANGE)
 
 
-    @handle_insert_or_update.register
-    async def profile_photo(self, incoming_profile_photo:tdlib_generated.profilePhoto, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:
-
-        session = params.session
-
-        # profile photos should be unique
-
-        # see if it exists
-
-        # see if the big and small files exist
-        big_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.big, params)
-        small_photo_file_result = await self.handle_insert_or_update(incoming_profile_photo.small, params)
-
-        if big_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE and \
-            small_photo_file_result.change == dbe.DatabaseChangeEnum.NO_CHANGE:
-
-            # files already exist, return the profile_photo_set that already exists
-
-            existing_profile_photo_set = session.query(db_model.ProfilePhotoSet) \
-                .join(db_model.Photo) \
-                .filter(db_model.Photo.file_id == big_photo_file_result.obj.file_id) \
-                .first()
-
-            insert_or_update_logger.debug("profile_photo: not adding db_model.ProfilePhotoSet object `%s` because it already exists or hasn't changed",
-                existing_profile_photo_set)
-
-            return InsertOrUpdateResult(obj=existing_profile_photo_set, change=dbe.DatabaseChangeEnum.NO_CHANGE)
-
-        else:
-
-            # files are new, so we need to create a Photo for each and then a ProfilePhotoSet,
-            # then return the ProfilePhotoSet
-            new_photo_set = db_model.ProfilePhotoSet(
-                tg_id=incoming_profile_photo.id)
-
-            big_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_BIG,
-                width=-1,
-                height=-1,
-                has_stickers=False,
-                file=big_photo_file_result.obj)
-
-            small_photo = db_model.Photo(
-                thumbnail_type=dbe.PhotoSizeThumbnailType.PHOTO_SMALL,
-                width=-1,
-                height=-1,
-                has_stickers=False,
-                file=small_photo_file_result.obj)
-
-            new_photo_set.photos.append(big_photo)
-            new_photo_set.photos.append(small_photo)
-
-            insert_or_update_logger.debug("profile_photo: adding db_model.ProfilePhotoSet object `%s` to session with change: `%s`",
-                new_photo_set, dbe.DatabaseChangeEnum.NEW)
-
-            return InsertOrUpdateResult(obj=new_photo_set, change=dbe.DatabaseChangeEnum.NEW)
-
 
     @handle_insert_or_update.register
     async def user(self, incoming_user:tdlib_generated.user, params:InsertOrUpdateParameter) -> InsertOrUpdateResult:

@@ -57,7 +57,7 @@ class UserAide:
         '''
 
         # we insert a string into the database and we get back a
-        phone_number_to_insert = ""
+        phone_number_to_insert = None
         if tdlib_user.phone_number:
             # add the + sign so it parses correctly
             phone_number_to_insert = PhoneNumberAide.fix_phone_number_from_string(tdlib_user.phone_number)
@@ -143,7 +143,7 @@ class UserAide:
                 tdlib_user.profile_photo)
 
         phoneno_result = PhoneNumberAide \
-            .compare_phonenumberslite_to_tdlib_phonenumber(latest_version.phone_number, tdlib_user.phone_number)
+            .compare_phonenumberslite_to_tdlib_phonenumber(tdlib_user.phone_number, latest_version.phone_number)
 
         final = user_version_comparison and profilephoto_result and phoneno_result
 
