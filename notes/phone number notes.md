@@ -110,8 +110,7 @@ PhoneNumber(country_code=1, national_number=42777, extension=None, italian_leadi
 ```
 
 HOWEVER, if you are adding a `+` sign to a short code number, you need to add the US country code of `1` to it as
-well or else it will not parse
-
+well or else it will not parse.
 ```python3
 >>> x = phonenumbers.parse("+42777", "US")
 
@@ -136,5 +135,23 @@ phonenumbers.phonenumberutil.NumberParseException: (0) Could not interpret numbe
 >>> x
 PhoneNumber(country_code=1, national_number=42777, extension=None, italian_leading_zero=None, number_of_leading_zeros=None, country_code_source=0, preferred_domestic_carrier_code=None)
 
+```
+
+
+If you have a short code number whose first digits happen to be a valid country code, then it will parse, but the country code will be incorrect! To be correct 100% of the time, either do not add a `+` infront of the number at all, or add a `+1` infront of the number!
+
+```python3
+
+>>> x = phonenumbers.parse("44227", "US")
+>>> x
+PhoneNumber(country_code=1, national_number=44227, extension=None, italian_leading_zero=None, number_of_leading_zeros=None, country_code_source=0, preferred_domestic_carrier_code=None)
+
+>>> y = phonenumbers.parse("+44227", "US")
+>>> y
+PhoneNumber(country_code=44, national_number=227, extension=None, italian_leading_zero=None, number_of_leading_zeros=None, country_code_source=0, preferred_domestic_carrier_code=None)
+
+>>> z = phonenumbers.parse("+144227", "US")
+>>> z
+PhoneNumber(country_code=1, national_number=44227, extension=None, italian_leading_zero=None, number_of_leading_zeros=None, country_code_source=0, preferred_domestic_carrier_code=None)
 ```
 

@@ -19,6 +19,12 @@ class PhoneNumberAide:
     def parse_phone_number_from_string(phone_number_str:str) -> PhoneNumber:
         '''
         parses a phone number string and returns a PhoneNumber object
+
+        note: for short code numbers, add a `+1` to the start of the number OR
+        don't add a plus at all (and no `1` as well) , because or else the country
+        code will get confused otherwise
+
+        see `notes/phone number notes.md` for more info
         '''
 
         fixed_phone_number_str = PhoneNumberAide.fix_phone_number_from_string(phone_number_str)
