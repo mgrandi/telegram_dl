@@ -68,6 +68,12 @@ class PhoneNumberAide:
         of a phone numberthat we get back from telegram
         '''
 
+        if phonenumbers_lib_obj is not None and not isinstance(phonenumbers_lib_obj, phonenumbers.PhoneNumber):
+            raise Exception(f"`phonenumbers_lib_obj` was not a PhoneNumber, it was {type(phonenumbers_lib_obj)}")
+
+        if tdlib_phone_number_str is not None and not isinstance(tdlib_phone_number_str, str):
+            raise Exception(f"`tdlib_phone_number_str` was not a str, it was {type(tdlib_phone_number_str)}")
+
         phone_number_compare_result = None
 
         logger.debug("comparing `%s` and `%s`", phonenumbers_lib_obj, tdlib_phone_number_str)
@@ -86,9 +92,7 @@ class PhoneNumberAide:
                 phone_number_compare_result = False
             else:
                 # both old and new phone numbers exist, compare
-                fixed_phone_number_str = PhoneNumberAide.fix_phone_number_from_string(tdlib_phone_number_str)
-
-                tdlib_parsed_phone = PhoneNumberAide.parse_phone_number_from_string(fixed_phone_number_str)
+                tdlib_parsed_phone = PhoneNumberAide.parse_phone_number_from_string(tdlib_phone_number_str)
 
                 phone_number_compare_result = phonenumbers_lib_obj == tdlib_parsed_phone
 

@@ -7,7 +7,6 @@ from telegram_dl.aides.phone_number_aide import PhoneNumberAide
 class TestPhoneNumberAideFix(unittest.TestCase):
     '''
     tests relating to `PhoneNumberAide.fix_phone_number_from_string`
-
     '''
 
     def test_fix_phone_number_from_string_plus_sign_us_number(self):
