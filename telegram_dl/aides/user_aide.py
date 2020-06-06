@@ -143,7 +143,7 @@ class UserAide:
                 tdlib_user.profile_photo)
 
         phoneno_result = PhoneNumberAide \
-            .compare_phonenumberslite_to_tdlib_phonenumber(tdlib_user.phone_number, latest_version.phone_number)
+            .compare_phonenumberslite_to_tdlib_phonenumber(latest_version.phone_number, tdlib_user.phone_number)
 
         final = user_version_comparison and profilephoto_result and phoneno_result
 
