@@ -826,7 +826,7 @@ object_ptr< TextEntityType >    type_
   "_extra": null,
   "message": {
     "_extra": null,
-    "id": 23068672,
+    "id": 46137344,
     "sender_user_id": 0,
     "chat_id": -1001446368458,
     "sending_state": null,
@@ -838,7 +838,7 @@ object_ptr< TextEntityType >    type_
     "can_be_deleted_for_all_users": true,
     "is_channel_post": true,
     "contains_unread_mention": false,
-    "date": 1589260540,
+    "date": 1591404703,
     "edit_date": 0,
     "forward_info": null,
     "reply_to_message_id": 0,
@@ -853,73 +853,22 @@ object_ptr< TextEntityType >    type_
       "_extra": null,
       "text": {
         "_extra": null,
-        "text": "TESTING123 LINK https://zombo.com",
+        "text": "https://html5zombo.com",
         "entities": [
           {
             "_extra": null,
-            "offset": 16,
-            "length": 17,
+            "offset": 0,
+            "length": 22,
             "type": {
               "_extra": null,
-              "url": "https://zombo.com/",
-              "@type": "textEntityTypeTextUrl"
+              "@type": "textEntityTypeUrl"
             },
             "@type": "textEntity"
           }
         ],
         "@type": "formattedText"
       },
-      "web_page": {
-        "_extra": null,
-        "url": "https://zombo.com/",
-        "display_url": "zombo.com",
-        "type": "article",
-        "site_name": "Zombo",
-        "title": "15footstick",
-        "description": {
-          "_extra": null,
-          "text": "15footstick is the independent record labelish aspect of the Zombocom zombo.com and home of Paw Paw Fuk, Giant Trio, Known In Bakersfield, Stars In Storage,and the  Kazoomy Love Guns. Serving The abstract world with digital power relics for the duration.   independent record label, music,Paw Paw Fuk, Giant Trio, Known In Bakersfield, Stars In Storage, Kazoomy Love Guns,Zombocom, zombo.com, post-cultural,webart, poetry, video,  flash, webart, metta, an early post-cultural portal. Serving The abstract transcommunity with Music and Multi-Media For since the bioZomb + The Independent World Report.",
-          "entities": [
-            {
-              "_extra": null,
-              "offset": 70,
-              "length": 9,
-              "type": {
-                "_extra": null,
-                "@type": "textEntityTypeUrl"
-              },
-              "@type": "textEntity"
-            },
-            {
-              "_extra": null,
-              "offset": 382,
-              "length": 9,
-              "type": {
-                "_extra": null,
-                "@type": "textEntityTypeUrl"
-              },
-              "@type": "textEntity"
-            }
-          ],
-          "@type": "formattedText"
-        },
-        "photo": null,
-        "embed_url": "",
-        "embed_type": "",
-        "embed_width": 0,
-        "embed_height": 0,
-        "duration": 0,
-        "author": "Zombocom",
-        "animation": null,
-        "audio": null,
-        "document": null,
-        "sticker": null,
-        "video": null,
-        "video_note": null,
-        "voice_note": null,
-        "instant_view_version": 0,
-        "@type": "webPage"
-      },
+      "web_page": null,
       "@type": "messageText"
     },
     "reply_markup": null,
@@ -927,5 +876,6 @@ object_ptr< TextEntityType >    type_
   },
   "@type": "updateNewMessage"
 }
+
 ```
 
