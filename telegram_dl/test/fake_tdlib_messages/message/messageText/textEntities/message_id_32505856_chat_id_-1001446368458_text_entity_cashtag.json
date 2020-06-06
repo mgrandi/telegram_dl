@@ -1,0 +1,50 @@
+{
+  "_extra": null,
+  "id": 32505856,
+  "sender_user_id": 0,
+  "chat_id": -1001446368458,
+  "sending_state": null,
+  "scheduling_state": null,
+  "is_outgoing": true,
+  "can_be_edited": true,
+  "can_be_forwarded": true,
+  "can_be_deleted_only_for_self": false,
+  "can_be_deleted_for_all_users": true,
+  "is_channel_post": true,
+  "contains_unread_mention": false,
+  "date": 1589260948,
+  "edit_date": 0,
+  "forward_info": null,
+  "reply_to_message_id": 0,
+  "ttl": 0,
+  "ttl_expires_in": "0",
+  "via_bot_user_id": 0,
+  "author_signature": "",
+  "views": 1,
+  "media_album_id": 0,
+  "restriction_reason": "",
+  "content": {
+    "_extra": null,
+    "text": {
+      "_extra": null,
+      "text": "$USD CASHTAG TESTING123",
+      "entities": [
+        {
+          "_extra": null,
+          "offset": 0,
+          "length": 4,
+          "type": {
+            "_extra": null,
+            "@type": "textEntityTypeCashtag"
+          },
+          "@type": "textEntity"
+        }
+      ],
+      "@type": "formattedText"
+    },
+    "web_page": null,
+    "@type": "messageText"
+  },
+  "reply_markup": null,
+  "@type": "message"
+}
