@@ -12,6 +12,7 @@ from telegram_dl.aides.chat_aide import ChatAide
 from telegram_dl.aides.file_aide import FileAide
 from telegram_dl.aides.photo_set_aide import PhotoSetAide
 from telegram_dl.aides.user_aide import UserAide
+from telegram_dl.aides.text_entity_aide import TextEntityAide
 
 import attr
 import arrow
@@ -102,31 +103,8 @@ class InsertOrUpdateHandler:
 
         change = None
 
-        def _create_text_entities_for_text_message(tdl_message_ver:db_model.MessageVersion, tdlib_message:tdlib_generated.message) -> typing.Sequence[db_model.TextEntity]:
-
-            if not isinstance(tdlib_message.content, tdlib_generated.messageText):
-                raise Exception(utils.strip_margin('''_create_text_entities_for_text_message called with a message that
-                    |doesn't have a messageText as its `content`! message: `%s`'''), tdlib_message)
-
-            result_list = []
-
-            for iter_te in tdlib_message.content.text.entities:
-
-                new_entity = db_model.TextEntity(
-                    message_version_text=tdl_message_ver,
-                    offset=iter_te.offset,
-                    length=iter_te.length,
-                    text_entity_type=dbe.TextEntityTypeEnum.parse_from_tdg_text_entity_type(iter_te.type))
-
-                result_list.append(new_entity)
-
-            insert_or_update_logger.debug("text entities created: `%s`", result_list)
-
-            return result_list
-
-
-
-        def _new_message_version_from_tdlib_message(tdl_message:db_model.Message, tdlib_message:tdlib_generated.message) -> db_model.Message:
+        def _new_message_version_from_tdlib_message(tdl_message:db_model.Message,
+            tdlib_message:tdlib_generated.message) -> db_model.Message:
             ''' helper function to create a new MessageVersion from a `tdlib_generated.message`
 
             @param tdlib_chat - the chat to copy the information from
@@ -149,15 +127,18 @@ class InsertOrUpdateHandler:
 
             if isinstance(tdlib_message.content, tdlib_generated.messageText):
 
+                message_text_content = tdlib_message.content
+
                 type_of_message_version = db_model.MessageVersionText
 
                 # add extra arguments
-                param_dict["text"] = tdlib_message.content.text.text
+                param_dict["text"] = message_text_content.text.text
                 param_dict["web_page_id"] = None
 
                 new_version = type_of_message_version(**param_dict)
 
-                text_entities =  _create_text_entities_for_text_message(new_version, tdlib_message)
+                text_entities =  TextEntityAide.get_text_entities_from_tdlib_text_entity_sequence(
+                    new_version, message_text_content.text.entities)
 
                 # can i just assign rather than iterating here?
                 for iter_te in text_entities:
