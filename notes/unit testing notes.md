@@ -43,3 +43,39 @@ Ran 6 tests in 0.038s
 
 OK
 ```
+
+## warnings
+
+it seems that nose2 doesn't log warnings very easily that I can tell, unlike
+`python -m unittest`.
+
+example:
+
+```plaintext
+
+
+PS C:\Users\auror\Code\Personal\telegram_dl> nose2
+
+sss.sssssssssssssssss..ss.sssss..s.sssss.ssssssss.....................s...
+----------------------------------------------------------------------
+Ran 74 tests in 0.380s
+
+OK (skipped=42)
+
+
+PS C:\Users\auror\Code\Personal\telegram_dl> python -m unittest
+sss.sssssssssssssssss..ss.sssss..s.sssss.ssssssss.....................s..C:\Users\auror\Code\Personal\telegram_dl\telegram_dl\test\test_cattr_converter.py:103: DeprecationWarning: Please use assertEqual instead.
+  self.assertEquals(round_trip_obj.dict_data["two"], "there")
+.
+----------------------------------------------------------------------
+Ran 74 tests in 0.331s
+
+OK (skipped=42)
+
+PS C:\Users\auror\Code\Personal\telegram_dl>
+```
+
+## subtests
+
+it seems that nose2 doesn't list out the subtests like `unittest` does, see
+this bug report: https://github.com/nose-devs/nose2/issues/334
