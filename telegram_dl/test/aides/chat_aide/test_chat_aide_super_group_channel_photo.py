@@ -204,10 +204,10 @@ class TestChatAideSuperGroupChannelPhoto(unittest.TestCase):
             session.commit()
 
             result_chat_one = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -1001446368458)
-            self.assertEquals(result_chat_one.tg_chat_id, -1001446368458)
-            self.assertEquals(len(result_chat_one.versions), 1)
-            self.assertEquals(type(result_chat_one), db_model.SuperGroupChat)
-            self.assertEquals(result_chat_one.versions[0].title, "TestingChannel")
+            self.assertEqual(result_chat_one.tg_chat_id, -1001446368458)
+            self.assertEqual(len(result_chat_one.versions), 1)
+            self.assertEqual(type(result_chat_one), db_model.SuperGroupChat)
+            self.assertEqual(result_chat_one.versions[0].title, "TestingChannel")
 
 
     @unittest.skip("TODO")

@@ -39,15 +39,15 @@ class TestUserAide(unittest.TestCase):
 
             # assertions
 
-            self.assertEquals(user_tdlib_obj.tg_user_id, 80661419)
+            self.assertEqual(user_tdlib_obj.tg_user_id, 80661419)
 
-            self.assertEquals(len(user_tdlib_obj.versions), 1)
+            self.assertEqual(len(user_tdlib_obj.versions), 1)
 
             latest_ver = user_tdlib_obj.versions[-1]
 
-            self.assertEquals(latest_ver.first_name, "John")
-            self.assertEquals(latest_ver.last_name, "Doe")
-            self.assertEquals(latest_ver.user_name, "TestingJohnDoe")
+            self.assertEqual(latest_ver.first_name, "John")
+            self.assertEqual(latest_ver.last_name, "Doe")
+            self.assertEqual(latest_ver.user_name, "TestingJohnDoe")
 
             # NOTE: it seems that the `sqlalchemy_utils.PhoneNumberType` converts
             # a string phone number into a `phonenumbers` object only when its been
@@ -59,18 +59,18 @@ class TestUserAide(unittest.TestCase):
                 region=constants.PHONE_NUMBER_DEFAULT_REGION)
             phone_number_from_user_parsed_from_str = PhoneNumberAide \
                 .parse_phone_number_from_string(latest_ver.phone_number)
-            self.assertEquals(type(latest_ver.phone_number), str)
-            self.assertEquals(phone_number_from_user_parsed_from_str, expected_phone_number)
+            self.assertEqual(type(latest_ver.phone_number), str)
+            self.assertEqual(phone_number_from_user_parsed_from_str, expected_phone_number)
 
             self.assertTrue(latest_ver.is_contact)
             self.assertTrue(latest_ver.is_mutual_contact)
             self.assertFalse(latest_ver.is_verified)
             self.assertFalse(latest_ver.is_support)
-            self.assertEquals(latest_ver.restriction_reason, "")
+            self.assertEqual(latest_ver.restriction_reason, "")
             self.assertFalse(latest_ver.is_scam)
             self.assertTrue(latest_ver.have_access)
-            self.assertEquals(latest_ver.language_code, "")
-            self.assertEquals(latest_ver.user_type, dbe.UserTypeEnum.USER_TYPE_REGULAR)
+            self.assertEqual(latest_ver.language_code, "")
+            self.assertEqual(latest_ver.user_type, dbe.UserTypeEnum.USER_TYPE_REGULAR)
 
             #########################
             # test profile photo set
@@ -90,7 +90,7 @@ class TestUserAide(unittest.TestCase):
             # unless we fetch the object fresh from the database again
             big_list = latest_ver_profile_photo_set \
                 .get_photos_by_thumnail_type(dbe.PhotoSizeThumbnailType.PHOTO_BIG)
-            self.assertEquals(len(big_list), 1)
+            self.assertEqual(len(big_list), 1)
             big_photo = big_list[0]
 
             self.assertEqual(big_photo.thumbnail_type, dbe.PhotoSizeThumbnailType.PHOTO_BIG)
@@ -111,7 +111,7 @@ class TestUserAide(unittest.TestCase):
             # see note above
             small_list = latest_ver_profile_photo_set \
                 .get_photos_by_thumnail_type(dbe.PhotoSizeThumbnailType.PHOTO_SMALL)
-            self.assertEquals(len(small_list), 1)
+            self.assertEqual(len(small_list), 1)
             small_photo = small_list[0]
 
             self.assertEqual(small_photo.thumbnail_type, dbe.PhotoSizeThumbnailType.PHOTO_SMALL)

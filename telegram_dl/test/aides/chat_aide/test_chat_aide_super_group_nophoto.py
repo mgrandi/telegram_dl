@@ -53,17 +53,17 @@ class TestChatAideSuperGroupNoPhoto(unittest.TestCase):
 
             p2 = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001266163180_no_photo.json")
             tdlib_obj2 = u.load_tdlib_generated_obj_from_file(p2, self.converter)
-            self.assertEquals(type(tdlib_obj2), tdg.chat)
+            self.assertEqual(type(tdlib_obj2), tdg.chat)
             chat_two = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj2)
             session.add(chat_two)
 
             session.commit()
 
             result_chat_two = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -1001266163180)
-            self.assertEquals(result_chat_two.tg_chat_id, -1001266163180)
-            self.assertEquals(len(result_chat_two.versions), 1)
-            self.assertEquals(type(result_chat_two), db_model.SuperGroupChat)
-            self.assertEquals(result_chat_two.versions[0].title, "TGS stuff")
+            self.assertEqual(result_chat_two.tg_chat_id, -1001266163180)
+            self.assertEqual(len(result_chat_two.versions), 1)
+            self.assertEqual(type(result_chat_two), db_model.SuperGroupChat)
+            self.assertEqual(result_chat_two.versions[0].title, "TGS stuff")
 
 
     @unittest.skip("TODO")

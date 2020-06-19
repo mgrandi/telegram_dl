@@ -59,10 +59,10 @@ class TestChatAideBasicGroupNoPhoto(unittest.TestCase):
             session.commit()
 
             result_chat_three = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -423872019)
-            self.assertEquals(result_chat_three.tg_chat_id, -423872019)
-            self.assertEquals(len(result_chat_three.versions), 1)
-            self.assertEquals(type(result_chat_three), db_model.BasicGroupChat)
-            self.assertEquals(result_chat_three.versions[0].title, "telegram_dl development")
+            self.assertEqual(result_chat_three.tg_chat_id, -423872019)
+            self.assertEqual(len(result_chat_three.versions), 1)
+            self.assertEqual(type(result_chat_three), db_model.BasicGroupChat)
+            self.assertEqual(result_chat_three.versions[0].title, "telegram_dl development")
 
 
     @unittest.skip("TODO")

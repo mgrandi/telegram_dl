@@ -60,25 +60,25 @@ class TestCattrConverter(unittest.TestCase):
         # make sure the dictionary is what we expect
         ##########################################################
 
-        self.assertEquals(obj_as_dict["binary_data"], base64.b64encode(binary_data).decode("utf-8"))
-        self.assertEquals(obj_as_dict["integer_data"], integer_data)
-        self.assertEquals(obj_as_dict["float_data"], float_data)
-        self.assertEquals(obj_as_dict["boolean_data"], boolean_data)
-        self.assertEquals(obj_as_dict["str_data"], str_data)
+        self.assertEqual(obj_as_dict["binary_data"], base64.b64encode(binary_data).decode("utf-8"))
+        self.assertEqual(obj_as_dict["integer_data"], integer_data)
+        self.assertEqual(obj_as_dict["float_data"], float_data)
+        self.assertEqual(obj_as_dict["boolean_data"], boolean_data)
+        self.assertEqual(obj_as_dict["str_data"], str_data)
 
-        self.assertEquals(obj_as_dict["list_data"], list_data)
-        self.assertEquals(obj_as_dict["list_data"][0], "hello")
-        self.assertEquals(obj_as_dict["list_data"][1], "there")
+        self.assertEqual(obj_as_dict["list_data"], list_data)
+        self.assertEqual(obj_as_dict["list_data"][0], "hello")
+        self.assertEqual(obj_as_dict["list_data"][1], "there")
 
-        self.assertEquals(obj_as_dict["dict_data"], dict_data)
-        self.assertEquals(obj_as_dict["dict_data"]["one"], "hello")
-        self.assertEquals(obj_as_dict["dict_data"]["two"], "there")
+        self.assertEqual(obj_as_dict["dict_data"], dict_data)
+        self.assertEqual(obj_as_dict["dict_data"]["one"], "hello")
+        self.assertEqual(obj_as_dict["dict_data"]["two"], "there")
 
         ##########################################################
         # assert the number of keys in the dictionary
         ##########################################################
 
-        self.assertEquals(len(obj_as_dict.keys()), 7)
+        self.assertEqual(len(obj_as_dict.keys()), 7)
 
         ##########################################################
         # now convert back to an object and assert its the same as the one we created
@@ -86,21 +86,21 @@ class TestCattrConverter(unittest.TestCase):
 
         round_trip_obj = converter.structure(obj_as_dict, TestClass)
 
-        self.assertEquals(round_trip_obj, test_instance)
+        self.assertEqual(round_trip_obj, test_instance)
 
-        self.assertEquals(round_trip_obj.binary_data, binary_data)
-        self.assertEquals(round_trip_obj.integer_data, integer_data)
-        self.assertEquals(round_trip_obj.float_data, float_data)
-        self.assertEquals(round_trip_obj.boolean_data, boolean_data)
-        self.assertEquals(round_trip_obj.str_data, str_data)
+        self.assertEqual(round_trip_obj.binary_data, binary_data)
+        self.assertEqual(round_trip_obj.integer_data, integer_data)
+        self.assertEqual(round_trip_obj.float_data, float_data)
+        self.assertEqual(round_trip_obj.boolean_data, boolean_data)
+        self.assertEqual(round_trip_obj.str_data, str_data)
 
-        self.assertEquals(round_trip_obj.list_data, list_data)
-        self.assertEquals(round_trip_obj.list_data[0], "hello")
-        self.assertEquals(round_trip_obj.list_data[1], "there")
+        self.assertEqual(round_trip_obj.list_data, list_data)
+        self.assertEqual(round_trip_obj.list_data[0], "hello")
+        self.assertEqual(round_trip_obj.list_data[1], "there")
 
-        self.assertEquals(round_trip_obj.dict_data, dict_data)
-        self.assertEquals(round_trip_obj.dict_data["one"], "hello")
-        self.assertEquals(round_trip_obj.dict_data["two"], "there")
+        self.assertEqual(round_trip_obj.dict_data, dict_data)
+        self.assertEqual(round_trip_obj.dict_data["one"], "hello")
+        self.assertEqual(round_trip_obj.dict_data["two"], "there")
 
 
 

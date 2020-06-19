@@ -72,10 +72,10 @@ class TestChatAidePrivateChatPhoto(unittest.TestCase):
 
             # do assertions
             result_chat_four = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, 80661419)
-            self.assertEquals(result_chat_four.tg_chat_id, 80661419)
-            self.assertEquals(len(result_chat_four.versions), 1)
-            self.assertEquals(type(result_chat_four), db_model.PrivateChat)
-            self.assertEquals(result_chat_four.versions[0].title, "John Smith")
+            self.assertEqual(result_chat_four.tg_chat_id, 80661419)
+            self.assertEqual(len(result_chat_four.versions), 1)
+            self.assertEqual(type(result_chat_four), db_model.PrivateChat)
+            self.assertEqual(result_chat_four.versions[0].title, "John Smith")
 
     def test_new_chat_from_tdlib_chat(self):
         '''
@@ -101,15 +101,15 @@ class TestChatAidePrivateChatPhoto(unittest.TestCase):
             db_model_chat_obj = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj)
 
             # assertions
-            self.assertEquals(type(db_model_chat_obj), db_model.PrivateChat)
+            self.assertEqual(type(db_model_chat_obj), db_model.PrivateChat)
 
-            self.assertEquals(db_model_chat_obj.tg_chat_id, 80661419)
+            self.assertEqual(db_model_chat_obj.tg_chat_id, 80661419)
 
-            self.assertEquals(len(db_model_chat_obj.versions), 1)
+            self.assertEqual(len(db_model_chat_obj.versions), 1)
 
             latest_ver = db_model_chat_obj.versions[-1]
 
-            self.assertEquals(latest_ver.title, "John Smith")
+            self.assertEqual(latest_ver.title, "John Smith")
             self.assertFalse(latest_ver.is_sponsored )
 
             ##################################
@@ -123,7 +123,7 @@ class TestChatAidePrivateChatPhoto(unittest.TestCase):
             # big chat photo
             big_list = latest_ver_photo_set \
                 .get_photos_by_thumnail_type(dbe.PhotoSizeThumbnailType.PHOTO_BIG)
-            self.assertEquals(len(big_list), 1)
+            self.assertEqual(len(big_list), 1)
             big_photo = big_list[0]
 
             self.assertEqual(big_photo.thumbnail_type, dbe.PhotoSizeThumbnailType.PHOTO_BIG)
@@ -149,7 +149,7 @@ class TestChatAidePrivateChatPhoto(unittest.TestCase):
             # small chat photo
             small_list = latest_ver_photo_set \
                 .get_photos_by_thumnail_type(dbe.PhotoSizeThumbnailType.PHOTO_SMALL)
-            self.assertEquals(len(small_list), 1)
+            self.assertEqual(len(small_list), 1)
             small_photo = small_list[0]
 
             self.assertEqual(small_photo.thumbnail_type, dbe.PhotoSizeThumbnailType.PHOTO_SMALL)
