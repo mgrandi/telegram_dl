@@ -13,6 +13,7 @@ from telegram_dl.aides.file_aide import FileAide
 from telegram_dl.aides.photo_set_aide import PhotoSetAide
 from telegram_dl.aides.user_aide import UserAide
 from telegram_dl.aides.text_entity_aide import TextEntityAide
+from telegram_dl.aides.message_aide import MessageAide
 
 import attr
 import arrow
@@ -97,62 +98,9 @@ class InsertOrUpdateHandler:
         session = params.session
 
 
-        maybe_existing_message = session.query(db_model.Message) \
-            .filter(db_model.Message.tg_message_id == obj_to_handle.id) \
-            .first()
+        maybe_existing_message = MessageAide.get_message_by_tg_message_id(obj_to_handle.id)
 
         change = None
-
-        def _new_message_version_from_tdlib_message(tdl_message:db_model.Message,
-            tdlib_message:tdlib_generated.message) -> db_model.Message:
-            ''' helper function to create a new MessageVersion from a `tdlib_generated.message`
-
-            @param tdlib_chat - the chat to copy the information from
-            @return the new ChatVersion object
-            '''
-
-            type_of_message_version = None
-
-            param_dict = {
-                "message": tdl_message,
-                "as_of": arrow.utcnow(),
-                "date": arrow.get(tdlib_message.date),
-                "edit_date": arrow.get(tdlib_message.edit_date) if tdlib_message.edit_date != 0 else None,
-                "author_signature": tdlib_message.author_signature,
-                "ttl": tdlib_message.ttl,
-            }
-
-            # handle the different `MessageContent` subclasses to figure out what type
-            # we are going to actually create
-
-            if isinstance(tdlib_message.content, tdlib_generated.messageText):
-
-                message_text_content = tdlib_message.content
-
-                type_of_message_version = db_model.MessageVersionText
-
-                # add extra arguments
-                param_dict["text"] = message_text_content.text.text
-                param_dict["web_page_id"] = None
-
-                new_version = type_of_message_version(**param_dict)
-
-                text_entities =  TextEntityAide.get_text_entities_from_tdlib_text_entity_sequence(
-                    new_version, message_text_content.text.entities)
-
-                # can i just assign rather than iterating here?
-                for iter_te in text_entities:
-                    new_version.text_entities.append(iter_te)
-
-                return new_version
-
-            else:
-
-                # unhandled message type
-                insert_or_update_logger.debug("unhandled MessageContent: `%a`", type(tdlib_message.content))
-                return None
-
-
 
 
         # see if we need to add a Message column or just a MessageVersion
@@ -162,65 +110,7 @@ class InsertOrUpdateHandler:
 
             # Message column doesn't exist, need to add a Message and a MessageVersion
 
-            # this should always exist, except it seems that channel posts have
-            # `sender_user_id` set to 0 (aka nothing)
-            sender_user = None
-            if obj_to_handle.sender_user_id != 0:
-                sender_user = session.query(db_model.User) \
-                    .filter(db_model.User.tg_user_id == obj_to_handle.sender_user_id) \
-                    .first()
-
-            message_chat = session.query(db_model.Chat) \
-                .filter(db_model.Chat.tg_chat_id == obj_to_handle.chat_id) \
-                .first()
-
-            # see if this message was a reply to another message
-            # it seems that if `reply_to_message_id` is 0, that means
-            # it was NOT a reply to another message
-            reply_to_message = None
-            if obj_to_handle.reply_to_message_id != 0:
-                reply_to_message = session.query(db_model.Message) \
-                    .filter(db_model.Message.tg_message_id == obj_to_handle.reply_to_message_id) \
-                    .first()
-
-            # see if this was via a bot
-            # it seems that if `via_bot_user_id` is 0, that means a
-            # bot did NOT send this message
-            bot_user = None
-            if obj_to_handle.via_bot_user_id != 0:
-                bot_user = session.query(db_model.User) \
-                    .filter(db_model.User.tg_user_id == obj_to_handle.via_bot_user_id) \
-                    .first()
-
-
-            new_message = db_model.Message(
-                tg_message_id=obj_to_handle.id,
-                sender_user=sender_user,
-                chat=message_chat,
-                reply_to_message=reply_to_message,
-                via_bot_user=bot_user,
-                is_outgoing=obj_to_handle.is_outgoing,
-                is_channel_post=obj_to_handle.is_channel_post,
-                can_edit=obj_to_handle.can_be_edited,
-                can_forward=obj_to_handle.can_be_forwarded,
-                can_be_deleted_only_for_self=obj_to_handle.can_be_deleted_only_for_self,
-                can_be_deleted_for_all_users=obj_to_handle.can_be_deleted_for_all_users,
-                restriction_reason=obj_to_handle.restriction_reason)
-
-            # now get the
-
-
-            # create the chat_version and add it to whatever type of chat we get back from the
-            # if/else statement
-            new_message_version = _new_message_version_from_tdlib_message(new_message, obj_to_handle)
-
-            #### TEMPORARY REMOVE LATER, if we don't have a supported message version just bail entirely
-
-            if not new_message_version:
-                return None
-            ############################
-
-            new_message.versions.append(new_message_version)
+            new_message = MessageAide.new_message_from_tdlib_message(session, obj_to_handle)
 
             insert_or_update_logger.debug(
                 utils.strip_margin('''message: adding db_model.MessageVersion (`%s) `  `%s`
@@ -245,7 +135,8 @@ class InsertOrUpdateHandler:
 
                 change = dbe.DatabaseChangeEnum.UPDATED
 
-                new_message_version = _new_message_version_from_tdlib_message(maybe_existing_message, obj_to_handle)
+                new_message_version = MessageAide.new_message_version_from_tdlib_message(
+                    session, maybe_existing_message, obj_to_handle)
 
                 #### TEMPORARY REMOVE LATER,  if we don't have a supported message version just bail entirely
 
