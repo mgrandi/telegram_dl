@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class MessageAide:
 
 
-    def get_message_by_tg_message_and_chat_id(
+    def get_message_by_tg_message_and_tg_chat_id(
         sqla_session:sqlalchemy.orm.session.Session,
         tg_message_id:int,
         tg_chat_id:int) -> typing.Optional[tdg.message]:

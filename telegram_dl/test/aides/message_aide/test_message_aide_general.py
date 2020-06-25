@@ -6,7 +6,7 @@ import arrow
 
 from telegram_dl import utils
 from telegram_dl import tdlib_generated as tdg
-from telegram_dl import db_model_enums as dbe
+from telegram_dl import db_model_enums as dbme
 from telegram_dl import db_model
 from telegram_dl.test import utilities as u
 from telegram_dl.aides.chat_aide import ChatAide
@@ -61,7 +61,7 @@ class TestMessageAideGeneral(unittest.TestCase):
             session.add(message_dbmodel_obj)
             session.commit()
 
-            retrieved_message_dbmodel_obj = MessageAide.get_message_by_tg_message_and_chat_id(
+            retrieved_message_dbmodel_obj = MessageAide.get_message_by_tg_message_and_tg_chat_id(
                 session, 599515987968, 80661419)
 
             # message assertions
@@ -80,8 +80,5 @@ class TestMessageAideGeneral(unittest.TestCase):
             self.assertEqual(retrieved_message_dbmodel_obj.sender_user.user_id, user_dbmodel_obj.user_id)
             self.assertEqual(retrieved_message_dbmodel_obj.chat.chat_id, chat_dbmodel_obj.chat_id)
 
-            self.assertEqual(len(retrieved_message_dbmodel_obj.versions), 1)
-
-
-
-
+            # not testing MessageVersion assertions in this test since we just want to
+            # test the 'MessageAide.get_message_by_tg_message_and_tg_chat_id' method
