@@ -49,6 +49,9 @@ OK
 it seems that nose2 doesn't log warnings very easily that I can tell, unlike
 `python -m unittest`.
 
+Maybe i should look into the `warnings` module and see if that has anything? maybe nose2 is
+using a custom 'warning' filter: https://docs.python.org/3/library/warnings.html?highlight=warning#overriding-the-default-filter
+
 example:
 
 ```plaintext
