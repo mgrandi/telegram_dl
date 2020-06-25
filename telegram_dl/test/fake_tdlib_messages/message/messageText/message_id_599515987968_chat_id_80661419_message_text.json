@@ -1,0 +1,79 @@
+{
+  "_extra": null,
+  "id": 599515987968,
+  "sender_user_id": 80661419,
+  "chat_id": 80661419,
+  "sending_state": null,
+  "scheduling_state": null,
+  "is_outgoing": true,
+  "can_be_edited": true,
+  "can_be_forwarded": true,
+  "can_be_deleted_only_for_self": true,
+  "can_be_deleted_for_all_users": false,
+  "is_channel_post": false,
+  "contains_unread_mention": false,
+  "date": 1589260319,
+  "edit_date": 0,
+  "forward_info": null,
+  "reply_to_message_id": 0,
+  "ttl": 0,
+  "ttl_expires_in": "0",
+  "via_bot_user_id": 0,
+  "author_signature": "",
+  "views": 0,
+  "media_album_id": 0,
+  "restriction_reason": "",
+  "content": {
+    "_extra": null,
+    "text": {
+      "_extra": null,
+      "text": "https://twitter.com/dril/status/107911000199671808",
+      "entities": [
+        {
+          "_extra": null,
+          "offset": 0,
+          "length": 50,
+          "type": {
+            "_extra": null,
+            "@type": "textEntityTypeUrl"
+          },
+          "@type": "textEntity"
+        }
+      ],
+      "@type": "formattedText"
+    },
+    "web_page": {
+      "_extra": null,
+      "url": "https://twitter.com/dril/status/107911000199671808",
+      "display_url": "twitter.com/dril/status/107911000199671808",
+      "type": "article",
+      "site_name": "Twitter",
+      "title": "wint",
+      "description": {
+        "_extra": null,
+        "text": "\"Is Wario A Libertarian\" - the greatest thread in the history of forums, locked by a moderator after 12,239 pages of heated debate,",
+        "entities": [],
+        "@type": "formattedText"
+      },
+      "photo": null,
+      "embed_url": "",
+      "embed_type": "",
+      "embed_width": 0,
+      "embed_height": 0,
+      "duration": 0,
+      "author": "@dril",
+      "animation": null,
+      "audio": null,
+      "document": null,
+      "sticker": null,
+      "video": null,
+      "video_note": null,
+      "voice_note": null,
+      "instant_view_version": 0,
+      "@type": "webPage"
+    },
+    "@type": "messageText"
+  },
+  "reply_markup": null,
+  "@type": "message"
+}
