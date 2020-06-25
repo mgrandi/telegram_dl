@@ -177,7 +177,7 @@ class TestTextEntityAide(unittest.TestCase):
         # load the chat
         path_chat = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_no_photo.json")
         tdlib_obj_chat = u.load_tdlib_generated_obj_from_file(path_chat, self.converter)
-        self.assertEqual(type(tdlib_obj_chat), tdg.chat)
+        self.assertIsInstance(tdlib_obj_chat, tdg.chat)
         chat = ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj_chat)
         session.add(chat)
 
@@ -199,7 +199,7 @@ class TestTextEntityAide(unittest.TestCase):
                     message_obj = u.load_tdlib_generated_obj_from_file(message_json, self.converter)
 
                     # assert that the loaded type is what we expect
-                    self.assertEqual(type(message_obj), tdg.message)
+                    self.assertIsInstance(message_obj, tdg.message)
 
                     with u.get_testing_sqla_session_contextmanager() as session:
 

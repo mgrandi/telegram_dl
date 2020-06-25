@@ -52,7 +52,7 @@ class TestChatAideBasicGroupNoPhoto(unittest.TestCase):
 
             p3 = u.get_fake_tdlib_messages_path("chat/chat_basic_group_id_-423872019_no_photo.json")
             tdlib_obj3 = u.load_tdlib_generated_obj_from_file(p3, self.converter)
-            self.assertEqual(type(tdlib_obj3), tdg.chat)
+            self.assertIsInstance(tdlib_obj3, tdg.chat)
             chat_three = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj3)
             session.add(chat_three)
 
@@ -61,7 +61,7 @@ class TestChatAideBasicGroupNoPhoto(unittest.TestCase):
             result_chat_three = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -423872019)
             self.assertEqual(result_chat_three.tg_chat_id, -423872019)
             self.assertEqual(len(result_chat_three.versions), 1)
-            self.assertEqual(type(result_chat_three), db_model.BasicGroupChat)
+            self.assertIsInstance(result_chat_three, db_model.BasicGroupChat)
             self.assertEqual(result_chat_three.versions[0].title, "telegram_dl development")
 
 

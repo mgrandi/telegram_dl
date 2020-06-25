@@ -197,7 +197,7 @@ class TestChatAideSuperGroupChannelPhoto(unittest.TestCase):
 
             p1 = u.get_fake_tdlib_messages_path("chat/chat_supergroup_id_-1001446368458_channel_has_photo.json")
             tdlib_obj1 = u.load_tdlib_generated_obj_from_file(p1, self.converter)
-            self.assertEqual(type(tdlib_obj1), tdg.chat)
+            self.assertIsInstance(tdlib_obj1, tdg.chat)
             chat_one = chat_aide.ChatAide.new_chat_from_tdlib_chat(session, tdlib_obj1)
             session.add(chat_one)
 
@@ -206,7 +206,7 @@ class TestChatAideSuperGroupChannelPhoto(unittest.TestCase):
             result_chat_one = chat_aide.ChatAide.get_chat_by_tg_chat_id(session, -1001446368458)
             self.assertEqual(result_chat_one.tg_chat_id, -1001446368458)
             self.assertEqual(len(result_chat_one.versions), 1)
-            self.assertEqual(type(result_chat_one), db_model.SuperGroupChat)
+            self.assertIsInstance(result_chat_one, db_model.SuperGroupChat)
             self.assertEqual(result_chat_one.versions[0].title, "TestingChannel")
 
 

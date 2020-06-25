@@ -33,7 +33,7 @@ class TestUserAide(unittest.TestCase):
             # will have a integrity error when we add the chat
             user_json =  u.get_fake_tdlib_messages_path("user/user_id_80661419.json")
             user_obj = u.load_tdlib_generated_obj_from_file(user_json, self.converter)
-            self.assertEqual(type(user_obj), tdg.user)
+            self.assertIsInstance(user_obj, tdg.user)
             user_tdlib_obj = UserAide.new_user_from_tdlib_user(session, user_obj)
             session.add(user_tdlib_obj)
 
@@ -59,7 +59,7 @@ class TestUserAide(unittest.TestCase):
                 region=constants.PHONE_NUMBER_DEFAULT_REGION)
             phone_number_from_user_parsed_from_str = PhoneNumberAide \
                 .parse_phone_number_from_string(latest_ver.phone_number)
-            self.assertEqual(type(latest_ver.phone_number), str)
+            self.assertIsInstance(latest_ver.phone_number, str)
             self.assertEqual(phone_number_from_user_parsed_from_str, expected_phone_number)
 
             self.assertTrue(latest_ver.is_contact)
