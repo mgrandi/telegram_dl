@@ -63,7 +63,7 @@ class TestMessageAideMessageContentTypeMessageText(unittest.TestCase):
             session.add(message_dbmodel_obj)
             session.commit()
 
-            retrieved_message_dbmodel_obj = MessageAide.get_message_by_tg_message_and_chat_id(
+            retrieved_message_dbmodel_obj = MessageAide.get_message_by_tg_message_and_tg_chat_id(
                 session, 599515987968, 80661419)
 
             # message assertions
