@@ -246,7 +246,7 @@ class DbModelEqualityTester:
         tdg_msg = msg_ver_text_arg.tdg_message
 
         # TODO HANDLE THE `web_page` argument
-        logger_message_version_text.warning("TODO `tdg.messageText.web_page` parameter is unchecked")
+        logger_message_version_text.debug("TODO `tdg.messageText.web_page` parameter is unchecked")
 
         message_ver_text_result = isinstance(tdl_msg_ver_text, db_model.MessageVersionText) \
             and isinstance(tdg_msg, tdg.message) \
