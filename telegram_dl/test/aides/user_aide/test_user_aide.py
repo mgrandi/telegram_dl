@@ -34,16 +34,16 @@ class TestUserAide(unittest.TestCase):
             user_json =  u.get_fake_tdlib_messages_path("user/user_id_80661419.json")
             user_obj = u.load_tdlib_generated_obj_from_file(user_json, self.converter)
             self.assertIsInstance(user_obj, tdg.user)
-            user_tdlib_obj = UserAide.new_user_from_tdlib_user(session, user_obj)
-            session.add(user_tdlib_obj)
+            user_dbmodel_obj = UserAide.new_user_from_tdlib_user(session, user_obj)
+            session.add(user_dbmodel_obj)
 
             # assertions
 
-            self.assertEqual(user_tdlib_obj.tg_user_id, 80661419)
+            self.assertEqual(user_dbmodel_obj.tg_user_id, 80661419)
 
-            self.assertEqual(len(user_tdlib_obj.versions), 1)
+            self.assertEqual(len(user_dbmodel_obj.versions), 1)
 
-            latest_ver = user_tdlib_obj.versions[-1]
+            latest_ver = user_dbmodel_obj.versions[-1]
 
             self.assertEqual(latest_ver.first_name, "John")
             self.assertEqual(latest_ver.last_name, "Doe")
