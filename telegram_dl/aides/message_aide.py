@@ -6,6 +6,7 @@ from telegram_dl import db_model
 from telegram_dl import tdlib_generated as tdg
 from telegram_dl.aides.text_entity_aide import TextEntityAide
 from telegram_dl.aides.chat_aide import ChatAide
+from telegram_dl.aides.user_aide import UserAide
 
 import arrow
 
@@ -14,16 +15,28 @@ logger = logging.getLogger(__name__)
 class MessageAide:
 
 
-    def get_message_by_tg_message_id(
+    def get_message_by_tg_message_and_chat_id(
         sqla_session:sqlalchemy.orm.session.Session,
-        tg_message_id:int) -> typing.Optional[tdg.message]:
+        tg_message_id:int,
+        tg_chat_id:int) -> typing.Optional[tdg.message]:
         '''
-        queries the database for a db_model.Message given the tg_message_id, or
-        returns None (see the documentation for `Query.first()` )
+        queries the database for a db_model.Message given the tg_message_id,
+        and tg_chat_id, or returns None (see the documentation for `Query.first()` )
         '''
 
+
+        chat_result = sqla_session.query(db_model.Chat) \
+            .filter(db_model.Chat.tg_chat_id == tg_chat_id) \
+            .first()
+
+        if chat_result is None:
+
+            logger.debug("no chat found for tg_chat_id `%s`, returning None", tg_chat_id)
+            return None
+
         result = sqla_session.query(db_model.Message) \
-            .filter(db_model.Message.tg_message_id == obj_to_handle.id) \
+            .filter(db_model.Message.tg_message_id == tg_message_id) \
+            .filter(db_model.Message.chat_id == chat_result.chat_id) \
             .first()
 
         return result

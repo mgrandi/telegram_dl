@@ -98,7 +98,7 @@ class InsertOrUpdateHandler:
         session = params.session
 
 
-        maybe_existing_message = MessageAide.get_message_by_tg_message_id(obj_to_handle.id)
+        maybe_existing_message = MessageAide.get_message_by_tg_message_id(session, obj_to_handle.id)
 
         change = None
 
@@ -112,14 +112,19 @@ class InsertOrUpdateHandler:
 
             new_message = MessageAide.new_message_from_tdlib_message(session, obj_to_handle)
 
-            insert_or_update_logger.debug(
-                utils.strip_margin('''message: adding db_model.MessageVersion (`%s) `  `%s`
-                |and db_model.Message  `%s` to session with change: `%s`'''),
-                    new_message_version, type(new_message_version), new_message, change)
+            # TODO FIXME TEMPORARY, this returns None for messageContent types we don't handle yet!!!
+            if new_message is not None:
 
-            session.add(new_message)
+                insert_or_update_logger.debug(
+                    utils.strip_margin('''message: adding db_model.Message  `%s` to session with change: `%s`'''),
+                        new_message, change)
 
-            return InsertOrUpdateResult(obj=new_message, change=change)
+                session.add(new_message)
+
+                return InsertOrUpdateResult(obj=new_message, change=change)
+            else:
+
+                return None
 
 
         else:
