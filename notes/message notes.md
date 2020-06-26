@@ -9,6 +9,9 @@
 messages usually come from the `updateNewMessage` object, which contains a `message` object, and inside the `message` object
 is a `content` member that is of type `MessageContent`
 
+Messages have a 'reply_to_message_id' field, I am assuming that this message is within the same chat as the original
+message because messages are basically keyed by `(message_id, chat_id)`
+
 ## Contents of messages
 
 `MessageContent` (superclasss): https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1_message_content.html
