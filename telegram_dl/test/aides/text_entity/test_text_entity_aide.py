@@ -230,3 +230,8 @@ class TestTextEntityAide(unittest.TestCase):
     def test_get_text_entities_multiple_per_message(self):
 
         pass
+
+
+    @unittest.skip("TODO")
+    def test_compare_dbmodel_and_tdlib_text_entity_sequence(self):
+        pass

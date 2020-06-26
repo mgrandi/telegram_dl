@@ -133,9 +133,9 @@ class InsertOrUpdateHandler:
             # Message column DOES exist, see if it is equal and if we need to
             # add a new MessageVersion
 
-            msg_equality_args = db_model_equality.EqualityArgumentMessage(
-                tdl_message=maybe_existing_message, tdg_message=obj_to_handle)
-            is_equal = equality_tester.is_equal(msg_equality_args)
+            is_equal = MessageAide.compare_dbmodel_and_tdlib_message(
+                dbmodel_message=maybe_existing_message,
+                tdlib_message=obj_to_handle)
 
             if not is_equal:
 

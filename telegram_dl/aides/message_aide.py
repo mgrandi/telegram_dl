@@ -1,6 +1,7 @@
 from __future__ import annotations
 import logging
 import typing
+import functools
 
 from telegram_dl import db_model
 from telegram_dl import tdlib_generated as tdg
@@ -11,6 +12,8 @@ from telegram_dl.aides.user_aide import UserAide
 import arrow
 
 logger = logging.getLogger(__name__)
+
+logger_message_content = logger.getChild("message_content_comparison")
 
 class MessageAide:
 
@@ -160,3 +163,143 @@ class MessageAide:
             # unhandled message type
             logger.debug("unhandled MessageContent: `%a`", type(tdlib_message.content))
             return None
+
+    @staticmethod
+    def compare_dbmodel_and_tdlib_message(
+        dbmodel_message:db_model.Message,
+        tdlib_message:tdg.message) -> bool:
+        '''
+        method that compares a `db_model.Message` and a
+        `tdlib_generated.message` instance
+
+        note: this just compares the `tdlib_generated.message` part of the
+        object, there is also the 'content' that is compared separately
+        '''
+
+        if dbmodel_message == None or tdlib_message == None:
+            logger.debug("one of the args is None, doing fast comparison")
+
+            fast_result = dbmodel_message == tdlib_message
+
+            logger.debug("fast result: `%s`", fast_result)
+
+            return fast_result
+
+        logger.debug("comparing `%s` and `%s`", dbmodel_message, tdlib_message)
+
+
+        # check stuff for the base message
+
+        tdl_sender_id = dbmodel_message.sender_user.tg_user_id if dbmodel_message.sender_user else None
+        tdg_sender_id = tdlib_message.sender_user_id if tdlib_message.sender_user_id != 0 else None
+
+        tdl_chat_id = dbmodel_message.chat.tg_chat_id if dbmodel_message.chat else None
+        tdg_chat_id = tdlib_message.chat_id if tdlib_message.chat_id != 0 else None
+
+        tdl_reply_msg_id = dbmodel_message.reply_to_message.tg_message_id if dbmodel_message.reply_to_message else None
+        tdg_reply_msg_id = tdlib_message.reply_to_message_id if tdlib_message.reply_to_message_id != 0 else None
+
+        tdl_via_bot_id = dbmodel_message.via_bot_user.tg_user_id if dbmodel_message.via_bot_user else None
+        tdg_via_bot_id = tdlib_message.via_bot_user_id if tdlib_message.via_bot_user_id != 0 else None
+
+        base_message_result = isinstance(dbmodel_message, db_model.Message) \
+            and isinstance(tdlib_message, tdg.message) \
+            and dbmodel_message.tg_message_id == tdlib_message.id \
+            and tdl_sender_id == tdg_sender_id \
+            and tdl_chat_id == tdg_chat_id \
+            and tdl_reply_msg_id == tdg_reply_msg_id \
+            and tdl_via_bot_id == tdg_via_bot_id \
+            and dbmodel_message.is_outgoing == tdlib_message.is_outgoing \
+            and dbmodel_message.is_channel_post == tdlib_message.is_channel_post \
+            and dbmodel_message.can_edit == tdlib_message.can_be_edited \
+            and dbmodel_message.can_forward == tdlib_message.can_be_forwarded \
+            and dbmodel_message.can_be_deleted_only_for_self == tdlib_message.can_be_deleted_only_for_self \
+            and dbmodel_message.can_be_deleted_for_all_users  == tdlib_message.can_be_deleted_for_all_users \
+            and dbmodel_message.restriction_reason == tdlib_message.restriction_reason
+
+        # now check the versions
+
+        if len(dbmodel_message.versions) == 0:
+            logger.debug("returning False because Chat exists but has no versions")
+            return False
+
+        latest_msg_version = dbmodel_message.versions[-1]
+
+        # so messages are fun, since they have a base `MessageVersion` which has the common
+        # shared info among all of the `messageContent` subclasses and then there are
+        # subclasses of `MessageVersion` that have extra fields based on the `MessageContent`
+        # type, so we call the equality methods for those types
+        msg_ver_result = MessageContentComparisonMethodDispatcher.compare_dbmodel_message_ver_and_tdlib_message_content(
+            latest_msg_version, tdlib_message)
+
+        final_result = base_message_result and msg_ver_result
+
+        logger.debug("final result: base: `%s` , msgver: `%s`, final: `%s`",
+            base_message_result, msg_ver_result, final_result)
+
+        return final_result
+
+
+class MessageContentComparisonMethodDispatcher:
+    '''
+    class that just holds the methods for comparing the different subclasses
+    of tdlib_generated.MessageContent
+
+    every method will return a true or a false for if the passed in db_model.MessageVersion
+    differs from the passed in tdlib_generated.message instance's `content`
+
+    '''
+
+    @functools.singledispatchmethod
+    @staticmethod
+    def compare_dbmodel_message_ver_and_tdlib_message_content(
+        dbmodel_message_version:db_model.MessageVersion,
+        tdlib_message:tdg.message) -> bool:
+        '''
+        the 'default' single dispatch method that gets called if nothing else matches
+
+        we return None here and log it, since reaching here means we don't support the given
+        tdlib_generated.MessageContent yet
+        '''
+
+        logger_message_content.debug("unhandled MessageContent! dbmodel_message: `%s`, tdlib_message: `%s`",
+            dbmodel_message, tdlib_message)
+
+        return False
+
+    @compare_dbmodel_message_ver_and_tdlib_message_content.register
+    def compare_message_text(
+        dbmodel_message_version_text:db_model.MessageVersionText,
+        tdlib_message:tdg.message) -> bool:
+
+        if dbmodel_message_version_text is None or \
+            tdlib_message is None:
+
+            logger_message_content.debug("one of the args is None, doing fast comparison")
+
+            fast_result = dbmodel_message_version_text == tdlib_message
+
+            logger_message_content.debug("fast result: `%s`", fast_result)
+
+            return fast_result
+
+        logger_message_content.debug("comparing: `%s` and `%s`", dbmodel_message_version_text, tdlib_message)
+
+        # TODO HANDLE THE `web_page` argument
+        logger_message_content.debug("TODO `tdg.messageText.web_page` parameter is unchecked")
+
+        message_ver_text_result = isinstance(dbmodel_message_version_text, db_model.MessageVersionText) \
+            and isinstance(tdlib_message, tdg.message) \
+            and dbmodel_message_version_text.text == tdlib_message.content.text.text
+
+        # check the text entities
+        text_entity_result = TextEntityAide.compare_dbmodel_and_tdlib_text_entities(
+            dbmodel_text_entities=dbmodel_message_version_text.text_entities,
+            tdlib_message=tdlib_message)
+
+        final_result = message_ver_text_result and text_entity_result
+
+        logger_message_content.debug("final result: message_version_text: `%s` , text_entities: `%s`, final: `%s`",
+            message_ver_text_result, text_entity_result, final_result)
+
+        return final_result
