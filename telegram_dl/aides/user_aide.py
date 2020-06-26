@@ -95,7 +95,7 @@ class UserAide:
         dbmodel_user:db_model.User,
         tdlib_user:tdg.user) -> bool:
         '''
-        method chat compares a `db_model.User` and a
+        method that compares a `db_model.User` and a
         `tdlib_generated.User` instance
         '''
 
