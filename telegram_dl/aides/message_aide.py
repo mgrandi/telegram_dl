@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 class MessageAide:
 
 
+    @staticmethod
     def get_message_by_tg_message_and_tg_chat_id(
         sqla_session:sqlalchemy.orm.session.Session,
         tg_message_id:int,
@@ -22,6 +23,9 @@ class MessageAide:
         '''
         queries the database for a db_model.Message given the tg_message_id,
         and tg_chat_id, or returns None (see the documentation for `Query.first()` )
+
+        # TODO: have a version that can take in a dbmodel.Chat to save us one sql lookup
+        if we already have a dbmodel.Chat?
         '''
 
 
@@ -42,6 +46,7 @@ class MessageAide:
         return result
 
 
+    @staticmethod
     def new_message_from_tdlib_message(
         sqla_session:sqlalchemy.orm.session.Session,
         tdlib_message:tdg.message) -> db_model.Message:
@@ -62,8 +67,8 @@ class MessageAide:
         # it was NOT a reply to another message
         reply_to_message = None
         if tdlib_message.reply_to_message_id != 0:
-            reply_to_message = MessageAide.get_message_by_tg_message_id(
-                sqla_session, tdlib_message.reply_to_message_id)
+            reply_to_message = MessageAide.get_message_by_tg_message_and_tg_chat_id(
+                sqla_session, tdlib_message.reply_to_message_id, tdlib_message.chat_id)
 
         # see if this was via a bot
         # it seems that if `via_bot_user_id` is 0, that means a
@@ -101,6 +106,7 @@ class MessageAide:
         return new_message
 
 
+    @staticmethod
     def new_message_version_from_tdlib_message(
         sqla_session:sqlalchemy.orm.session.Session,
         dbmodel_message:db_model.Message,

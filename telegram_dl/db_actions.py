@@ -98,7 +98,8 @@ class InsertOrUpdateHandler:
         session = params.session
 
 
-        maybe_existing_message = MessageAide.get_message_by_tg_message_id(session, obj_to_handle.id)
+        maybe_existing_message = MessageAide.get_message_by_tg_message_and_tg_chat_id(
+            session, obj_to_handle.id, obj_to_handle.chat_id)
 
         change = None
 
