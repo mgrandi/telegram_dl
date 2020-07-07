@@ -2,6 +2,23 @@
 
 TODO:
 
+2020-07-07:
+
+in: telegram_dl\test\aides\message_aide\test_message_aide_general.py
+TestMessageAideGeneral.test_compare_dbmodel_and_tdlib_message
+```
+            # note: i was originally using `_load_and_return_message_id_599515987968` here but then
+            # it was not proving equal because it was adding another (duplicate) TextEntity to the message
+            # probably because the message already existed , but i would think it would be a brand new
+            # message / MessageVersion, rather than using the existing one, so maybe this is a bug? i'm not
+            # sure, should probably look into this at some point
+            # TODO
+            modified_dbmodel_message_obj = session.query(db_model.Message) \
+                .filter(db_model.Message.message_id == initial_dbmodel_message_obj.message_id) \
+                .first()
+
+```
+
 edit db_model classes to make it so we can specify `primary_key=True` on the PK columns and have an empty
 PrimaryConstraint for naming it
 see:

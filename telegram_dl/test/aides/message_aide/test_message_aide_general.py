@@ -29,13 +29,12 @@ class TestMessageAideGeneral(unittest.TestCase):
         utils.register_custom_types_with_cattr_converter(self.converter)
 
 
-    def _load_user_and_chat_id_80661419(self, session, commit_to_db=True):
+    def _load_user_and_chat_id_80661419(self, session):
         '''
         helper function that loads the db_model.User and
         db_model.Chat for user / chat id `80661419` which we need if we want to
         test messages
 
-        if commit_to_db is true, we add it to the database and commit it
         '''
 
         # load user
@@ -45,9 +44,8 @@ class TestMessageAideGeneral(unittest.TestCase):
         user_dbmodel_obj = UserAide.new_user_from_tdlib_user(session, user_obj)
         self.assertEqual(user_dbmodel_obj.tg_user_id, 80661419)
 
-        if commit_to_db:
-            session.add(user_dbmodel_obj)
-            session.commit()
+        session.add(user_dbmodel_obj)
+        session.commit()
 
         # load chat
         chat_json_path = u.get_fake_tdlib_messages_path("chat/chat_private_id_80661419_has_photo.json")
@@ -56,17 +54,15 @@ class TestMessageAideGeneral(unittest.TestCase):
         chat_dbmodel_obj = ChatAide.new_chat_from_tdlib_chat(session, chat_tdlib_obj)
         self.assertEqual(chat_dbmodel_obj.tg_chat_id, 80661419)
 
-        if commit_to_db:
-            session.add(chat_dbmodel_obj)
-            session.commit()
+        session.add(chat_dbmodel_obj)
+        session.commit()
 
 
-    def _load_and_return_message_id_599515987968(self, session, commit_to_db=True):
+    def _load_and_return_message_id_599515987968(self, session):
         '''
         helper function that loads the db_model.Message for message id `599515987968`
         and returns the resulting db_model.Message object
 
-        if commit_to_db is true, we add it to the database and commit it
         '''
 
         # load message from JSON
@@ -76,9 +72,8 @@ class TestMessageAideGeneral(unittest.TestCase):
         self.assertIsInstance(message_tdlib_obj.content, tdg.messageText)
         message_dbmodel_obj = MessageAide.new_message_from_tdlib_message(session, message_tdlib_obj)
 
-        if commit_to_db:
-            session.add(message_dbmodel_obj)
-            session.commit()
+        session.add(message_dbmodel_obj)
+        session.commit()
 
         return message_dbmodel_obj
 
@@ -93,10 +88,10 @@ class TestMessageAideGeneral(unittest.TestCase):
 
             # add the db_model.User and db_model.Chat that this private chat is with, or else it
             # will have a integrity error when we add the chat
-            self._load_user_and_chat_id_80661419(session, commit_to_db=True)
+            self._load_user_and_chat_id_80661419(session)
 
             # load message
-            initial_message_obj = self._load_and_return_message_id_599515987968(session, commit_to_db=True)
+            initial_message_obj = self._load_and_return_message_id_599515987968(session)
 
             # retrieve the message again from the database
             retrieved_message_dbmodel_obj = MessageAide.get_message_by_tg_message_and_tg_chat_id(
@@ -144,11 +139,11 @@ class TestMessageAideGeneral(unittest.TestCase):
 
             # add the db_model.User and db_model.Chat that this private chat is with, or else it
             # will have a integrity error when we add the chat
-            self._load_user_and_chat_id_80661419(session, commit_to_db=True)
+            self._load_user_and_chat_id_80661419(session)
 
 
             # do the initial load of the first message
-            initial_dbmodel_message_obj = self._load_and_return_message_id_599515987968(session, commit_to_db=True)
+            initial_dbmodel_message_obj = self._load_and_return_message_id_599515987968(session)
 
             # assert that the db_model.Message and tdlib_generated.message are equal
 
@@ -157,16 +152,38 @@ class TestMessageAideGeneral(unittest.TestCase):
 
             self.assertTrue(is_equal_unmodified_message, "unmodified message should be equal")
 
-            # do a second load but DON'T commit it since we are going to be modifying it
-            modified_dbmodel_message_obj = self._load_and_return_message_id_599515987968(session, commit_to_db=False)
+            # get a copy of the message from the sqlalchemy session so we can 'modify it' for testing
+            # note: i was originally using `_load_and_return_message_id_599515987968` here but then
+            # it was not proving equal because it was adding another (duplicate) TextEntity to the message
+            # probably because the message already existed , but i would think it would be a brand new
+            # message / MessageVersion, rather than using the existing one, so maybe this is a bug? i'm not
+            # sure, should probably look into this at some point
+            # TODO
+            modified_dbmodel_message_obj = session.query(db_model.Message) \
+                .filter(db_model.Message.message_id == initial_dbmodel_message_obj.message_id) \
+                .first()
 
 
             attributes_to_modify = [
-                AttributeToModify(attr_name="is_outgoing", attr_value=False)
+                AttributeToModify(attr_name="is_outgoing", attr_value=False),
+                AttributeToModify(attr_name="is_channel_post", attr_value=True),
+                AttributeToModify(attr_name="can_edit", attr_value=False),
+                AttributeToModify(attr_name="can_forward", attr_value=False),
+                AttributeToModify(attr_name="can_be_deleted_only_for_self", attr_value=False),
+                AttributeToModify(attr_name="can_be_deleted_for_all_users", attr_value=True),
+                AttributeToModify(attr_name="restriction_reason", attr_value='''{"ios":"contains a sonic meme"'''),
+
             ]
 
             for iter_attr_to_mod in attributes_to_modify:
 
+                # make sure the db_model and tdlib message should be equal before modification
+                self.assertTrue(
+                    MessageAide.compare_dbmodel_and_tdlib_message(
+                    modified_dbmodel_message_obj, message_tdlib_obj),
+                "tdlib and dbmodel message should be equal before modification")
+
+                # modify the db_model message and assert it is no longer equal
                 old_value = getattr(modified_dbmodel_message_obj, iter_attr_to_mod.attr_name)
 
                 setattr(modified_dbmodel_message_obj, iter_attr_to_mod.attr_name, iter_attr_to_mod.attr_value)
@@ -174,5 +191,15 @@ class TestMessageAideGeneral(unittest.TestCase):
                 is_equal_with_modified_message = MessageAide.compare_dbmodel_and_tdlib_message(
                     modified_dbmodel_message_obj, message_tdlib_obj)
 
-                self.assertFalse(is_equal_with_modified_message, "modified message should not be equal")
+                self.assertFalse(is_equal_with_modified_message,
+                    "tdlib and dbmodel message after modification should not be equal")
 
+
+                # modify the value back to its original value and make sure it is equal
+
+                setattr(modified_dbmodel_message_obj, iter_attr_to_mod.attr_name, old_value)
+
+                self.assertTrue(
+                    MessageAide.compare_dbmodel_and_tdlib_message(
+                    modified_dbmodel_message_obj, message_tdlib_obj),
+                "tdlib and dbmodel message should be equal after restoring original value")
