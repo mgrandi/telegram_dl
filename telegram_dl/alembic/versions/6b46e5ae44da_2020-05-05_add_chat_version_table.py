@@ -27,7 +27,8 @@ def upgrade():
         # sa.Column('as_of', sqlalchemy_utils.types.arrow.ArrowType(), nullable=False),
         sa.Column('as_of', sa.DateTime, nullable=False),
 
-       sa.Column('title', sa.Unicode(), nullable=False),
+        sa.Column('title', sa.Unicode(), nullable=False),
+        sa.Column("description", sa.Unicode(), nullable=True),
         sa.Column('photo_set_id', sa.Integer(), nullable=True),
         sa.Column('is_sponsored', sa.Boolean(), nullable=False),
 

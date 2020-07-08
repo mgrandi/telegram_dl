@@ -287,6 +287,10 @@ class ChatVersion(CustomDeclarativeBase):
 
     title = Column(Unicode, nullable=False)
 
+    # this has to be nullable because:
+    # not all chats have a description, only super groups / basic groups do
+    description = Column(Unicode, nullable=True)
+
     photo_set_id = Column(Integer,
         ForeignKey("photo_set.photo_set_id",
             name="FK-chat_version-photo_set_id-photo_set-photo_set_id"),
