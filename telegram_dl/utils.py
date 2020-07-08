@@ -155,7 +155,7 @@ def register_custom_types_with_cattr_converter(cattr_converter):
 
     # decimal
     cattr_converter.register_unstructure_hook(decimal.Decimal, lambda x: str(x))
-    cattr_converter.register_structure_hook(decimal.Decimal, lambda inst, cl: decimal.Decimal(inst))
+    cattr_converter.register_structure_hook(decimal.Decimal, lambda inst, clazz: decimal.Decimal(inst))
 
     # bytes are already registered by default with `cattr` but in this case, tdjson is
     # giving us a base64 string so we need to override the default converter methods do some additional logic
@@ -189,6 +189,11 @@ def register_custom_types_with_cattr_converter(cattr_converter):
     # bytes
     cattr_converter.register_unstructure_hook(bytes, _unstructure_bytes)
     cattr_converter.register_structure_hook(bytes, _structure_bytes)
+
+    # uuid
+    cattr_converter.register_unstructure_hook(uuid.UUID, lambda x: str(x))
+    cattr_converter.register_structure_hook(uuid.UUID, lambda inst, clazz: uuid.UUID(inst))
+
 
 def new_extra():
     return str(uuid.uuid4())
